@@ -1,0 +1,58 @@
+# ---------------------------------------------------------------------------
+# What is committed, and why.
+#
+# exports/            IS COMMITTED. It used to be `.raw/` and used to hold the
+#                     unscrubbed n8n exports, which must never reach a remote.
+#                     Those files have now been scrubbed IN PLACE by
+#                     `.tooling/scrub.py`, so what is on disk is the sanitised
+#                     export, and the sanitised export is the canonical diffable
+#                     artefact: it is what `.tooling/extract-units.py` reads, and
+#                     it is what you diff against the live n8n instance to see
+#                     what drifted. Ignoring it would throw away the only
+#                     reviewable record of the workflows. Keep it in git.
+#
+#                     Corollary: never re-export a workflow straight into
+#                     exports/ and commit. Re-export, then run
+#                     `.tooling/scrub.py`, then `.tooling/leak-check.sh`, then
+#                     commit. The leak check is the gate.
+#
+# workflows/*.md      Committed. Prose specs. Scrubbed.
+# harness/, fixtures/ Committed. Test scaffolding and scenarios. Scrubbed.
+# .tooling/           Committed, including scrub-map.json -- which holds the REAL
+#                     literals as its keys. That is deliberate (the scrub cannot be
+#                     re-applied or audited without them) and leak-check.sh excludes
+#                     that one file. It is also the reason this repo is private and
+#                     must not be pushed to a public remote. See docs/decisions.md (c).
+# ---------------------------------------------------------------------------
+
+# Never commit an unscrubbed export. If you need somewhere to stage one before
+# scrubbing, use these; they are ignored.
+.raw/
+exports-unscrubbed/
+*.unscrubbed.json
+*.raw.json
+
+# Transient only.
+node_modules/
+scratch/
+*.log
+.env
+.env.*
+!.env.example
+
+# Local editor / OS noise.
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Test output
+coverage/
+.nyc_output/

@@ -1,0 +1,27 @@
+{
+  "id": "wf4-one-pending-approval-per-action",
+  "workflow": "wf4",
+  "unit": "Approvals register - live approval uniqueness",
+  "kind": "invariant",
+  "source_qa_workflow": {
+    "id": "3TVCLIVFGlBNSwK4",
+    "name": "QA - Daily Report State Census"
+  },
+  "description": "No action has more than one PENDING approval at the same time.",
+  "why_it_exists": "Each end-to-end QA rerun of a drafting action raised a fresh approval request against a newer draft, leaving the older requests PENDING alongside the current one. The result was an action with several live approvals, any of which the owner could have decided - and deciding a stale one would send an out-of-date draft. QA - Approval Supersede Audit was written to clear exactly this state on one action.",
+  "input": {},
+  "expect": {
+    "actions_with_multiple_pending_approvals": [],
+    "correct_terminal_state_for_an_overtaken_request": "SUPERSEDED",
+    "why_not_void": "each was a genuine approval request for the draft current at the time; VOID would assert something untrue about the original request, while SUPERSEDED records what actually happened - it was neither approved nor rejected."
+  },
+  "assertions": [
+    "Grouping Approvals rows by action_id, no group contains more than one row whose upper-cased status is PENDING.",
+    "An approval that has been overtaken by a later draft is marked SUPERSEDED with decision SUPERSEDED, not VOID, REJECTED or blank.",
+    "Superseding must be read-before-mutate: refuse if the target is absent, appears more than once, is already SUPERSEDED, is any status other than PENDING, or belongs to a different matter than the authorised one.",
+    "Superseding must be refused entirely unless the approval that is meant to survive is present exactly once and PENDING - leaving an action with no live approval is worse than leaving stale ones.",
+    "Each supersede writes exactly one audit Events row with event_id 'EVT-APPROVAL-SUPERSEDED-' + approval_id, so re-running updates that row rather than appending another."
+  ],
+  "target": null,
+  "target_unresolved_reason": "kind is \"invariant\": not executed by harness/run.js."
+}

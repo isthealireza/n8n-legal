@@ -1,0 +1,39 @@
+{
+  "id": "wf4-live-fetch-wa-road-traffic-act-1974",
+  "workflow": "wf4",
+  "unit": "Live retrieval and verification of the real playbook source policies (GET only)",
+  "kind": "integration",
+  "source_qa_workflow": {
+    "id": "oClbmnidX0swK0oP",
+    "name": "QA - Source Retrieval Fix"
+  },
+  "description": "Live GET of Road Traffic Act 1974 (WA) must grade RETRIEVED.",
+  "why_it_exists": "WF4 was drafting with no sources at all because Build Draft Context yielded urls: [] (the URL constructor does not exist in the n8n Code sandbox), and separately because the old verification graded navigation chrome and app shells as RETRIEVED. This harness runs the proposed regex host filter and the hardened verification against the REAL playbook source URLs over live GET requests, so the grading is checked against the pages as they actually serve rather than against a fixture.",
+  "input": {
+    "policy": "motor_vehicle_damage_v1",
+    "url": "https://www.legislation.wa.gov.au/legislation/statutes.nsf/RedirectURL?OpenAgent&query=mrdoc_48198.htm",
+    "http": {
+      "method": "GET",
+      "responseFormat": "text",
+      "neverError": true,
+      "timeout": 30000,
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1000
+    }
+  },
+  "expect": {
+    "verification_status": "RETRIEVED",
+    "source_type": "WA_LEGISLATION"
+  },
+  "assertions": [
+    "classifySource(url) returns WA_LEGISLATION",
+    "verify(url, rawBody, strippedText, type) returns RETRIEVED",
+    "GET only; nothing is written to any sheet and no message is sent",
+    "INTEGRATION: this depends on a live third-party government site. A change to that site can flip the result without any code change, so a failure here is a signal to re-inspect the page, not automatically a code regression.",
+    "the stripped text exceeds 400 characters, carries no block phrase and is not an app shell",
+    "the page carries both a LEGAL_STRUCTURE match and a HEADING_MARKER match"
+  ],
+  "target": null,
+  "target_unresolved_reason": "kind is \"integration\": not executed by harness/run.js."
+}

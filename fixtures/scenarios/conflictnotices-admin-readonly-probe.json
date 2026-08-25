@@ -1,0 +1,42 @@
+{
+  "id": "conflictnotices-admin-readonly-probe",
+  "workflow": "admin-sheet-migration",
+  "unit": "Admin ConflictNotices probe (GET only)",
+  "kind": "integration",
+  "source_qa_workflow": {
+    "id": "wZxVkmUtbGusTR39",
+    "name": "Admin - Create ConflictNotices Tab - 2026-08-25"
+  },
+  "description": "A GET-only probe that reads spreadsheet metadata and the whole ConflictNotices tab to establish the true used-row count.",
+  "why_it_exists": "Retained 2026-08-24 as the safe way to inspect ConflictNotices before touching it. Despite the name 'Create ConflictNotices Tab' this workflow contains no write node at all - the create path was stripped and only the two reads remain.",
+  "input": {
+    "spreadsheet_id": "SHEET_ID_PLACEHOLDER",
+    "reads": [
+      {
+        "method": "GET",
+        "target": "spreadsheets metadata",
+        "fields": "spreadsheetId,properties.title,sheets.properties(sheetId,title,index,gridProperties)"
+      },
+      {
+        "method": "GET",
+        "target": "values/ConflictNotices",
+        "majorDimension": "ROWS",
+        "valueRenderOption": "UNFORMATTED_VALUE"
+      }
+    ]
+  },
+  "expect": {
+    "http_methods_used": [
+      "GET"
+    ],
+    "writes": 0,
+    "used_row_count_source": "length of the values array returned by spreadsheets.values.get"
+  },
+  "assertions": [
+    "Every HTTP node in this workflow is method GET; a POST or PUT appearing here is a regression.",
+    "spreadsheets.values.get returns only the populated range, so the response row count is the true used-row count and must not be read off gridProperties.rowCount.",
+    "The workflow name promises a create that the nodes do not perform - any agent relying on the name rather than the nodes will believe a tab was created when nothing was written."
+  ],
+  "target": null,
+  "target_unresolved_reason": "kind is \"integration\": not executed by harness/run.js."
+}

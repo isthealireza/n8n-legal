@@ -1,0 +1,50 @@
+{
+  "id": "wf4-regex-host-filter-replaces-url-constructor",
+  "workflow": "wf4",
+  "unit": "WF4 Build Draft Context source-policy domain allow-list filter",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "nRcZrgLMDuBPjmEm",
+    "name": "QA - URL Filter Probe"
+  },
+  "description": "The production URL-constructor allow-list filter keeps zero URLs from the real motor_vehicle_damage_v1 source policy, while the proposed regex filter keeps all four.",
+  "why_it_exists": "Build Draft Context yielded urls: [] on every run, so WF4 fetched nothing and drafted with no sources at all. This probe was written to prove or disprove that the URL constructor was the cause rather than the policy data.",
+  "input": {
+    "source_policy": [
+      "https://www.wa.gov.au/organisation/department-of-transport",
+      "https://www.police.wa.gov.au/Crime/Report-a-crime",
+      "https://www.icwa.wa.gov.au/",
+      "https://www.magistratescourt.wa.gov.au/"
+    ],
+    "production_filter": "allowedHosts built with new URL(u).host.toLowerCase(); then policy.filter(u => { const h = new URL(u); return h.protocol === \"https:\" && allowedHosts.has(h.host.toLowerCase()); }).slice(0, 6)",
+    "proposed_filter": "hostOf(u) = String(u).match(/^https:\\/\\/([^\\/?#]+)/i)[1].toLowerCase(); allow-list built the same way; then policy.filter(u => !!hostOf(u) && allowed.has(hostOf(u))).slice(0, 6)"
+  },
+  "expect": {
+    "allowedHosts_prod": [],
+    "prod_urls_count": 0,
+    "prod_urls": [],
+    "allowedHosts_proposed": [
+      "www.wa.gov.au",
+      "www.police.wa.gov.au",
+      "www.icwa.wa.gov.au",
+      "www.magistratescourt.wa.gov.au"
+    ],
+    "proposed_urls_count": 4,
+    "proposed_urls": [
+      "https://www.wa.gov.au/organisation/department-of-transport",
+      "https://www.police.wa.gov.au/Crime/Report-a-crime",
+      "https://www.icwa.wa.gov.au/",
+      "https://www.magistratescourt.wa.gov.au/"
+    ],
+    "verdict": "URL_CONSTRUCTOR_IS_THE_CAUSE",
+    "note": "The prod_urls_count === 0 half of this assertion only holds in an environment with no global URL constructor. On plain Node.js the production filter also returns all four and the verdict flips to PRODUCTION_FILTER_WORKS_CAUSE_IS_ELSEWHERE. Run the production half only under the n8n sandbox, or stub URL away."
+  },
+  "assertions": [
+    "the regex filter derives all four hosts and keeps all four https URLs",
+    "the filter is capped at six URLs by .slice(0, 6)",
+    "the allow-list is self-referential: it is built from the same policy list it then filters, so it can only ever remove non-https entries and malformed URLs",
+    "the production filter keeps nothing, and does so silently, because its try/catch swallows the ReferenceError"
+  ],
+  "target": null,
+  "target_unresolved_reason": "The production half of the expect (prod_urls_count === 0) is only true in an environment with no global URL constructor. On Node.js it is false and the scenario's own note says the verdict flips. The filter also lives inline in Build Draft Context behind five other node reads, not as an addressable function."
+}

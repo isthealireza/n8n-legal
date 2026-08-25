@@ -1,0 +1,130 @@
+{
+  "id": "wf5-ingress-sender-not-a-party",
+  "workflow": "wf5",
+  "unit": "Build Reply Context (resolveReply) - sender authority",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "XevQwFviJHUobw0U",
+    "name": "QA - Ingress Round Trip"
+  },
+  "description": "A first delivery on a correctly resolved thread from an address that is not the recipient of any real OUTBOUND row on that matter is BLOCKED.",
+  "why_it_exists": "Derived variant of the round-trip fixture: the QA workflow only exercised the happy path, but the same compacted resolver body carries this branch, and it is the control that stops a stranger who replies into a thread from steering a legal matter. Recorded here so the branch is covered by the harness rather than only by reading.",
+  "input": {
+    "event": {
+      "provider_message_id": "MSG-RT-1",
+      "thread_id": "THREAD-AAA",
+      "from": "Someone Else <stranger@examplemail.test>",
+      "subject": "Re: [MAT-QA-001] round trip",
+      "body": "First delivery body.",
+      "received_at": "2026-08-21T02:00:00.000Z"
+    },
+    "communications_register": [
+      {
+        "communication_id": "COM-OUT-1",
+        "matter_id": "MAT-QA-001",
+        "action_id": "ACT-QA-001",
+        "direction": "OUTBOUND",
+        "channel": "GMAIL",
+        "provider_message_id": "MSG-OUT-1",
+        "thread_id": "THREAD-AAA",
+        "recipient": "claims@examplecarpark.test",
+        "subject": "Preserve footage request",
+        "summary": "seed outbound",
+        "classification": "",
+        "received_at": "2026-08-20T00:00:00.000Z",
+        "response_due": "",
+        "next_action": "",
+        "draft_id": "",
+        "approval_id": "",
+        "idempotency_key": "ACT-QA-001|seed",
+        "ingress_fingerprint": ""
+      }
+    ],
+    "now": "2026-08-23T06:00:00.000Z",
+    "items": [
+      {
+        "communication_id": "COM-OUT-1",
+        "matter_id": "MAT-QA-001",
+        "action_id": "ACT-QA-001",
+        "direction": "OUTBOUND",
+        "channel": "GMAIL",
+        "provider_message_id": "MSG-OUT-1",
+        "thread_id": "THREAD-AAA",
+        "recipient": "claims@examplecarpark.test",
+        "subject": "Preserve footage request",
+        "summary": "seed outbound",
+        "classification": "",
+        "received_at": "2026-08-20T00:00:00.000Z",
+        "response_due": "",
+        "next_action": "",
+        "draft_id": "",
+        "approval_id": "",
+        "idempotency_key": "ACT-QA-001|seed",
+        "ingress_fingerprint": ""
+      }
+    ],
+    "nodeOutputs": {
+      "Match Reply to Matter": [
+        {
+          "provider_message_id": "MSG-RT-1",
+          "thread_id": "THREAD-AAA",
+          "from_address": "Someone Else <stranger@examplemail.test>",
+          "subject": "Re: [MAT-QA-001] round trip",
+          "body_text": "First delivery body.",
+          "received_at": "2026-08-21T02:00:00.000Z"
+        }
+      ],
+      "Load Matters (Reply)": [
+        {
+          "matter_id": "MAT-QA-001"
+        }
+      ],
+      "Load Actions (Reply)": [],
+      "Load Comms (Reply)": [
+        {
+          "communication_id": "COM-OUT-1",
+          "matter_id": "MAT-QA-001",
+          "action_id": "ACT-QA-001",
+          "direction": "OUTBOUND",
+          "channel": "GMAIL",
+          "provider_message_id": "MSG-OUT-1",
+          "thread_id": "THREAD-AAA",
+          "recipient": "claims@examplecarpark.test",
+          "subject": "Preserve footage request",
+          "summary": "seed outbound",
+          "classification": "",
+          "received_at": "2026-08-20T00:00:00.000Z",
+          "response_due": "",
+          "next_action": "",
+          "draft_id": "",
+          "approval_id": "",
+          "idempotency_key": "ACT-QA-001|seed",
+          "ingress_fingerprint": ""
+        }
+      ]
+    }
+  },
+  "expect": {
+    "decision": "BLOCKED",
+    "basis": "SENDER_NOT_A_PARTY",
+    "matter_id": "MAT-QA-001",
+    "event_type": "INBOUND_REPLY_SENDER_NOT_A_PARTY",
+    "severity": "WARNING",
+    "requires_human_review": false,
+    "sender_address": "stranger@examplemail.test",
+    "reason_shape": "<sender> is not a party."
+  },
+  "assertions": [
+    "The party set is built only from real OUTBOUND rows (OUTBOUND, OUTBOUND_PENDING) on the resolved matter, using normalised recipient addresses.",
+    "An unrecognised sender is BLOCKED even when the thread_id resolves cleanly to exactly one matter.",
+    "The matter_id is still reported on the blocked result so the event can be filed against the right matter."
+  ],
+  "derived": true,
+  "target": {
+    "workflow": "wf5",
+    "unit_file": "harness/units/wf5/build-reply-context.js"
+  },
+  "harness": {
+    "adapter": "reply-policy"
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "id": "conflictnotices-tab-schema",
+  "workflow": "admin-sheet-migration",
+  "unit": "ConflictNotices sheet schema",
+  "kind": "schema",
+  "source_qa_workflow": {
+    "id": "t64Pc7BbZruFl57G",
+    "name": "QA - Create ConflictNotices Tab"
+  },
+  "description": "The exact ordered 15-column header row written to, and verified on, the ConflictNotices tab.",
+  "why_it_exists": "WF5's conflict-notice digest and the notification retry loop both address these columns by position (A1:O1). A drifted or reordered header silently misfiles integrity codes and notification state.",
+  "input": {
+    "tab": "ConflictNotices",
+    "range": "ConflictNotices!A1:O1",
+    "grid": {
+      "rowCount": 1000,
+      "columnCount": 15
+    }
+  },
+  "expect": {
+    "columns": [
+      "conflict_key",
+      "integrity_code",
+      "matter_id",
+      "action_ids_json",
+      "fingerprints_json",
+      "conflict_types_json",
+      "occurrence_count",
+      "first_seen_at",
+      "last_seen_at",
+      "notified_at",
+      "notification_status",
+      "notification_attempts",
+      "last_notification_error",
+      "source_workflow",
+      "execution_id"
+    ],
+    "column_count": 15,
+    "data_row_count": 0
+  },
+  "assertions": [
+    "The header row read back equals the expected list exactly, in order, compared with JSON.stringify equality - not as a set.",
+    "The tab is created with exactly 15 columns and 1000 rows.",
+    "Immediately after creation the tab holds zero non-blank data rows in A2:O1000.",
+    "header_exact_match, zero_data_rows, tab_created and other_tabs_unchanged must all be true for overall_ok."
+  ],
+  "target": null,
+  "target_unresolved_reason": "kind is \"schema\": not executed by harness/run.js."
+}

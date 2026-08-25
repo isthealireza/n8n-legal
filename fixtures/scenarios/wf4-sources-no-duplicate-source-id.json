@@ -1,0 +1,28 @@
+{
+  "id": "wf4-sources-no-duplicate-source-id",
+  "workflow": "wf4",
+  "unit": "Append Sources (appendOrUpdate on source_id)",
+  "kind": "invariant",
+  "source_qa_workflow": {
+    "id": "k0IFnNVRdtMOEmjP",
+    "name": "QA - Sources Row Census"
+  },
+  "description": "The Sources tab holds at most one row per source_id, so a rerun corrects a contaminated citation in place rather than adding a second copy beside it.",
+  "why_it_exists": "Four Sources rows for one matter were written with contaminated citation data. Append Sources was changed from append to appendOrUpdate matched on source_id and the job was rerun. The census (2026-08-21) exists because both outcomes - four rows corrected, or four more rows added - look identical in the n8n execution log. A row count read back off the sheet was the only honest way to tell which had happened.",
+  "input": {},
+  "expect": {
+    "duplicate_source_ids_anywhere": "(none)",
+    "target_matter_example": "MAT-20260101-001 (synthetic stand-in for the real matter the census named; format and length preserved)",
+    "target_row_count": "equals target_unique_source_ids",
+    "target_has_duplicates": false
+  },
+  "assertions": [
+    "No source_id value appears on more than one Sources row anywhere in the tab.",
+    "For any single matter, the row count equals the count of distinct source_id values.",
+    "Rows with a blank source_id, and a stray literal header row where source_id == 'source_id', must be excluded before counting.",
+    "For a nominated matter, title, url, publisher, source_type, verification_status and pinpoints must be reported so citation integrity can be checked by eye against the live sheet.",
+    "Switching a writer from append to appendOrUpdate must be verified by reading row counts back, never by reading the execution log."
+  ],
+  "target": null,
+  "target_unresolved_reason": "kind is \"invariant\": not executed by harness/run.js."
+}

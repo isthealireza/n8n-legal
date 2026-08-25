@@ -1,0 +1,67 @@
+{
+  "id": "conflictnotices-tab-other-tabs-unchanged",
+  "workflow": "admin-sheet-migration",
+  "unit": "Create ConflictNotices Tab / Verify (blast-radius check)",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "t64Pc7BbZruFl57G",
+    "name": "QA - Create ConflictNotices Tab"
+  },
+  "description": "After the new tab is added, every pre-existing tab must be byte-identical in sheetId, title, index and grid size.",
+  "why_it_exists": "addSheet without an explicit index can renumber sibling tabs, and a mistyped batchUpdate can resize or rename one. The harness fingerprints each tab as sheetId|title|index|rows|cols before and after and compares the sorted lists.",
+  "input": {
+    "inventory_before": [
+      {
+        "sheetId": 0,
+        "title": "Matters",
+        "index": 0,
+        "rows": 1000,
+        "cols": 14
+      },
+      {
+        "sheetId": 1,
+        "title": "Actions",
+        "index": 1,
+        "rows": 1000,
+        "cols": 18
+      }
+    ],
+    "inventory_after": [
+      {
+        "sheetId": 0,
+        "title": "Matters",
+        "index": 0,
+        "rows": 1000,
+        "cols": 14
+      },
+      {
+        "sheetId": 1,
+        "title": "Actions",
+        "index": 1,
+        "rows": 1000,
+        "cols": 18
+      },
+      {
+        "sheetId": 9,
+        "title": "ConflictNotices",
+        "index": 2,
+        "rows": 1000,
+        "cols": 15
+      }
+    ]
+  },
+  "expect": {
+    "other_tabs_unchanged": true,
+    "tab_count_before": 2,
+    "tab_count_after": 3,
+    "tab_created": true
+  },
+  "assertions": [
+    "The set of sheetId|title|index|rows|cols fingerprints for all non-ConflictNotices tabs is identical before and after.",
+    "Exactly one tab named ConflictNotices exists after the run.",
+    "tab_count_after equals tab_count_before plus one.",
+    "A changed index, a renamed tab or a resized grid on any pre-existing tab fails the run even if the new tab itself is perfect."
+  ],
+  "target": null,
+  "target_unresolved_reason": "Administrative / QA-infrastructure workflow. No WF1-WF5/WF9 Code node implements it."
+}

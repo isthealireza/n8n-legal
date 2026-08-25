@@ -1,0 +1,310 @@
+{
+  "id": "wf5-reply-identical-replay-is-already-recorded",
+  "workflow": "wf5",
+  "unit": "WF5 Build Reply Context resolveReply policy",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "BAKIml11QKedtH9d",
+    "name": "QA - WF5 Reply Policy v2"
+  },
+  "description": "A byte-identical redelivery of an already-accepted message is ALREADY_RECORDED and performs no writes.",
+  "why_it_exists": "Inbound delivery is at-least-once. Without a stored ingress fingerprint a redelivered message either appended a duplicate inbound row and a duplicate action, or - once a wall-clock value entered the fingerprint - a plain retry looked like a tampered message and raised a false IDEMPOTENCY_CONFLICT. The fingerprint is now derived only from the raw message, and every replay outcome is decided before the classifier runs. Covers suite cases R1-R6 and E1.",
+  "input": {
+    "case_id": "R1-R6/E1",
+    "register": {
+      "matters": [
+        {
+          "matter_id": "MAT-20260101-011",
+          "title": "Parked vehicle damage"
+        },
+        {
+          "matter_id": "MAT-20260101-012",
+          "title": "Employment contract review"
+        },
+        {
+          "matter_id": "MAT-20260101-013",
+          "title": "Second car park matter, same insurer"
+        }
+      ],
+      "comms": [
+        {
+          "communication_id": "COM-OUT-1",
+          "matter_id": "MAT-20260101-011",
+          "direction": "OUTBOUND",
+          "recipient": "claims@examplecarpark.test",
+          "thread_id": "THREAD-AAA",
+          "provider_message_id": "MSG-OUT-1"
+        },
+        {
+          "communication_id": "COM-OUT-2",
+          "matter_id": "MAT-20260101-012",
+          "direction": "OUTBOUND_DRY_RUN",
+          "recipient": "hr@exampleco.test",
+          "thread_id": "THREAD-BBB",
+          "provider_message_id": "DRY_RUN"
+        },
+        {
+          "communication_id": "COM-OUT-3",
+          "matter_id": "MAT-20260101-013",
+          "direction": "OUTBOUND",
+          "recipient": "claims@examplecarpark.test",
+          "thread_id": "THREAD-CCC",
+          "provider_message_id": "MSG-OUT-3"
+        },
+        {
+          "communication_id": "COM-LEGACY",
+          "matter_id": "MAT-20260101-011",
+          "direction": "INBOUND",
+          "recipient": "me@example.test",
+          "thread_id": "THREAD-AAA",
+          "provider_message_id": "MSG-LEGACY-1",
+          "ingress_fingerprint": ""
+        },
+        {
+          "communication_id": "COM-MSG-IN-1",
+          "matter_id": "MAT-20260101-011",
+          "direction": "INBOUND",
+          "recipient": "me@example.test",
+          "thread_id": "THREAD-AAA",
+          "provider_message_id": "MSG-IN-1",
+          "ingress_fingerprint": "RUNTIME:ingressFingerprint(event of C1)"
+        },
+        {
+          "communication_id": "COM-MSG-IN-2",
+          "matter_id": "MAT-20260101-011",
+          "direction": "INBOUND",
+          "recipient": "me@example.test",
+          "thread_id": "THREAD-AAA",
+          "provider_message_id": "MSG-IN-2",
+          "ingress_fingerprint": "RUNTIME:ingressFingerprint(event of C2)"
+        },
+        {
+          "communication_id": "COM-MSG-IN-8",
+          "matter_id": "MAT-20260101-011",
+          "direction": "INBOUND",
+          "recipient": "me@example.test",
+          "thread_id": "THREAD-AAA",
+          "provider_message_id": "MSG-IN-8",
+          "ingress_fingerprint": "RUNTIME:ingressFingerprint(event of C7)"
+        },
+        {
+          "communication_id": "COM-MSG-IN-12",
+          "matter_id": "MAT-20260101-011",
+          "direction": "INBOUND",
+          "recipient": "me@example.test",
+          "thread_id": "THREAD-AAA",
+          "provider_message_id": "MSG-IN-12",
+          "ingress_fingerprint": "RUNTIME:ingressFingerprint(event of X5)"
+        }
+      ]
+    },
+    "event": {
+      "provider_message_id": "MSG-IN-1",
+      "thread_id": "THREAD-AAA",
+      "from": "Claims Team <claims@examplecarpark.test>",
+      "subject": "Re: [MAT-20260101-011] parked vehicle damage",
+      "body": "We have received your letter.",
+      "received_at": "2026-08-20T05:00:00.000Z"
+    },
+    "sequence_note": "MSG-IN-1 was already accepted as case C1 and its INBOUND row COM-MSG-IN-1 carries the fingerprint of that exact event.",
+    "now": "2026-08-23T06:00:00.000Z",
+    "items": [
+      {
+        "communication_id": "COM-OUT-1",
+        "matter_id": "MAT-20260101-011",
+        "direction": "OUTBOUND",
+        "recipient": "claims@examplecarpark.test",
+        "thread_id": "THREAD-AAA",
+        "provider_message_id": "MSG-OUT-1"
+      },
+      {
+        "communication_id": "COM-OUT-2",
+        "matter_id": "MAT-20260101-012",
+        "direction": "OUTBOUND_DRY_RUN",
+        "recipient": "hr@exampleco.test",
+        "thread_id": "THREAD-BBB",
+        "provider_message_id": "DRY_RUN"
+      },
+      {
+        "communication_id": "COM-OUT-3",
+        "matter_id": "MAT-20260101-013",
+        "direction": "OUTBOUND",
+        "recipient": "claims@examplecarpark.test",
+        "thread_id": "THREAD-CCC",
+        "provider_message_id": "MSG-OUT-3"
+      },
+      {
+        "communication_id": "COM-LEGACY",
+        "matter_id": "MAT-20260101-011",
+        "direction": "INBOUND",
+        "recipient": "me@example.test",
+        "thread_id": "THREAD-AAA",
+        "provider_message_id": "MSG-LEGACY-1",
+        "ingress_fingerprint": ""
+      },
+      {
+        "communication_id": "COM-MSG-IN-1",
+        "matter_id": "MAT-20260101-011",
+        "direction": "INBOUND",
+        "recipient": "me@example.test",
+        "thread_id": "THREAD-AAA",
+        "provider_message_id": "MSG-IN-1",
+        "ingress_fingerprint": "ING-c83030ea-29"
+      },
+      {
+        "communication_id": "COM-MSG-IN-2",
+        "matter_id": "MAT-20260101-011",
+        "direction": "INBOUND",
+        "recipient": "me@example.test",
+        "thread_id": "THREAD-AAA",
+        "provider_message_id": "MSG-IN-2",
+        "ingress_fingerprint": "ING-4d819888-29"
+      },
+      {
+        "communication_id": "COM-MSG-IN-8",
+        "matter_id": "MAT-20260101-011",
+        "direction": "INBOUND",
+        "recipient": "me@example.test",
+        "thread_id": "THREAD-AAA",
+        "provider_message_id": "MSG-IN-8",
+        "ingress_fingerprint": "ING-2b912a70-101"
+      },
+      {
+        "communication_id": "COM-MSG-IN-12",
+        "matter_id": "MAT-20260101-011",
+        "direction": "INBOUND",
+        "recipient": "me@example.test",
+        "thread_id": "THREAD-AAA",
+        "provider_message_id": "MSG-IN-12",
+        "ingress_fingerprint": "ING-4d8a43a1-36"
+      }
+    ],
+    "nodeOutputs": {
+      "Match Reply to Matter": [
+        {
+          "provider_message_id": "MSG-IN-1",
+          "thread_id": "THREAD-AAA",
+          "from_address": "Claims Team <claims@examplecarpark.test>",
+          "subject": "Re: [MAT-20260101-011] parked vehicle damage",
+          "body_text": "We have received your letter.",
+          "received_at": "2026-08-20T05:00:00.000Z"
+        }
+      ],
+      "Load Matters (Reply)": [
+        {
+          "matter_id": "MAT-20260101-011",
+          "title": "Parked vehicle damage"
+        },
+        {
+          "matter_id": "MAT-20260101-012",
+          "title": "Employment contract review"
+        },
+        {
+          "matter_id": "MAT-20260101-013",
+          "title": "Second car park matter, same insurer"
+        }
+      ],
+      "Load Actions (Reply)": [],
+      "Load Comms (Reply)": [
+        {
+          "communication_id": "COM-OUT-1",
+          "matter_id": "MAT-20260101-011",
+          "direction": "OUTBOUND",
+          "recipient": "claims@examplecarpark.test",
+          "thread_id": "THREAD-AAA",
+          "provider_message_id": "MSG-OUT-1"
+        },
+        {
+          "communication_id": "COM-OUT-2",
+          "matter_id": "MAT-20260101-012",
+          "direction": "OUTBOUND_DRY_RUN",
+          "recipient": "hr@exampleco.test",
+          "thread_id": "THREAD-BBB",
+          "provider_message_id": "DRY_RUN"
+        },
+        {
+          "communication_id": "COM-OUT-3",
+          "matter_id": "MAT-20260101-013",
+          "direction": "OUTBOUND",
+          "recipient": "claims@examplecarpark.test",
+          "thread_id": "THREAD-CCC",
+          "provider_message_id": "MSG-OUT-3"
+        },
+        {
+          "communication_id": "COM-LEGACY",
+          "matter_id": "MAT-20260101-011",
+          "direction": "INBOUND",
+          "recipient": "me@example.test",
+          "thread_id": "THREAD-AAA",
+          "provider_message_id": "MSG-LEGACY-1",
+          "ingress_fingerprint": ""
+        },
+        {
+          "communication_id": "COM-MSG-IN-1",
+          "matter_id": "MAT-20260101-011",
+          "direction": "INBOUND",
+          "recipient": "me@example.test",
+          "thread_id": "THREAD-AAA",
+          "provider_message_id": "MSG-IN-1",
+          "ingress_fingerprint": "ING-c83030ea-29"
+        },
+        {
+          "communication_id": "COM-MSG-IN-2",
+          "matter_id": "MAT-20260101-011",
+          "direction": "INBOUND",
+          "recipient": "me@example.test",
+          "thread_id": "THREAD-AAA",
+          "provider_message_id": "MSG-IN-2",
+          "ingress_fingerprint": "ING-4d819888-29"
+        },
+        {
+          "communication_id": "COM-MSG-IN-8",
+          "matter_id": "MAT-20260101-011",
+          "direction": "INBOUND",
+          "recipient": "me@example.test",
+          "thread_id": "THREAD-AAA",
+          "provider_message_id": "MSG-IN-8",
+          "ingress_fingerprint": "ING-2b912a70-101"
+        },
+        {
+          "communication_id": "COM-MSG-IN-12",
+          "matter_id": "MAT-20260101-011",
+          "direction": "INBOUND",
+          "recipient": "me@example.test",
+          "thread_id": "THREAD-AAA",
+          "provider_message_id": "MSG-IN-12",
+          "ingress_fingerprint": "ING-4d8a43a1-36"
+        }
+      ]
+    }
+  },
+  "expect": {
+    "decision": "ALREADY_RECORDED",
+    "basis": "ALREADY_RECORDED",
+    "matter_id": "MAT-20260101-011",
+    "communication_id": "COM-MSG-IN-1",
+    "event_id": "EVT-REPLAY-MSG-IN-1",
+    "event_type": "INBOUND_REPLAY_IGNORED",
+    "severity": "INFO",
+    "requires_human_review": false,
+    "write_log_inbound": false,
+    "write_append_action": false,
+    "write_touch_matter": false
+  },
+  "assertions": [
+    "R1: decision is ALREADY_RECORDED with basis ALREADY_RECORDED on MAT-20260101-011",
+    "R2: no inbound row is written",
+    "R3: no action is appended",
+    "R4: no matter update is performed",
+    "R5: the STORED communication_id COM-MSG-IN-1 is returned, not a freshly derived one",
+    "R6: the deterministic replay event id EVT-REPLAY-MSG-IN-1 / INBOUND_REPLAY_IGNORED is used",
+    "E1: the original ACCEPT of this message used the deterministic id EVT-INBOUND-MSG-IN-1 / NEW_INBOUND"
+  ],
+  "target": {
+    "workflow": "wf5",
+    "unit_file": "harness/units/wf5/build-reply-context.js"
+  },
+  "harness": {
+    "adapter": "reply-policy"
+  }
+}

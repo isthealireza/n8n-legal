@@ -1,0 +1,186 @@
+{
+  "id": "wf5-ingress-round-trip-fingerprint-persistence",
+  "workflow": "wf5",
+  "unit": "Communications.ingress_fingerprint persistence and replay no-op",
+  "kind": "integration",
+  "source_qa_workflow": {
+    "id": "XevQwFviJHUobw0U",
+    "name": "QA - Ingress Round Trip"
+  },
+  "description": "Full three-round round trip against a real throwaway spreadsheet carrying the production 18-column Communications schema: write the fingerprint, read it back off column R, and prove that neither an identical replay nor a changed-body replay mutates anything.",
+  "why_it_exists": "The pure resolver can be right while the sheet round trip is wrong: a fingerprint that is computed but never persisted, or persisted into the wrong column, would make every replay look like a first delivery. This is the only assertion in the group that cannot be made without live Sheets I/O.",
+  "input": {
+    "spreadsheet": "created fresh per run; the harness must not use SHEET_ID_PLACEHOLDER or any production sheet",
+    "tabs": [
+      "QA_Communications",
+      "QA_Actions",
+      "QA_Matters",
+      "QA_Events"
+    ],
+    "communications_schema_columns": [
+      "communication_id",
+      "matter_id",
+      "action_id",
+      "direction",
+      "channel",
+      "provider_message_id",
+      "thread_id",
+      "recipient",
+      "subject",
+      "summary",
+      "classification",
+      "received_at",
+      "response_due",
+      "next_action",
+      "draft_id",
+      "approval_id",
+      "idempotency_key",
+      "ingress_fingerprint"
+    ],
+    "seed_communications": [
+      {
+        "communication_id": "COM-OUT-1",
+        "matter_id": "MAT-QA-001",
+        "action_id": "ACT-QA-001",
+        "direction": "OUTBOUND",
+        "channel": "GMAIL",
+        "provider_message_id": "MSG-OUT-1",
+        "thread_id": "THREAD-AAA",
+        "recipient": "claims@examplecarpark.test",
+        "subject": "Preserve footage request",
+        "summary": "seed outbound",
+        "classification": "",
+        "received_at": "2026-08-20T00:00:00.000Z",
+        "response_due": "",
+        "next_action": "",
+        "draft_id": "",
+        "approval_id": "",
+        "idempotency_key": "ACT-QA-001|seed",
+        "ingress_fingerprint": ""
+      }
+    ],
+    "seed_actions": [
+      {
+        "action_id": "ACT-QA-001",
+        "matter_id": "MAT-QA-001",
+        "action_type": "SEND_DOCUMENT",
+        "description": "Preserve footage request",
+        "status": "SENT",
+        "recipient": "claims@examplecarpark.test",
+        "channel": "GMAIL",
+        "idempotency_key": "MAT-QA-001|seed"
+      }
+    ],
+    "seed_matters": [
+      {
+        "matter_id": "MAT-QA-001",
+        "title": "Round trip matter",
+        "status": "AWAITING_REPLY",
+        "playbook_id": "motor_vehicle_damage_v1",
+        "jurisdiction": "WA/Australia",
+        "owner_chat_id": "OWNER_CHAT_ID",
+        "updated_at": "SEED-STAMP"
+      }
+    ],
+    "seed_events": [
+      {
+        "event_id": "EVT-SEED-0",
+        "event_type": "SEED",
+        "severity": "INFO",
+        "matter_id": "MAT-QA-001",
+        "action_id": "",
+        "workflow": "QA - Ingress Round Trip",
+        "node": "Build Seed Events",
+        "message": "synthetic seed",
+        "chat_id": "OWNER_CHAT_ID",
+        "created_at": "2026-08-20T00:00:00.000Z"
+      }
+    ],
+    "rounds": [
+      {
+        "round": "R1",
+        "event": {
+          "provider_message_id": "MSG-RT-1",
+          "thread_id": "THREAD-AAA",
+          "from": "Claims Team <claims@examplecarpark.test>",
+          "subject": "Re: [MAT-QA-001] round trip",
+          "body": "First delivery body.",
+          "received_at": "2026-08-21T02:00:00.000Z"
+        },
+        "register_read_from": "sheet after seed"
+      },
+      {
+        "round": "R2",
+        "event": {
+          "provider_message_id": "MSG-RT-1",
+          "thread_id": "THREAD-AAA",
+          "from": "Claims Team <claims@examplecarpark.test>",
+          "subject": "Re: [MAT-QA-001] round trip",
+          "body": "First delivery body.",
+          "received_at": "2026-08-21T02:00:00.000Z"
+        },
+        "register_read_from": "sheet after R1"
+      },
+      {
+        "round": "R3",
+        "event": {
+          "provider_message_id": "MSG-RT-1",
+          "thread_id": "THREAD-AAA",
+          "from": "Claims Team <claims@examplecarpark.test>",
+          "subject": "Re: [MAT-QA-001] round trip",
+          "body": "DIFFERENT BODY. We now deny liability entirely.",
+          "received_at": "2026-08-21T02:00:00.000Z"
+        },
+        "register_read_from": "sheet after R2"
+      }
+    ],
+    "poison_writes": {
+      "R2": {
+        "communication_id": "COM-SHOULD-NOT-HAPPEN",
+        "summary": "R2 OVERWROTE THE ROW",
+        "idempotency_key": "MAT-QA-001|MSG-RT-1"
+      },
+      "R3": {
+        "communication_id": "COM-SHOULD-NOT-HAPPEN-3",
+        "summary": "R3 OVERWROTE THE ROW",
+        "idempotency_key": "MAT-QA-001|MSG-RT-1"
+      },
+      "note": "These writes sit behind the ACCEPT gate. They exist so that a gate failure is visible as text in the sheet rather than as a silent pass."
+    }
+  },
+  "expect": {
+    "comms_header_count_after_seed": 18,
+    "decision_r1": "ACCEPT",
+    "decision_r2": "ALREADY_RECORDED",
+    "decision_r3": "IDEMPOTENCY_CONFLICT",
+    "requires_human_review_r3": true,
+    "fingerprint_stored_in_sheet": "equals fingerprint_from_resolver_r1, non-empty",
+    "fingerprint_read_back_by_r2": "equals fingerprint_stored_in_sheet",
+    "communication_id_everywhere": "COM-MSG-RT-1",
+    "event_id_r1": "EVT-INBOUND-MSG-RT-1",
+    "event_id_r2": "EVT-REPLAY-MSG-RT-1",
+    "event_id_r3": "EVT-REPLAY-CONFLICT-MSG-RT-1",
+    "content_changed_by_r2": "(none)",
+    "content_changed_by_r3": "(none)",
+    "comms_rows_after_r2": "equals comms_rows_after_r1",
+    "comms_rows_after_r3": "equals comms_rows_after_r1",
+    "actions_after_r2": "equals actions_after_r1",
+    "actions_after_r3": "equals actions_after_r1",
+    "matter_stamp_r2": "equals matter_stamp_r1 (R1-STAMP)",
+    "matter_stamp_r3": "equals matter_stamp_r1 (R1-STAMP)",
+    "verdict": "ROUND TRIP PROVEN"
+  },
+  "assertions": [
+    "T3: the fingerprint computed on first delivery is written to Communications column R (ingress_fingerprint) and is non-empty when read back.",
+    "T6: the resolver reads the stored fingerprint off the sheet on the next round and returns ALREADY_RECORDED for a byte-identical replay.",
+    "T7a: an identical replay changes none of communication_id, subject, summary, classification, received_at, ingress_fingerprint.",
+    "T7b: an identical replay adds no Communications row, adds no Actions row, and does not change Matters.updated_at.",
+    "T9a: a changed-body replay returns IDEMPOTENCY_CONFLICT with requires_human_review true.",
+    "T9b: a changed-body replay mutates nothing in Communications, Actions or Matters.",
+    "T10: communication_id is identical across R1, R2, R3, the stored row, and the owner-facing Telegram notice text.",
+    "Event ids are deterministic and distinct per outcome, so the three audit rows coexist instead of overwriting one another.",
+    "A Sheets read of a header-only tab returns one item whose json is an empty object; that item must not be counted as a row."
+  ],
+  "target": null,
+  "target_unresolved_reason": "kind is \"integration\": not executed by harness/run.js."
+}

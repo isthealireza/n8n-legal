@@ -1,0 +1,533 @@
+[
+  {
+    "workflow": "wf1",
+    "nodeName": "Normalise Input",
+    "nodeId": "75ffa3c9-c265-4dbc-98cd-e6a44651a584",
+    "mode": "runOnceForAllItems",
+    "file": "wf1/normalise-input.js",
+    "bytes": 2574,
+    "sha256OfJsCode": "96296f10d277b57837ebdaec5ae1d8cdf646c74454901a4146ddd39fd4ef8abb"
+  },
+  {
+    "workflow": "wf1",
+    "nodeName": "Parse Command",
+    "nodeId": "1d16630b-1467-4cef-b59b-5b0d710503fa",
+    "mode": "runOnceForAllItems",
+    "file": "wf1/parse-command.js",
+    "bytes": 4831,
+    "sha256OfJsCode": "775d630a5f3ae0d39180ac5893cb68b18291af4372fe42755a360d7610711741"
+  },
+  {
+    "workflow": "wf1",
+    "nodeName": "Validate Intent JSON",
+    "nodeId": "d2f960fc-0d41-48c9-89fe-6ff3ba103d65",
+    "mode": "runOnceForAllItems",
+    "file": "wf1/validate-intent-json.js",
+    "bytes": 4022,
+    "sha256OfJsCode": "bba47ab4639c520fdafab6df85c269604af62191d84de4f393898244676cc4a4"
+  },
+  {
+    "workflow": "wf1",
+    "nodeName": "Resolve Route",
+    "nodeId": "f6557dbb-b74d-41b6-8106-a4bbcc96d4c7",
+    "mode": "runOnceForAllItems",
+    "file": "wf1/resolve-route.js",
+    "bytes": 620,
+    "sha256OfJsCode": "d079c9a96c6f90554ff9161fb4a9a04e03c2bc6eb4d5d2077aa4ac4045837730"
+  },
+  {
+    "workflow": "wf1",
+    "nodeName": "Format Status",
+    "nodeId": "7561e30e-bbf9-49bf-aa40-b4c21621935e",
+    "mode": "runOnceForAllItems",
+    "file": "wf1/format-status.js",
+    "bytes": 1632,
+    "sha256OfJsCode": "220c01fb6f028f6f82266c12aa1b84b09e952148cbdf3ae7414e104ee9d60eca"
+  },
+  {
+    "workflow": "wf1",
+    "nodeName": "Build Clarification",
+    "nodeId": "f50ce2f6-a4f6-4e28-bd23-e61210c0d06e",
+    "mode": "runOnceForAllItems",
+    "file": "wf1/build-clarification.js",
+    "bytes": 447,
+    "sha256OfJsCode": "5628440aa937a8234e35153fef62d72182f2dcdf04b7698917945e34a274558b"
+  },
+  {
+    "workflow": "wf1",
+    "nodeName": "Extract Child Result",
+    "nodeId": "10810d44-0d75-4f31-95a7-57fd566db654",
+    "mode": "runOnceForAllItems",
+    "file": "wf1/extract-child-result.js",
+    "bytes": 1958,
+    "sha256OfJsCode": "28ea1b094199471f4b2da9f0064fc3f0ea149220266da7d9add781c6a511d236"
+  },
+  {
+    "workflow": "wf2",
+    "nodeName": "Playbook Library",
+    "nodeId": "70cd180e-05e8-4c61-82fd-28226d4a2c5f",
+    "mode": "runOnceForAllItems",
+    "file": "wf2/playbook-library.js",
+    "bytes": 13410,
+    "sha256OfJsCode": "8f3c18fd9f6f499f5171ed56f5eb07c35cc7a828b4543a8e67cc4406780bd383"
+  },
+  {
+    "workflow": "wf2",
+    "nodeName": "Resolve Matter",
+    "nodeId": "f2f9d98f-c11c-4c54-b40c-ec6f8261efab",
+    "mode": "runOnceForAllItems",
+    "file": "wf2/resolve-matter.js",
+    "bytes": 3972,
+    "sha256OfJsCode": "f487ac13f5ae5306ba80ff9effc74649c94a91929cb872838c0fab1755401ec3"
+  },
+  {
+    "workflow": "wf2",
+    "nodeName": "Validate Plan JSON",
+    "nodeId": "9576e77b-4c3c-4ace-ad2d-324cc7fe449c",
+    "mode": "runOnceForAllItems",
+    "file": "wf2/validate-plan-json.js",
+    "bytes": 18652,
+    "sha256OfJsCode": "7086f2132251323d267c3c69c8ce28e98da1c357f134ee0b0f2ac14d8320edfe"
+  },
+  {
+    "workflow": "wf2",
+    "nodeName": "Build Questions",
+    "nodeId": "9b9840de-4764-4ac2-8c7d-c988608d03e8",
+    "mode": "runOnceForAllItems",
+    "file": "wf2/build-questions.js",
+    "bytes": 1042,
+    "sha256OfJsCode": "d91687ec77f9951265623bfadb239960e93e38989db78f6e562ff9cacbcb2d12"
+  },
+  {
+    "workflow": "wf2",
+    "nodeName": "Expand Actions",
+    "nodeId": "62cfb096-89cd-457f-8fa1-edd05375881a",
+    "mode": "runOnceForAllItems",
+    "file": "wf2/expand-actions.js",
+    "bytes": 228,
+    "sha256OfJsCode": "d88a70418dd6e220b2753045dc2017752e9a0778d01dce9f09f9ee84603ebb9d"
+  },
+  {
+    "workflow": "wf2",
+    "nodeName": "Build Plan Message",
+    "nodeId": "342cc689-fc17-40d2-a79f-831fd1bc82ca",
+    "mode": "runOnceForAllItems",
+    "file": "wf2/build-plan-message.js",
+    "bytes": 3116,
+    "sha256OfJsCode": "603e5f13465e59aba39c1416a6dc8f4e6d7bb81390e84b7e5409db5ef75fb23f"
+  },
+  {
+    "workflow": "wf2",
+    "nodeName": "Set Return Data NI",
+    "nodeId": "b51d5e8a-94a3-4e3f-b073-60be4abdf6e4",
+    "mode": "runOnceForAllItems",
+    "file": "wf2/set-return-data-ni.js",
+    "bytes": 517,
+    "sha256OfJsCode": "c5ce87b342991c768ae802ce2cddf4fb76e8bcb8b0ae0c172ecad00a4fc9e247"
+  },
+  {
+    "workflow": "wf2",
+    "nodeName": "Set Return Data CL",
+    "nodeId": "ed3307e4-6aa3-425c-b9bf-87eb1fc85b5e",
+    "mode": "runOnceForAllItems",
+    "file": "wf2/set-return-data-cl.js",
+    "bytes": 512,
+    "sha256OfJsCode": "2709126ae075a90692a9c3b550a7210a1dd747d4532c1cd71aea03016f09ceb3"
+  },
+  {
+    "workflow": "wf2",
+    "nodeName": "Finalise Plan",
+    "nodeId": "7a18e9d1-820c-4aa7-a84b-bab52f95bf74",
+    "mode": "runOnceForAllItems",
+    "file": "wf2/finalise-plan.js",
+    "bytes": 13381,
+    "sha256OfJsCode": "3d9e63e91ac4ffc375c6a816e03f8a27dc46f85dce9b8418cddec979aa59fd09"
+  },
+  {
+    "workflow": "wf3",
+    "nodeName": "Resolve Evidence Target",
+    "nodeId": "806c8eff-1efa-4645-9f6c-f510bf7871ba",
+    "mode": "runOnceForAllItems",
+    "file": "wf3/resolve-evidence-target.js",
+    "bytes": 2666,
+    "sha256OfJsCode": "d1eaa777cdfc0ae7cd822d1ffd48b0ee9c2d1a11a838171ec5715a4393d7090f"
+  },
+  {
+    "workflow": "wf3",
+    "nodeName": "Set Folder Id",
+    "nodeId": "08877567-fb71-444d-a6e6-5fa6a2ed599a",
+    "mode": "runOnceForAllItems",
+    "file": "wf3/set-folder-id.js",
+    "bytes": 307,
+    "sha256OfJsCode": "e5fa2bd1c2b1a015bdb9c21c03ec3cff25eb731be9ee14653b97163f9ea019b8"
+  },
+  {
+    "workflow": "wf3",
+    "nodeName": "Hash File",
+    "nodeId": "b4f5669a-cffa-4214-9ccd-34ed24ae28c5",
+    "mode": "runOnceForAllItems",
+    "file": "wf3/hash-file.js",
+    "bytes": 695,
+    "sha256OfJsCode": "f28b252066258641424572308ab2697507da3d9aa6db171dc8969ae554bed212"
+  },
+  {
+    "workflow": "wf3",
+    "nodeName": "Build Evidence Record",
+    "nodeId": "cf83bea8-e83b-44c4-ab67-cba14a15302f",
+    "mode": "runOnceForAllItems",
+    "file": "wf3/build-evidence-record.js",
+    "bytes": 1872,
+    "sha256OfJsCode": "5fee8c36d3e9211cc89c73e4b361f90b4ed2caaf51409ccdbe765a0eb28716d2"
+  },
+  {
+    "workflow": "wf3",
+    "nodeName": "Finalise Evidence Row",
+    "nodeId": "54e88e1f-5703-4c60-a18d-de72614eefcd",
+    "mode": "runOnceForAllItems",
+    "file": "wf3/finalise-evidence-row.js",
+    "bytes": 712,
+    "sha256OfJsCode": "2f1f98c6ec10ad1f518c56f518a051da8e03a1133b5bf06ea709e7bdaade08d9"
+  },
+  {
+    "workflow": "wf3",
+    "nodeName": "Build Confirmation",
+    "nodeId": "c5db9bfe-b7f9-4989-b1bc-676505487546",
+    "mode": "runOnceForAllItems",
+    "file": "wf3/build-confirmation.js",
+    "bytes": 730,
+    "sha256OfJsCode": "12217dcb316a90ce798e190c6094edf2e463b54d6999cac7a815bc86cf1ba908"
+  },
+  {
+    "workflow": "wf3",
+    "nodeName": "Encode Image",
+    "nodeId": "6b08be0a-72b8-4731-904a-d62e4913038e",
+    "mode": "runOnceForAllItems",
+    "file": "wf3/encode-image.js",
+    "bytes": 2481,
+    "sha256OfJsCode": "c05fa1fd06aa562b6ef34aad59c662d0b3d2054a9a725f404f89489c4c82d1ed"
+  },
+  {
+    "workflow": "wf3",
+    "nodeName": "Parse Vision Result",
+    "nodeId": "c9eb452e-2e23-40b2-8aa0-4422faddd3a3",
+    "mode": "runOnceForAllItems",
+    "file": "wf3/parse-vision-result.js",
+    "bytes": 1563,
+    "sha256OfJsCode": "404ec54079ea44fed0886b2eedbe6ebe6145b84a15e634fdfc19d353f934170b"
+  },
+  {
+    "workflow": "wf4",
+    "nodeName": "Build Draft Context",
+    "nodeId": "cce4648c-52b1-458e-a5ef-498a2f908016",
+    "mode": "runOnceForAllItems",
+    "file": "wf4/build-draft-context.js",
+    "bytes": 18738,
+    "sha256OfJsCode": "46ffb517101fa13ea816c2a71032d4e49a9de2e94e73290ab1bd1e696fce3327"
+  },
+  {
+    "workflow": "wf4",
+    "nodeName": "Expand Evidence Text",
+    "nodeId": "72150a69-1b65-491f-abc8-caddde429afc",
+    "mode": "runOnceForAllItems",
+    "file": "wf4/expand-evidence-text.js",
+    "bytes": 256,
+    "sha256OfJsCode": "d8dc87755a53f31723f69710845cbb7a28173d720131b7d1c3fe1f48aabe0537"
+  },
+  {
+    "workflow": "wf4",
+    "nodeName": "Collect Evidence Text",
+    "nodeId": "139d7cf5-36e2-4660-a037-05de91e80ab2",
+    "mode": "runOnceForAllItems",
+    "file": "wf4/collect-evidence-text.js",
+    "bytes": 946,
+    "sha256OfJsCode": "fc569488e5c06cadcedc3aafa3c22e88f6111d09ad9a7f66bc21f5147975de7c"
+  },
+  {
+    "workflow": "wf4",
+    "nodeName": "Source Registry",
+    "nodeId": "69fe2185-9000-4718-b08a-b9905d0c9f72",
+    "mode": "runOnceForAllItems",
+    "file": "wf4/source-registry.js",
+    "bytes": 4476,
+    "sha256OfJsCode": "cd0ab62a305523ff907d7d589a73e40e6bd422fe4438eaa528dbea9ab65909ec"
+  },
+  {
+    "workflow": "wf4",
+    "nodeName": "Distil Sources",
+    "nodeId": "d342b856-c980-4b7b-a336-244e473c2818",
+    "mode": "runOnceForAllItems",
+    "file": "wf4/distil-sources.js",
+    "bytes": 21389,
+    "sha256OfJsCode": "323e5d6bf91f0785916a9824e7ade50891e6149525dbbeb8837a8aad64416068"
+  },
+  {
+    "workflow": "wf4",
+    "nodeName": "Expand Sources",
+    "nodeId": "e06134c2-327f-44f2-9927-18b14ada008a",
+    "mode": "runOnceForAllItems",
+    "file": "wf4/expand-sources.js",
+    "bytes": 67,
+    "sha256OfJsCode": "69abc968d346ac51262ae7da45a8034c7e86acb611644b63098a425a52a2c720"
+  },
+  {
+    "workflow": "wf4",
+    "nodeName": "Assemble Draft Input",
+    "nodeId": "8ca45acc-7e68-462e-9b88-15c83bcbb993",
+    "mode": "runOnceForAllItems",
+    "file": "wf4/assemble-draft-input.js",
+    "bytes": 1129,
+    "sha256OfJsCode": "a4661f30feea6fca8a5a37c62f9f910d6b2636c53e5ce287192ccf78a0aee1dc"
+  },
+  {
+    "workflow": "wf4",
+    "nodeName": "Validate Draft JSON",
+    "nodeId": "ba5b816c-6108-404b-9f90-acd883c5c94c",
+    "mode": "runOnceForAllItems",
+    "file": "wf4/validate-draft-json.js",
+    "bytes": 3795,
+    "sha256OfJsCode": "6fafee417dc738785ecf627a7099ad824a16407285bf2e272fa109dda327fefc"
+  },
+  {
+    "workflow": "wf4",
+    "nodeName": "Build Approval Message",
+    "nodeId": "13a8d0c2-653f-4ba9-b854-5351276b9fba",
+    "mode": "runOnceForAllItems",
+    "file": "wf4/build-approval-message.js",
+    "bytes": 13405,
+    "sha256OfJsCode": "85c7ac31ce59787df5d5e50cf8467c9075adeecdb678b9429c2597c5ba870847"
+  },
+  {
+    "workflow": "wf4",
+    "nodeName": "Approval Gate",
+    "nodeId": "9564a873-d0f1-44a8-ba85-e139dc83a594",
+    "mode": "runOnceForAllItems",
+    "file": "wf4/approval-gate.js",
+    "bytes": 22227,
+    "sha256OfJsCode": "c7f80a9501332f5c4992e98638bcafc84f62abd16da8d881deeca17390322f4a"
+  },
+  {
+    "workflow": "wf4",
+    "nodeName": "Set Doc Folder Id",
+    "nodeId": "1e5933fb-005c-4279-9945-f55efbeb846c",
+    "mode": "runOnceForAllItems",
+    "file": "wf4/set-doc-folder-id.js",
+    "bytes": 240,
+    "sha256OfJsCode": "6ce6c659fc50f5d2bda2fd2ded34b4163717fcce4b310e6b58bb8053b8d59ab6"
+  },
+  {
+    "workflow": "wf4",
+    "nodeName": "Build Dry Run Report",
+    "nodeId": "05ed9ab8-cb7b-4cdd-a224-ff84a08387d2",
+    "mode": "runOnceForAllItems",
+    "file": "wf4/build-dry-run-report.js",
+    "bytes": 1711,
+    "sha256OfJsCode": "7c5ad5410a2c63e66670e573d54cf150ca1fcc0a0f20455504f7f5384c20bac0"
+  },
+  {
+    "workflow": "wf4",
+    "nodeName": "Reselect Action If Drafted",
+    "nodeId": "8bb600b6-02cf-4a6c-8e51-70c30e512701",
+    "mode": "runOnceForAllItems",
+    "file": "wf4/reselect-action-if-drafted.js",
+    "bytes": 7880,
+    "sha256OfJsCode": "8a0bbd3160ee758ad37fdce6d5a45b95d0c1a316c2b156f1adcc5c2f6bd4e442"
+  },
+  {
+    "workflow": "wf4",
+    "nodeName": "Classify Send Outcome",
+    "nodeId": "d5cae654-9daa-41b7-9793-bb837f74c90a",
+    "mode": "runOnceForAllItems",
+    "file": "wf4/classify-send-outcome.js",
+    "bytes": 3883,
+    "sha256OfJsCode": "af64384562249e4a4145c70e681a2fd10f922eb77a507cb7acf0a54dcb3f11b0"
+  },
+  {
+    "workflow": "wf4",
+    "nodeName": "Integrity Guard",
+    "nodeId": "7bee0e49-ab5e-471d-9a88-4da7d736e459",
+    "mode": "runOnceForAllItems",
+    "file": "wf4/integrity-guard.js",
+    "bytes": 8212,
+    "sha256OfJsCode": "039f3be3be2522fd5f38a3941912231cab0f9a348b0ba6a020bac34a374bbe22"
+  },
+  {
+    "workflow": "wf4",
+    "nodeName": "Verify Selected Row",
+    "nodeId": "9943a62a-bd82-49e3-9433-1fac628837fa",
+    "mode": "runOnceForAllItems",
+    "file": "wf4/verify-selected-row.js",
+    "bytes": 7003,
+    "sha256OfJsCode": "b3565238c23540a86d5ab503f8d5478cf8f9f805fd475af40905103c184a5049"
+  },
+  {
+    "workflow": "wf4",
+    "nodeName": "Resolve Conflict Notice",
+    "nodeId": "2308fe13-2015-4299-8426-7aaee38003a4",
+    "mode": "runOnceForAllItems",
+    "file": "wf4/resolve-conflict-notice.js",
+    "bytes": 8152,
+    "sha256OfJsCode": "f58ea02aa9850adf37fbd892bffcb2eaf854922497db113f545e6aeae7f95aa3"
+  },
+  {
+    "workflow": "wf4",
+    "nodeName": "Verify Conflict Notice",
+    "nodeId": "39672098-3e3c-4eb4-adec-515f5eadfbb8",
+    "mode": "runOnceForAllItems",
+    "file": "wf4/verify-conflict-notice.js",
+    "bytes": 2411,
+    "sha256OfJsCode": "57b1677f615f5290bf21b69af8b76e6b34689bbe291aed13f1f396da0e4322bf"
+  },
+  {
+    "workflow": "wf4",
+    "nodeName": "Evaluate Send Eligibility",
+    "nodeId": "5bb79d90-6cb6-4571-b463-db36be22b24e",
+    "mode": "runOnceForAllItems",
+    "file": "wf4/evaluate-send-eligibility.js",
+    "bytes": 3706,
+    "sha256OfJsCode": "ed167aaa4eff17e48b3b97af550cc581c27d553402bf368535d75940fd984e97"
+  },
+  {
+    "workflow": "wf4",
+    "nodeName": "Send Conflict Notice (PLACEHOLDER - NO SENDER BUILT)",
+    "nodeId": "05b039ad-bbc5-4732-ba86-5616b9323c98",
+    "mode": "runOnceForAllItems",
+    "file": "wf4/send-conflict-notice-placeholder-no-sender-built.js",
+    "bytes": 662,
+    "sha256OfJsCode": "b207bcf1013061c333b2b38c445801036491546054289c59d45686207fa49dd7"
+  },
+  {
+    "workflow": "wf4",
+    "nodeName": "Classify Notification Outcome",
+    "nodeId": "da695018-aa42-421e-bd03-7b4b057bffe4",
+    "mode": "runOnceForAllItems",
+    "file": "wf4/classify-notification-outcome.js",
+    "bytes": 3875,
+    "sha256OfJsCode": "7b2240ba59fda0e4533e441e02a2e70f035da68c603701ee03a8be2d71884ae5"
+  },
+  {
+    "workflow": "wf4",
+    "nodeName": "Verify Notification Record",
+    "nodeId": "416adae9-a70c-47cd-a8e1-89e1a095a3c5",
+    "mode": "runOnceForAllItems",
+    "file": "wf4/verify-notification-record.js",
+    "bytes": 3151,
+    "sha256OfJsCode": "c01948570427c5ce7afdfee1256fd1d81c83a0058f46e5b7125756eab58a4280"
+  },
+  {
+    "workflow": "wf4",
+    "nodeName": "Build Integrity Halt Notice",
+    "nodeId": "7fd2f6ec-ab2d-4afa-940a-1def80c503fe",
+    "mode": "runOnceForAllItems",
+    "file": "wf4/build-integrity-halt-notice.js",
+    "bytes": 9279,
+    "sha256OfJsCode": "baabf88da65ed5bce10c3d0142837cbe10c98f11d6809bcd5e045a11930a7ffe"
+  },
+  {
+    "workflow": "wf4",
+    "nodeName": "Unknown Route - Fail Closed",
+    "nodeId": "c2bc10bf-f046-4faa-997b-8e22453678ed",
+    "mode": "runOnceForAllItems",
+    "file": "wf4/unknown-route-fail-closed.js",
+    "bytes": 1385,
+    "sha256OfJsCode": "90cc41bb52238e6eb2c48e88706018d39dbd291c2883ebcd48e968c2383a9bba"
+  },
+  {
+    "workflow": "wf4",
+    "nodeName": "Build Notification Failure Record",
+    "nodeId": "ef6d777f-1ce3-4acf-b008-807983b1b655",
+    "mode": "runOnceForAllItems",
+    "file": "wf4/build-notification-failure-record.js",
+    "bytes": 6408,
+    "sha256OfJsCode": "41509b0bd332b35878c8b6f71bd8e6f422a3f537d69ffcb491b00d63f6b71afb"
+  },
+  {
+    "workflow": "wf5",
+    "nodeName": "Match Reply to Matter",
+    "nodeId": "89b44a59-fafd-4e6a-b3ba-bbf20308e153",
+    "mode": "runOnceForAllItems",
+    "file": "wf5/match-reply-to-matter.js",
+    "bytes": 3759,
+    "sha256OfJsCode": "72b794e1cf848f945457e747b7ae78705ef8229a84f26cde7bb7f0dc3957bb07"
+  },
+  {
+    "workflow": "wf5",
+    "nodeName": "Build Reply Context",
+    "nodeId": "998c759a-f2bd-4173-ac83-ccd2b176738a",
+    "mode": "runOnceForAllItems",
+    "file": "wf5/build-reply-context.js",
+    "bytes": 13074,
+    "sha256OfJsCode": "9b42958fd75ff06f8248ffa54395f3cf3d38d511bc800dd4f68d864b6f26420e"
+  },
+  {
+    "workflow": "wf5",
+    "nodeName": "Validate Reply JSON",
+    "nodeId": "8af1d1d2-c474-45bc-957f-c9902c1bbe59",
+    "mode": "runOnceForAllItems",
+    "file": "wf5/validate-reply-json.js",
+    "bytes": 6887,
+    "sha256OfJsCode": "10710e2a8e4783e7fc53c4d931be1aecc03156673b5b387843dcb8944e591d30"
+  },
+  {
+    "workflow": "wf5",
+    "nodeName": "Build Reply Notice",
+    "nodeId": "7d73d2a8-6e37-479b-8dfc-730df61288b4",
+    "mode": "runOnceForAllItems",
+    "file": "wf5/build-reply-notice.js",
+    "bytes": 1121,
+    "sha256OfJsCode": "d93e2a6e19d85ce9dbd0ba646b4caad2d0996e69f746fa78a7ad2f1098355f59"
+  },
+  {
+    "workflow": "wf5",
+    "nodeName": "Build Daily Digest",
+    "nodeId": "00a4aea9-d1ea-4038-b462-e2cd037bede6",
+    "mode": "runOnceForAllItems",
+    "file": "wf5/build-daily-digest.js",
+    "bytes": 20956,
+    "sha256OfJsCode": "ad149beced78d782d90a135db8c225148c5647bdf6577fc5553d5f322da67bac"
+  },
+  {
+    "workflow": "wf5",
+    "nodeName": "Find Due Follow-ups",
+    "nodeId": "88ced760-10e7-40a5-b18c-91711162dc7f",
+    "mode": "runOnceForAllItems",
+    "file": "wf5/find-due-follow-ups.js",
+    "bytes": 4132,
+    "sha256OfJsCode": "031e3fde5a2c57b713b2e4e72c046efa5efa0f7ccced4d38f822aef1b6db1af8"
+  },
+  {
+    "workflow": "wf5",
+    "nodeName": "Build Follow-up Draft Request",
+    "nodeId": "5dd12e17-95fc-4783-9cf6-b6d92f9d2c61",
+    "mode": "runOnceForAllItems",
+    "file": "wf5/build-follow-up-draft-request.js",
+    "bytes": 447,
+    "sha256OfJsCode": "91467f9652a23f14a9a06c4ee8a04802ec94787b8ffdefe224725d519040fd21"
+  },
+  {
+    "workflow": "wf5",
+    "nodeName": "Build Follow-up Notice",
+    "nodeId": "6ef0e2ff-0dd2-4619-8142-270e861d8637",
+    "mode": "runOnceForAllItems",
+    "file": "wf5/build-follow-up-notice.js",
+    "bytes": 640,
+    "sha256OfJsCode": "bb248bf5289040c8ed4f81b5dd89302458f82809ef8c44b91a8a68f47433a709"
+  },
+  {
+    "workflow": "wf5",
+    "nodeName": "Parse Classifier JSON",
+    "nodeId": "de7b88ac-3624-4e95-b887-015990a3a946",
+    "mode": "runOnceForAllItems",
+    "file": "wf5/parse-classifier-json.js",
+    "bytes": 455,
+    "sha256OfJsCode": "19c15cd8eb70b0284e1ce50419c1c970b8f39e1424a6bb1a7b5cda9bb0452646"
+  },
+  {
+    "workflow": "wf9",
+    "nodeName": "Build Error Record",
+    "nodeId": "6e707592-124b-4c7e-93fe-bd0ed77644af",
+    "mode": "runOnceForAllItems",
+    "file": "wf9/build-error-record.js",
+    "bytes": 13163,
+    "sha256OfJsCode": "28eb329f4eb650a71f488afaf09c79577b2f9c6cc8c87486f272a61aec6d106b"
+  }
+]

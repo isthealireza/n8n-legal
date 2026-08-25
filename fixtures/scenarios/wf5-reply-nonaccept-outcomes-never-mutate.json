@@ -1,0 +1,122 @@
+{
+  "id": "wf5-reply-nonaccept-outcomes-never-mutate",
+  "workflow": "wf5",
+  "unit": "WF5 Build Reply Context resolveReply policy",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "BAKIml11QKedtH9d",
+    "name": "QA - WF5 Reply Policy v2"
+  },
+  "description": "Suite-wide invariants: every non-ACCEPT outcome carries a deterministic audit event id, writes nothing, and never reaches the classifier.",
+  "why_it_exists": "These are the safety invariants the whole reply path rests on: a blocked or duplicated inbound message must leave an audit trail, must not append rows, and must not spend a model call. Suite cases A1, A2, A3.",
+  "input": {
+    "case_id": "A1/A2/A3",
+    "note": "evaluated over the outcomes of every case in this suite (C1-C10, X3, X5, X5b, R1-R6, X1-X4)",
+    "register": {
+      "matters": [
+        {
+          "matter_id": "MAT-20260101-011",
+          "title": "Parked vehicle damage"
+        },
+        {
+          "matter_id": "MAT-20260101-012",
+          "title": "Employment contract review"
+        },
+        {
+          "matter_id": "MAT-20260101-013",
+          "title": "Second car park matter, same insurer"
+        }
+      ],
+      "comms": [
+        {
+          "communication_id": "COM-OUT-1",
+          "matter_id": "MAT-20260101-011",
+          "direction": "OUTBOUND",
+          "recipient": "claims@examplecarpark.test",
+          "thread_id": "THREAD-AAA",
+          "provider_message_id": "MSG-OUT-1"
+        },
+        {
+          "communication_id": "COM-OUT-2",
+          "matter_id": "MAT-20260101-012",
+          "direction": "OUTBOUND_DRY_RUN",
+          "recipient": "hr@exampleco.test",
+          "thread_id": "THREAD-BBB",
+          "provider_message_id": "DRY_RUN"
+        },
+        {
+          "communication_id": "COM-OUT-3",
+          "matter_id": "MAT-20260101-013",
+          "direction": "OUTBOUND",
+          "recipient": "claims@examplecarpark.test",
+          "thread_id": "THREAD-CCC",
+          "provider_message_id": "MSG-OUT-3"
+        },
+        {
+          "communication_id": "COM-LEGACY",
+          "matter_id": "MAT-20260101-011",
+          "direction": "INBOUND",
+          "recipient": "me@example.test",
+          "thread_id": "THREAD-AAA",
+          "provider_message_id": "MSG-LEGACY-1",
+          "ingress_fingerprint": ""
+        },
+        {
+          "communication_id": "COM-MSG-IN-1",
+          "matter_id": "MAT-20260101-011",
+          "direction": "INBOUND",
+          "recipient": "me@example.test",
+          "thread_id": "THREAD-AAA",
+          "provider_message_id": "MSG-IN-1",
+          "ingress_fingerprint": "RUNTIME:ingressFingerprint(event of C1)"
+        },
+        {
+          "communication_id": "COM-MSG-IN-2",
+          "matter_id": "MAT-20260101-011",
+          "direction": "INBOUND",
+          "recipient": "me@example.test",
+          "thread_id": "THREAD-AAA",
+          "provider_message_id": "MSG-IN-2",
+          "ingress_fingerprint": "RUNTIME:ingressFingerprint(event of C2)"
+        },
+        {
+          "communication_id": "COM-MSG-IN-8",
+          "matter_id": "MAT-20260101-011",
+          "direction": "INBOUND",
+          "recipient": "me@example.test",
+          "thread_id": "THREAD-AAA",
+          "provider_message_id": "MSG-IN-8",
+          "ingress_fingerprint": "RUNTIME:ingressFingerprint(event of C7)"
+        },
+        {
+          "communication_id": "COM-MSG-IN-12",
+          "matter_id": "MAT-20260101-011",
+          "direction": "INBOUND",
+          "recipient": "me@example.test",
+          "thread_id": "THREAD-AAA",
+          "provider_message_id": "MSG-IN-12",
+          "ingress_fingerprint": "RUNTIME:ingressFingerprint(event of X5)"
+        }
+      ]
+    },
+    "now": "2026-08-23T06:00:00.000Z"
+  },
+  "expect": {
+    "every_replay_outcome_has_event_id": true,
+    "no_nonaccept_outcome_writes": true,
+    "no_replay_reaches_classifier": true
+  },
+  "assertions": [
+    "A1: every ALREADY_RECORDED and IDEMPOTENCY_CONFLICT outcome carries a non-empty deterministic event_id",
+    "A2: no BLOCKED, ALREADY_RECORDED or IDEMPOTENCY_CONFLICT outcome sets any of the three write flags",
+    "A3: no replay outcome reaches the classifier",
+    "CAVEAT: as implemented in the QA workflow, A1 exempts BLOCKED decisions from the event-id requirement (the check is guarded by decision !== \"BLOCKED\"), so it is weaker than its label. A BLOCKED outcome with no provider_message_id emits event_id \"\" and A1 still passes."
+  ],
+  "target": {
+    "workflow": "wf5",
+    "unit_file": "harness/units/wf5/build-reply-context.js"
+  },
+  "harness": {
+    "adapter": "reply-policy-nonaccept"
+  }
+}

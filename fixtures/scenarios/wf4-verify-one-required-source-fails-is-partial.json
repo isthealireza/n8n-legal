@@ -1,0 +1,91 @@
+{
+  "id": "wf4-verify-one-required-source-fails-is-partial",
+  "workflow": "wf4",
+  "unit": "WF4 Distil Sources verification grading (pre-alignment version)",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "rMxfriXtRP8nQGAb",
+    "name": "QA - Source Verification Regression"
+  },
+  "description": "One good legislation source plus one failed required source yields PARTIAL, never COMPLETE.",
+  "why_it_exists": "Three verification defects were found in live WF4 runs. (1) source_type was HARDCODED to OFFICIAL for every fetched page, so a landing page, a block page or a blog was all stamped official. (2) verification_status was decided by text.length > 400 alone, so navigation chrome on a bare homepage passed as RETRIEVED and was then cited by id in a legal draft - fabricated authority, and the most dangerous defect in the build. (3) execution 300: a federal legislation page returned 1.23 MB of text with no section heading marker and was still graded RETRIEVED, because a table of contents is full of structural words. A heading-marker check now separates a real section body from an index.",
+  "input": {
+    "ctx": {
+      "matter_id": "MAT-TEST-000",
+      "jurisdiction": "WA, Australia",
+      "playbook_name": "regression fixture",
+      "urls": [
+        "https://www.legislation.wa.gov.au/legislation/statutes.nsf/RedirectURL?OpenAgent&query=mrdoc_47979.htm",
+        "https://www.legislation.gov.au/C2009A00028/latest/text/original/epub/OEBPS/document_2/document_2.html"
+      ]
+    },
+    "items": [
+      {
+        "json": {
+          "data": "<html><title>Limitation Act 2005</title><body>Division 2 General limitation period 13 .General limitation period 6 years (1) An action on any cause of action cannot be commenced if 6 years have elapsed since the cause of action accrued. section 13 applies. the following words are padding only and carry no heading marker and no digits repeated so that the stripped text passes the four hundred character floor easily the following words are padding only and carry no heading marker and no digits repeated so that the stripped text passes the four hundred character floor easily the following words are padding only and carry no heading marker and no digits repeated so that the stripped text passes the four hundred character floor easily the following words are padding only and carry no heading marker and no digits repeated so that the stripped text passes the four hundred character floor easily the following words are padding only and carry no heading marker and no digits repeated so that the stripped text passes the four hundred character floor easily the following words are padding only and carry no heading marker and no digits repeated so that the stripped text passes the four hundred character floor easily</body></html>"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "data": "<html><title>Fair Work Act 2009</title><body>Part 2 2 Contents <a href=\"#x\">61 The National Employment Standards are minimum standards applying to employment</a> section 61 subsection Schedule 1 Division 3 the following words are padding only and carry no heading marker and no digits repeated so that the stripped text passes the four hundred character floor easily the following words are padding only and carry no heading marker and no digits repeated so that the stripped text passes the four hundred character floor easily the following words are padding only and carry no heading marker and no digits repeated so that the stripped text passes the four hundred character floor easily the following words are padding only and carry no heading marker and no digits repeated so that the stripped text passes the four hundred character floor easily the following words are padding only and carry no heading marker and no digits repeated so that the stripped text passes the four hundred character floor easily the following words are padding only and carry no heading marker and no digits repeated so that the stripped text passes the four hundred character floor easily</body></html>"
+        },
+        "pairedItem": {
+          "item": 1
+        }
+      }
+    ],
+    "now": "2026-08-23T06:00:00.000Z",
+    "nodeOutputs": {
+      "Collect Evidence Text": [
+        {
+          "matter_id": "MAT-TEST-000",
+          "jurisdiction": "WA, Australia",
+          "playbook_name": "regression fixture",
+          "urls": [
+            "https://www.legislation.wa.gov.au/legislation/statutes.nsf/RedirectURL?OpenAgent&query=mrdoc_47979.htm",
+            "https://www.legislation.gov.au/C2009A00028/latest/text/original/epub/OEBPS/document_2/document_2.html"
+          ]
+        }
+      ],
+      "Source Registry": [
+        {
+          "json": {
+            "url": "https://www.legislation.wa.gov.au/legislation/statutes.nsf/RedirectURL?OpenAgent&query=mrdoc_47979.htm",
+            "want": [],
+            "cite": ""
+          }
+        },
+        {
+          "json": {
+            "url": "https://www.legislation.gov.au/C2009A00028/latest/text/original/epub/OEBPS/document_2/document_2.html",
+            "want": [],
+            "cite": ""
+          }
+        }
+      ]
+    }
+  },
+  "expect": {
+    "verification_status": [
+      "RETRIEVED",
+      "NO_PINPOINT_FOUND"
+    ],
+    "research_status": "PARTIAL"
+  },
+  "assertions": [
+    "the per-source verification_status list is exactly [\"RETRIEVED\",\"NO_PINPOINT_FOUND\"]",
+    "research_status is PARTIAL",
+    "COMPLETE requires every candidate retrieved AND at least one legislation source",
+    "sources_required_failed is 1, which alone downgrades COMPLETE to PARTIAL"
+  ],
+  "target": {
+    "workflow": "wf4",
+    "unit_file": "harness/units/wf4/distil-sources.js"
+  },
+  "harness": {
+    "adapter": "distil-grading"
+  }
+}

@@ -1,0 +1,193 @@
+{
+  "id": "wf5-ingress-replay-fingerprint-not-recorded",
+  "workflow": "wf5",
+  "unit": "Build Reply Context (resolveReply) - replay detection",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "XevQwFviJHUobw0U",
+    "name": "QA - Ingress Round Trip"
+  },
+  "description": "A prior INBOUND row that carries no stored ingress_fingerprint (a row written before column R existed) is a conflict requiring human review, not a silent ACCEPT.",
+  "why_it_exists": "Communications rows predate the ingress_fingerprint column, which was added by QA - Add Ingress Fingerprint Column on 2026-08-21. A legacy row has a blank fingerprint, and the resolver must not treat 'cannot compare' as 'identical'. This branch fails closed.",
+  "input": {
+    "event": {
+      "provider_message_id": "MSG-RT-1",
+      "thread_id": "THREAD-AAA",
+      "from": "Claims Team <claims@examplecarpark.test>",
+      "subject": "Re: [MAT-QA-001] round trip",
+      "body": "First delivery body.",
+      "received_at": "2026-08-21T02:00:00.000Z"
+    },
+    "communications_register": [
+      {
+        "communication_id": "COM-OUT-1",
+        "matter_id": "MAT-QA-001",
+        "action_id": "ACT-QA-001",
+        "direction": "OUTBOUND",
+        "channel": "GMAIL",
+        "provider_message_id": "MSG-OUT-1",
+        "thread_id": "THREAD-AAA",
+        "recipient": "claims@examplecarpark.test",
+        "subject": "Preserve footage request",
+        "summary": "seed outbound",
+        "classification": "",
+        "received_at": "2026-08-20T00:00:00.000Z",
+        "response_due": "",
+        "next_action": "",
+        "draft_id": "",
+        "approval_id": "",
+        "idempotency_key": "ACT-QA-001|seed",
+        "ingress_fingerprint": ""
+      },
+      {
+        "communication_id": "COM-MSG-RT-1",
+        "matter_id": "MAT-QA-001",
+        "action_id": "ACT-QA-001",
+        "direction": "INBOUND",
+        "channel": "GMAIL",
+        "provider_message_id": "MSG-RT-1",
+        "thread_id": "THREAD-AAA",
+        "recipient": "me@example.test",
+        "subject": "Re: [MAT-QA-001] round trip",
+        "summary": "classifier output for first delivery",
+        "classification": "ACKNOWLEDGEMENT",
+        "received_at": "2026-08-21T02:00:00.000Z",
+        "response_due": "",
+        "next_action": "",
+        "draft_id": "",
+        "approval_id": "",
+        "idempotency_key": "MAT-QA-001|MSG-RT-1",
+        "ingress_fingerprint": ""
+      }
+    ],
+    "now": "2026-08-23T06:00:00.000Z",
+    "items": [
+      {
+        "communication_id": "COM-OUT-1",
+        "matter_id": "MAT-QA-001",
+        "action_id": "ACT-QA-001",
+        "direction": "OUTBOUND",
+        "channel": "GMAIL",
+        "provider_message_id": "MSG-OUT-1",
+        "thread_id": "THREAD-AAA",
+        "recipient": "claims@examplecarpark.test",
+        "subject": "Preserve footage request",
+        "summary": "seed outbound",
+        "classification": "",
+        "received_at": "2026-08-20T00:00:00.000Z",
+        "response_due": "",
+        "next_action": "",
+        "draft_id": "",
+        "approval_id": "",
+        "idempotency_key": "ACT-QA-001|seed",
+        "ingress_fingerprint": ""
+      },
+      {
+        "communication_id": "COM-MSG-RT-1",
+        "matter_id": "MAT-QA-001",
+        "action_id": "ACT-QA-001",
+        "direction": "INBOUND",
+        "channel": "GMAIL",
+        "provider_message_id": "MSG-RT-1",
+        "thread_id": "THREAD-AAA",
+        "recipient": "me@example.test",
+        "subject": "Re: [MAT-QA-001] round trip",
+        "summary": "classifier output for first delivery",
+        "classification": "ACKNOWLEDGEMENT",
+        "received_at": "2026-08-21T02:00:00.000Z",
+        "response_due": "",
+        "next_action": "",
+        "draft_id": "",
+        "approval_id": "",
+        "idempotency_key": "MAT-QA-001|MSG-RT-1",
+        "ingress_fingerprint": ""
+      }
+    ],
+    "nodeOutputs": {
+      "Match Reply to Matter": [
+        {
+          "provider_message_id": "MSG-RT-1",
+          "thread_id": "THREAD-AAA",
+          "from_address": "Claims Team <claims@examplecarpark.test>",
+          "subject": "Re: [MAT-QA-001] round trip",
+          "body_text": "First delivery body.",
+          "received_at": "2026-08-21T02:00:00.000Z"
+        }
+      ],
+      "Load Matters (Reply)": [
+        {
+          "matter_id": "MAT-QA-001"
+        }
+      ],
+      "Load Actions (Reply)": [],
+      "Load Comms (Reply)": [
+        {
+          "communication_id": "COM-OUT-1",
+          "matter_id": "MAT-QA-001",
+          "action_id": "ACT-QA-001",
+          "direction": "OUTBOUND",
+          "channel": "GMAIL",
+          "provider_message_id": "MSG-OUT-1",
+          "thread_id": "THREAD-AAA",
+          "recipient": "claims@examplecarpark.test",
+          "subject": "Preserve footage request",
+          "summary": "seed outbound",
+          "classification": "",
+          "received_at": "2026-08-20T00:00:00.000Z",
+          "response_due": "",
+          "next_action": "",
+          "draft_id": "",
+          "approval_id": "",
+          "idempotency_key": "ACT-QA-001|seed",
+          "ingress_fingerprint": ""
+        },
+        {
+          "communication_id": "COM-MSG-RT-1",
+          "matter_id": "MAT-QA-001",
+          "action_id": "ACT-QA-001",
+          "direction": "INBOUND",
+          "channel": "GMAIL",
+          "provider_message_id": "MSG-RT-1",
+          "thread_id": "THREAD-AAA",
+          "recipient": "me@example.test",
+          "subject": "Re: [MAT-QA-001] round trip",
+          "summary": "classifier output for first delivery",
+          "classification": "ACKNOWLEDGEMENT",
+          "received_at": "2026-08-21T02:00:00.000Z",
+          "response_due": "",
+          "next_action": "",
+          "draft_id": "",
+          "approval_id": "",
+          "idempotency_key": "MAT-QA-001|MSG-RT-1",
+          "ingress_fingerprint": ""
+        }
+      ]
+    }
+  },
+  "expect": {
+    "decision": "IDEMPOTENCY_CONFLICT",
+    "basis": "FINGERPRINT_NOT_RECORDED",
+    "matter_id": "MAT-QA-001",
+    "communication_id": "COM-MSG-RT-1",
+    "requires_human_review": true,
+    "stored_fingerprint": "",
+    "event_id": "EVT-REPLAY-CONFLICT-MSG-RT-1",
+    "event_type": "INBOUND_REPLAY_IGNORED_CONFLICT",
+    "severity": "WARNING",
+    "reason_shape": "No stored fingerprint.",
+    "_correction_2026-08-25": "expect.reason was the paraphrase \"No stored fingerprint.\"; the node emits \"Message <id> is already recorded on <matter>, but that row carries no ingress fingerprint, so it cannot be confirmed identical. Nothing was changed.\" Demoted to reason_shape (informational); basis FINGERPRINT_NOT_RECORDED and the rest are unchanged and still asserted."
+  },
+  "assertions": [
+    "A blank stored fingerprint is distinguished from a matching one and from a differing one, with its own basis value FINGERPRINT_NOT_RECORDED.",
+    "The absence of evidence is treated as a conflict, not as agreement.",
+    "requires_human_review is true.",
+    "The stored communication_id is still returned even though the row cannot be verified."
+  ],
+  "target": {
+    "workflow": "wf5",
+    "unit_file": "harness/units/wf5/build-reply-context.js"
+  },
+  "harness": {
+    "adapter": "reply-policy"
+  }
+}

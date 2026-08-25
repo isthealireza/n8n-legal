@@ -1,0 +1,47 @@
+{
+  "id": "wf2-b1-malformed-planner-output-rejected",
+  "workflow": "wf2",
+  "unit": "Validate Plan JSON / Plan Valid?",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "olEuL3AIVr4ER0bT",
+    "name": "QA - WF2 B1 Boundary Harness"
+  },
+  "description": "Case C3: the planner returns an object with no title, so validation fails, the matter is marked FAILED and no sheet write happens.",
+  "why_it_exists": "The planner is a model. Its output is untrusted structure, and a plan that is missing a mandatory field must fail closed rather than write a half-formed matter row. C3 exercises that path deliberately.",
+  "input": {
+    "case_id": "C3",
+    "planner_output": {
+      "playbook_id": "motor_vehicle_damage_v1",
+      "jurisdiction": "WA/Australia",
+      "known_facts": {
+        "incident_description": "Rear quarter panel struck while the vehicle was parked and unattended.",
+        "incident_datetime": "UNVERIFIED: unknown; discovered 2026-08-14 about 18:00 AWST; occurred while parked",
+        "incident_location": "Level 2, Hay Street car park, Perth WA",
+        "owner_present": "no",
+        "driver_identity": "vehicle was unattended",
+        "own_vehicle_registration": "9XYZ876",
+        "damage_description": "Dent and paint transfer to the rear quarter panel."
+      },
+      "missing_facts": [],
+      "proposed_actions": []
+    }
+  },
+  "expect": {
+    "plan_valid": false,
+    "failure_reason": "Planner returned no title.",
+    "matter_status": "FAILED",
+    "actions": [],
+    "questions": [],
+    "requires_information": false,
+    "branch_taken": "Capture Failure",
+    "writes": 0
+  },
+  "assertions": [
+    "Unparsable JSON, an unknown playbook_id, a non-array missing_facts, a non-array proposed_actions, and a blank title each fail validation with their own reason string.",
+    "Finalise Plan short-circuits and returns the item untouched when plan_valid is false, so none of its logic runs on an invalid plan.",
+    "The Plan Valid? IF routes a failed plan away from both write gates."
+  ],
+  "target": null,
+  "target_unresolved_reason": "The oracle is the Plan Valid? IF node plus a Capture Failure branch, not a Code node. Validate Plan JSON does emit plan_valid and failure_reason, but the scenario's expect also pins branch_taken and writes:0, which are graph properties. Binding it to Validate Plan JSON would test a strict subset while claiming the whole."
+}

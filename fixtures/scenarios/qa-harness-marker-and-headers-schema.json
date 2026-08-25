@@ -1,0 +1,74 @@
+{
+  "id": "qa-harness-marker-and-headers-schema",
+  "workflow": "qa-harness-setup",
+  "unit": "QA harness spreadsheet schema and QA_ONLY marker",
+  "kind": "schema",
+  "source_qa_workflow": {
+    "id": "ExgwKCZsekbzUBM4",
+    "name": "QA - Create B1 Harness Spreadsheet"
+  },
+  "description": "The isolated WF2 B1 harness spreadsheet carries Matters and Actions headers identical to production plus a QA_MARKER tab whose cell A2 is the write-permission token.",
+  "why_it_exists": "Copying production node code byte-for-byte only proves anything if the target sheet has the production column layout; and every downstream write gate keys off QA_MARKER!A2, so the marker's exact cell and exact string are load-bearing.",
+  "input": {
+    "spreadsheet_title": "QA - WF2 B1 Boundary Harness",
+    "tabs": [
+      "Matters",
+      "Actions",
+      "QA_MARKER"
+    ]
+  },
+  "expect": {
+    "Matters": [
+      "matter_id",
+      "title",
+      "playbook_id",
+      "jurisdiction",
+      "status",
+      "owner_chat_id",
+      "facts_json",
+      "missing_facts_json",
+      "risk_flags_json",
+      "required_evidence_json",
+      "created_at",
+      "updated_at",
+      "last_activity_at",
+      "unmapped_facts_json"
+    ],
+    "Actions": [
+      "action_id",
+      "matter_id",
+      "action_type",
+      "description",
+      "status",
+      "priority",
+      "depends_on_json",
+      "recipient",
+      "channel",
+      "requires_approval",
+      "draft_id",
+      "approval_id",
+      "due_at",
+      "deadline_basis",
+      "blocked_reason",
+      "idempotency_key",
+      "created_at",
+      "updated_at"
+    ],
+    "QA_MARKER": {
+      "A1": "qa_marker",
+      "A2": "QA_ONLY_DO_NOT_WRITE_PRODUCTION",
+      "A3": "purpose",
+      "A4": "Isolated harness for WF2 B1. Synthetic data only. Never a production register."
+    },
+    "marker_location": "QA_MARKER!A2"
+  },
+  "assertions": [
+    "Matters header equals the 14-column production order exactly, ending in unmapped_facts_json.",
+    "Actions header equals the 18-column production order exactly, ending in updated_at.",
+    "QA_MARKER!A2 is exactly the string QA_ONLY_DO_NOT_WRITE_PRODUCTION - no whitespace, no case variation.",
+    "Headers are written with valueInputOption RAW so no value is coerced by Sheets.",
+    "All three ranges are read back and compared after writing; a write that reports success but reads back wrong fails the run."
+  ],
+  "target": null,
+  "target_unresolved_reason": "kind is \"schema\": not executed by harness/run.js."
+}

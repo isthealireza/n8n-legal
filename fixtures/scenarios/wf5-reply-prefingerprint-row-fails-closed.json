@@ -1,0 +1,279 @@
+{
+  "id": "wf5-reply-prefingerprint-row-fails-closed",
+  "workflow": "wf5",
+  "unit": "WF5 Build Reply Context resolveReply policy",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "BAKIml11QKedtH9d",
+    "name": "QA - WF5 Reply Policy v2"
+  },
+  "description": "Pre-fingerprint row: identity cannot be confirmed, fail closed.",
+  "why_it_exists": "Inbound delivery is at-least-once. Without a stored ingress fingerprint a redelivered message either appended a duplicate inbound row and a duplicate action, or - once a wall-clock value entered the fingerprint - a plain retry looked like a tampered message and raised a false IDEMPOTENCY_CONFLICT. The fingerprint is now derived only from the raw message, and every replay outcome is decided before the classifier runs.",
+  "input": {
+    "case_id": "X3",
+    "register": {
+      "matters": [
+        {
+          "matter_id": "MAT-20260101-011",
+          "title": "Parked vehicle damage"
+        },
+        {
+          "matter_id": "MAT-20260101-012",
+          "title": "Employment contract review"
+        },
+        {
+          "matter_id": "MAT-20260101-013",
+          "title": "Second car park matter, same insurer"
+        }
+      ],
+      "comms": [
+        {
+          "communication_id": "COM-OUT-1",
+          "matter_id": "MAT-20260101-011",
+          "direction": "OUTBOUND",
+          "recipient": "claims@examplecarpark.test",
+          "thread_id": "THREAD-AAA",
+          "provider_message_id": "MSG-OUT-1"
+        },
+        {
+          "communication_id": "COM-OUT-2",
+          "matter_id": "MAT-20260101-012",
+          "direction": "OUTBOUND_DRY_RUN",
+          "recipient": "hr@exampleco.test",
+          "thread_id": "THREAD-BBB",
+          "provider_message_id": "DRY_RUN"
+        },
+        {
+          "communication_id": "COM-OUT-3",
+          "matter_id": "MAT-20260101-013",
+          "direction": "OUTBOUND",
+          "recipient": "claims@examplecarpark.test",
+          "thread_id": "THREAD-CCC",
+          "provider_message_id": "MSG-OUT-3"
+        },
+        {
+          "communication_id": "COM-LEGACY",
+          "matter_id": "MAT-20260101-011",
+          "direction": "INBOUND",
+          "recipient": "me@example.test",
+          "thread_id": "THREAD-AAA",
+          "provider_message_id": "MSG-LEGACY-1",
+          "ingress_fingerprint": ""
+        },
+        {
+          "communication_id": "COM-MSG-IN-1",
+          "matter_id": "MAT-20260101-011",
+          "direction": "INBOUND",
+          "recipient": "me@example.test",
+          "thread_id": "THREAD-AAA",
+          "provider_message_id": "MSG-IN-1",
+          "ingress_fingerprint": "RUNTIME:ingressFingerprint(event of C1)"
+        },
+        {
+          "communication_id": "COM-MSG-IN-2",
+          "matter_id": "MAT-20260101-011",
+          "direction": "INBOUND",
+          "recipient": "me@example.test",
+          "thread_id": "THREAD-AAA",
+          "provider_message_id": "MSG-IN-2",
+          "ingress_fingerprint": "RUNTIME:ingressFingerprint(event of C2)"
+        },
+        {
+          "communication_id": "COM-MSG-IN-8",
+          "matter_id": "MAT-20260101-011",
+          "direction": "INBOUND",
+          "recipient": "me@example.test",
+          "thread_id": "THREAD-AAA",
+          "provider_message_id": "MSG-IN-8",
+          "ingress_fingerprint": "RUNTIME:ingressFingerprint(event of C7)"
+        }
+      ]
+    },
+    "event": {
+      "provider_message_id": "MSG-LEGACY-1",
+      "thread_id": "THREAD-AAA",
+      "from": "Claims Team <claims@examplecarpark.test>",
+      "subject": "Re: old message",
+      "body": "Old body.",
+      "received_at": "2026-08-20T05:00:00.000Z"
+    },
+    "sequence_note": "The suite is stateful: every earlier ACCEPT appends an INBOUND row carrying its own runtime ingress_fingerprint. The rows appended before this case are the ones in register.comms after COM-LEGACY.",
+    "now": "2026-08-23T06:00:00.000Z",
+    "items": [
+      {
+        "communication_id": "COM-OUT-1",
+        "matter_id": "MAT-20260101-011",
+        "direction": "OUTBOUND",
+        "recipient": "claims@examplecarpark.test",
+        "thread_id": "THREAD-AAA",
+        "provider_message_id": "MSG-OUT-1"
+      },
+      {
+        "communication_id": "COM-OUT-2",
+        "matter_id": "MAT-20260101-012",
+        "direction": "OUTBOUND_DRY_RUN",
+        "recipient": "hr@exampleco.test",
+        "thread_id": "THREAD-BBB",
+        "provider_message_id": "DRY_RUN"
+      },
+      {
+        "communication_id": "COM-OUT-3",
+        "matter_id": "MAT-20260101-013",
+        "direction": "OUTBOUND",
+        "recipient": "claims@examplecarpark.test",
+        "thread_id": "THREAD-CCC",
+        "provider_message_id": "MSG-OUT-3"
+      },
+      {
+        "communication_id": "COM-LEGACY",
+        "matter_id": "MAT-20260101-011",
+        "direction": "INBOUND",
+        "recipient": "me@example.test",
+        "thread_id": "THREAD-AAA",
+        "provider_message_id": "MSG-LEGACY-1",
+        "ingress_fingerprint": ""
+      },
+      {
+        "communication_id": "COM-MSG-IN-1",
+        "matter_id": "MAT-20260101-011",
+        "direction": "INBOUND",
+        "recipient": "me@example.test",
+        "thread_id": "THREAD-AAA",
+        "provider_message_id": "MSG-IN-1",
+        "ingress_fingerprint": "ING-c83030ea-29"
+      },
+      {
+        "communication_id": "COM-MSG-IN-2",
+        "matter_id": "MAT-20260101-011",
+        "direction": "INBOUND",
+        "recipient": "me@example.test",
+        "thread_id": "THREAD-AAA",
+        "provider_message_id": "MSG-IN-2",
+        "ingress_fingerprint": "ING-4d819888-29"
+      },
+      {
+        "communication_id": "COM-MSG-IN-8",
+        "matter_id": "MAT-20260101-011",
+        "direction": "INBOUND",
+        "recipient": "me@example.test",
+        "thread_id": "THREAD-AAA",
+        "provider_message_id": "MSG-IN-8",
+        "ingress_fingerprint": "ING-2b912a70-101"
+      }
+    ],
+    "nodeOutputs": {
+      "Match Reply to Matter": [
+        {
+          "provider_message_id": "MSG-LEGACY-1",
+          "thread_id": "THREAD-AAA",
+          "from_address": "Claims Team <claims@examplecarpark.test>",
+          "subject": "Re: old message",
+          "body_text": "Old body.",
+          "received_at": "2026-08-20T05:00:00.000Z"
+        }
+      ],
+      "Load Matters (Reply)": [
+        {
+          "matter_id": "MAT-20260101-011",
+          "title": "Parked vehicle damage"
+        },
+        {
+          "matter_id": "MAT-20260101-012",
+          "title": "Employment contract review"
+        },
+        {
+          "matter_id": "MAT-20260101-013",
+          "title": "Second car park matter, same insurer"
+        }
+      ],
+      "Load Actions (Reply)": [],
+      "Load Comms (Reply)": [
+        {
+          "communication_id": "COM-OUT-1",
+          "matter_id": "MAT-20260101-011",
+          "direction": "OUTBOUND",
+          "recipient": "claims@examplecarpark.test",
+          "thread_id": "THREAD-AAA",
+          "provider_message_id": "MSG-OUT-1"
+        },
+        {
+          "communication_id": "COM-OUT-2",
+          "matter_id": "MAT-20260101-012",
+          "direction": "OUTBOUND_DRY_RUN",
+          "recipient": "hr@exampleco.test",
+          "thread_id": "THREAD-BBB",
+          "provider_message_id": "DRY_RUN"
+        },
+        {
+          "communication_id": "COM-OUT-3",
+          "matter_id": "MAT-20260101-013",
+          "direction": "OUTBOUND",
+          "recipient": "claims@examplecarpark.test",
+          "thread_id": "THREAD-CCC",
+          "provider_message_id": "MSG-OUT-3"
+        },
+        {
+          "communication_id": "COM-LEGACY",
+          "matter_id": "MAT-20260101-011",
+          "direction": "INBOUND",
+          "recipient": "me@example.test",
+          "thread_id": "THREAD-AAA",
+          "provider_message_id": "MSG-LEGACY-1",
+          "ingress_fingerprint": ""
+        },
+        {
+          "communication_id": "COM-MSG-IN-1",
+          "matter_id": "MAT-20260101-011",
+          "direction": "INBOUND",
+          "recipient": "me@example.test",
+          "thread_id": "THREAD-AAA",
+          "provider_message_id": "MSG-IN-1",
+          "ingress_fingerprint": "ING-c83030ea-29"
+        },
+        {
+          "communication_id": "COM-MSG-IN-2",
+          "matter_id": "MAT-20260101-011",
+          "direction": "INBOUND",
+          "recipient": "me@example.test",
+          "thread_id": "THREAD-AAA",
+          "provider_message_id": "MSG-IN-2",
+          "ingress_fingerprint": "ING-4d819888-29"
+        },
+        {
+          "communication_id": "COM-MSG-IN-8",
+          "matter_id": "MAT-20260101-011",
+          "direction": "INBOUND",
+          "recipient": "me@example.test",
+          "thread_id": "THREAD-AAA",
+          "provider_message_id": "MSG-IN-8",
+          "ingress_fingerprint": "ING-2b912a70-101"
+        }
+      ]
+    }
+  },
+  "expect": {
+    "decision": "IDEMPOTENCY_CONFLICT",
+    "basis": "FINGERPRINT_NOT_RECORDED",
+    "matter_id": "MAT-20260101-011",
+    "requires_human_review": true,
+    "write_log_inbound": false,
+    "write_append_action": false,
+    "write_touch_matter": false
+  },
+  "assertions": [
+    "resolveReply(event, register).decision is IDEMPOTENCY_CONFLICT",
+    "basis is FINGERPRINT_NOT_RECORDED",
+    "matter_id is MAT-20260101-011",
+    "write_log_inbound, write_append_action and write_touch_matter are all false: nothing is mutated",
+    "COM-LEGACY carries ingress_fingerprint: \"\" - a row written before the column existed",
+    "the resolver refuses to assume the redelivery is identical and escalates to a human instead",
+    "event_id is EVT-REPLAY-CONFLICT-MSG-LEGACY-1, event_type INBOUND_REPLAY_IGNORED_CONFLICT"
+  ],
+  "target": {
+    "workflow": "wf5",
+    "unit_file": "harness/units/wf5/build-reply-context.js"
+  },
+  "harness": {
+    "adapter": "reply-policy"
+  }
+}

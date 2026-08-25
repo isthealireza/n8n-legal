@@ -1,0 +1,47 @@
+{
+  "id": "wf5-communications-schema-18-columns-with-ingress-fingerprint",
+  "workflow": "wf5",
+  "unit": "Communications tab schema",
+  "kind": "invariant",
+  "source_qa_workflow": {
+    "id": "kBcbUbZAwGifd9rZ",
+    "name": "QA - Add Ingress Fingerprint Column"
+  },
+  "description": "The Communications tab has exactly 18 columns in the fixed production order, with ingress_fingerprint as column R.",
+  "why_it_exists": "The replay resolver stores its digest in Communications.ingress_fingerprint. That column did not exist until this one-shot migration wrote the header cell Communications!R1 on 2026-08-21 via a raw Sheets PUT (valueInputOption=RAW), adding a column without touching a single data row. If the column is ever dropped, renamed or reordered, every replay silently reads a blank fingerprint and the resolver degrades to FINGERPRINT_NOT_RECORDED on every message.",
+  "input": {},
+  "expect": {
+    "header_count": 18,
+    "headers": [
+      "communication_id",
+      "matter_id",
+      "action_id",
+      "direction",
+      "channel",
+      "provider_message_id",
+      "thread_id",
+      "recipient",
+      "subject",
+      "summary",
+      "classification",
+      "received_at",
+      "response_due",
+      "next_action",
+      "draft_id",
+      "approval_id",
+      "idempotency_key",
+      "ingress_fingerprint"
+    ],
+    "ingress_fingerprint_present": true,
+    "ingress_fingerprint_column_letter": "R",
+    "ingress_fingerprint_column_index_1based": 18
+  },
+  "assertions": [
+    "Communications row 1 contains exactly 18 header cells.",
+    "The 18th header (column R) is exactly the string 'ingress_fingerprint'.",
+    "The first 17 headers appear in the order: communication_id, matter_id, action_id, direction, channel, provider_message_id, thread_id, recipient, subject, summary, classification, received_at, response_due, next_action, draft_id, approval_id, idempotency_key.",
+    "Adding the column must not append, delete or reorder any data row."
+  ],
+  "target": null,
+  "target_unresolved_reason": "kind is \"invariant\": not executed by harness/run.js."
+}

@@ -1,0 +1,31 @@
+{
+  "id": "qa-harness-refuse-production-spreadsheet-id",
+  "workflow": "qa-harness-setup",
+  "unit": "Create B1 Harness Spreadsheet / Build Header Payload guard",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "ExgwKCZsekbzUBM4",
+    "name": "QA - Create B1 Harness Spreadsheet"
+  },
+  "description": "Setup throws immediately if the spreadsheet id it is about to write to is the production register id, or is empty.",
+  "why_it_exists": "The isolated harness only stays isolated while its target id is provably not production. The check is a hard throw before the first write payload is even built, so a mis-copied id can never reach a values:batchUpdate.",
+  "input": {
+    "create_spreadsheet_response": {
+      "spreadsheetId": "SHEET_ID_PLACEHOLDER",
+      "spreadsheetUrl": "https://docs.google.com/spreadsheets/d/SHEET_ID_PLACEHOLDER/edit"
+    }
+  },
+  "expect": {
+    "throws": true,
+    "error": "Refusing: production spreadsheet id returned.",
+    "payload_built": false
+  },
+  "assertions": [
+    "An empty spreadsheetId throws 'No spreadsheetId returned.' before any payload is built.",
+    "A spreadsheetId equal to the production register id throws 'Refusing: production spreadsheet id returned.'",
+    "The guard runs before the header payload is constructed, so no write body containing the production id ever exists.",
+    "The final Verify step independently re-asserts is_not_production by comparing the id again after the writes."
+  ],
+  "target": null,
+  "target_unresolved_reason": "Administrative / QA-infrastructure workflow. No WF1-WF5/WF9 Code node implements it."
+}

@@ -1,0 +1,285 @@
+{
+  "id": "wf5-digest-blank-status-new",
+  "workflow": "wf5",
+  "unit": "WF5 Build Daily Digest conflict-notice sections and budget omission",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "RtNgxMxS10ZOJPFG",
+    "name": "QA - WF5 Conflict Notice Digest Sections"
+  },
+  "description": "A legacy row written before the notification_status column existed, with no notified_at, is treated as PENDING.",
+  "why_it_exists": "Conflict notices written by the WF5 conflict detector could be silently lost: a notice whose Telegram delivery failed or was abandoned never resurfaced anywhere the owner reads. The digest gained three notice sections plus an unreported-count headline, and this fixture set pins the status lifecycle (blank/PENDING/FAILED/EXHAUSTED/SENT) so a reported notice stays silent and an unreported one never does.",
+  "input": {
+    "scenario_id": 6,
+    "scenario_name": "Blank status with empty notified_at defaults to PENDING",
+    "register": {
+      "matters": [
+        {
+          "matter_id": "MAT-20260101-001",
+          "title": "Harness live matter",
+          "playbook_id": "qa_v1",
+          "jurisdiction": "Western Australia, Australia",
+          "status": "NEEDS_INFORMATION",
+          "owner_chat_id": 0,
+          "facts_json": "{}",
+          "missing_facts_json": "[]",
+          "risk_flags_json": "[]",
+          "required_evidence_json": "[]",
+          "created_at": "2026-08-23T00:00:00.000Z",
+          "updated_at": "2026-08-23T00:00:00.000Z",
+          "last_activity_at": "2026-08-23T00:00:00.000Z"
+        },
+        {
+          "matter_id": "MAT-QA-001",
+          "title": "Harness synthetic matter",
+          "playbook_id": "qa_v1",
+          "jurisdiction": "Western Australia, Australia",
+          "status": "APPROVAL_REQUIRED",
+          "owner_chat_id": 0,
+          "facts_json": "{}",
+          "missing_facts_json": "[]",
+          "risk_flags_json": "[]",
+          "required_evidence_json": "[]",
+          "created_at": "2026-08-23T00:00:00.000Z",
+          "updated_at": "2026-08-23T00:00:00.000Z",
+          "last_activity_at": "2026-08-23T00:00:00.000Z"
+        }
+      ],
+      "actions": [
+        {
+          "action_id": "ACT-20260101-001-001",
+          "matter_id": "MAT-20260101-001",
+          "action_type": "COLLECT_FACTS",
+          "description": "harness fixture",
+          "status": "READY",
+          "priority": "MEDIUM",
+          "depends_on_json": "[]",
+          "recipient": "",
+          "channel": "NONE",
+          "requires_approval": "FALSE",
+          "draft_id": "",
+          "approval_id": "",
+          "due_at": "",
+          "deadline_basis": "",
+          "blocked_reason": "",
+          "idempotency_key": "",
+          "created_at": "2026-08-23T00:00:00.000Z",
+          "updated_at": "2026-08-23T00:00:00.000Z"
+        },
+        {
+          "action_id": "ACT-20260101-001-002",
+          "matter_id": "MAT-20260101-001",
+          "action_type": "CONTACT_INSURER",
+          "description": "harness fixture",
+          "status": "BLOCKED",
+          "priority": "MEDIUM",
+          "depends_on_json": "[]",
+          "recipient": "",
+          "channel": "NONE",
+          "requires_approval": "FALSE",
+          "draft_id": "",
+          "approval_id": "",
+          "due_at": "",
+          "deadline_basis": "",
+          "blocked_reason": "Waiting on an earlier action.",
+          "idempotency_key": "",
+          "created_at": "2026-08-23T00:00:00.000Z",
+          "updated_at": "2026-08-23T00:00:00.000Z"
+        },
+        {
+          "action_id": "ACT-QA-001-001",
+          "matter_id": "MAT-QA-001",
+          "action_type": "REVIEW_DOCUMENT",
+          "description": "harness fixture",
+          "status": "READY",
+          "priority": "MEDIUM",
+          "depends_on_json": "[]",
+          "recipient": "",
+          "channel": "NONE",
+          "requires_approval": "FALSE",
+          "draft_id": "",
+          "approval_id": "",
+          "due_at": "",
+          "deadline_basis": "",
+          "blocked_reason": "",
+          "idempotency_key": "",
+          "created_at": "2026-08-23T00:00:00.000Z",
+          "updated_at": "2026-08-23T00:00:00.000Z"
+        }
+      ],
+      "approvals": [],
+      "evidence": [],
+      "events": [],
+      "drafts": [],
+      "notices": [
+        {
+          "conflict_key": "CK-BLANK-NEW",
+          "matter_id": "MAT-20260101-001",
+          "action_ids_json": "[\"ACT-20260101-001-001\"]",
+          "conflict_reason": "SAME_ACTION_ID_DIFFERENT_ACTION_TYPE",
+          "occurrence_count": 1,
+          "first_seen_at": "2026-08-20T01:00:00.000Z",
+          "last_seen_at": "2026-08-22T01:00:00.000Z",
+          "notification_status": "",
+          "notified_at": "",
+          "notification_attempts": 0,
+          "last_notification_error": ""
+        }
+      ]
+    },
+    "now": "2026-08-23T06:00:00.000Z",
+    "items": [
+      {}
+    ],
+    "nodeOutputs": {
+      "Load Matters (Digest)": [
+        {
+          "matter_id": "MAT-20260101-001",
+          "title": "Harness live matter",
+          "playbook_id": "qa_v1",
+          "jurisdiction": "Western Australia, Australia",
+          "status": "NEEDS_INFORMATION",
+          "owner_chat_id": 0,
+          "facts_json": "{}",
+          "missing_facts_json": "[]",
+          "risk_flags_json": "[]",
+          "required_evidence_json": "[]",
+          "created_at": "2026-08-23T00:00:00.000Z",
+          "updated_at": "2026-08-23T00:00:00.000Z",
+          "last_activity_at": "2026-08-23T00:00:00.000Z"
+        },
+        {
+          "matter_id": "MAT-QA-001",
+          "title": "Harness synthetic matter",
+          "playbook_id": "qa_v1",
+          "jurisdiction": "Western Australia, Australia",
+          "status": "APPROVAL_REQUIRED",
+          "owner_chat_id": 0,
+          "facts_json": "{}",
+          "missing_facts_json": "[]",
+          "risk_flags_json": "[]",
+          "required_evidence_json": "[]",
+          "created_at": "2026-08-23T00:00:00.000Z",
+          "updated_at": "2026-08-23T00:00:00.000Z",
+          "last_activity_at": "2026-08-23T00:00:00.000Z"
+        }
+      ],
+      "Load Actions (Digest)": [
+        {
+          "action_id": "ACT-20260101-001-001",
+          "matter_id": "MAT-20260101-001",
+          "action_type": "COLLECT_FACTS",
+          "description": "harness fixture",
+          "status": "READY",
+          "priority": "MEDIUM",
+          "depends_on_json": "[]",
+          "recipient": "",
+          "channel": "NONE",
+          "requires_approval": "FALSE",
+          "draft_id": "",
+          "approval_id": "",
+          "due_at": "",
+          "deadline_basis": "",
+          "blocked_reason": "",
+          "idempotency_key": "",
+          "created_at": "2026-08-23T00:00:00.000Z",
+          "updated_at": "2026-08-23T00:00:00.000Z"
+        },
+        {
+          "action_id": "ACT-20260101-001-002",
+          "matter_id": "MAT-20260101-001",
+          "action_type": "CONTACT_INSURER",
+          "description": "harness fixture",
+          "status": "BLOCKED",
+          "priority": "MEDIUM",
+          "depends_on_json": "[]",
+          "recipient": "",
+          "channel": "NONE",
+          "requires_approval": "FALSE",
+          "draft_id": "",
+          "approval_id": "",
+          "due_at": "",
+          "deadline_basis": "",
+          "blocked_reason": "Waiting on an earlier action.",
+          "idempotency_key": "",
+          "created_at": "2026-08-23T00:00:00.000Z",
+          "updated_at": "2026-08-23T00:00:00.000Z"
+        },
+        {
+          "action_id": "ACT-QA-001-001",
+          "matter_id": "MAT-QA-001",
+          "action_type": "REVIEW_DOCUMENT",
+          "description": "harness fixture",
+          "status": "READY",
+          "priority": "MEDIUM",
+          "depends_on_json": "[]",
+          "recipient": "",
+          "channel": "NONE",
+          "requires_approval": "FALSE",
+          "draft_id": "",
+          "approval_id": "",
+          "due_at": "",
+          "deadline_basis": "",
+          "blocked_reason": "",
+          "idempotency_key": "",
+          "created_at": "2026-08-23T00:00:00.000Z",
+          "updated_at": "2026-08-23T00:00:00.000Z"
+        }
+      ],
+      "Load Approvals (Digest)": [],
+      "Load Evidence (Digest)": [],
+      "Load Events (Digest)": [],
+      "Load Drafts (Digest)": [],
+      "Load Conflict Notices (Digest)": [
+        {
+          "conflict_key": "CK-BLANK-NEW",
+          "matter_id": "MAT-20260101-001",
+          "action_ids_json": "[\"ACT-20260101-001-001\"]",
+          "conflict_reason": "SAME_ACTION_ID_DIFFERENT_ACTION_TYPE",
+          "occurrence_count": 1,
+          "first_seen_at": "2026-08-20T01:00:00.000Z",
+          "last_seen_at": "2026-08-22T01:00:00.000Z",
+          "notification_status": "",
+          "notified_at": "",
+          "notification_attempts": 0,
+          "last_notification_error": ""
+        }
+      ]
+    }
+  },
+  "expect": {
+    "total": 1,
+    "pending": 1,
+    "failed": 0,
+    "exhausted": 0,
+    "dupes": [],
+    "present": [
+      "CONFLICT NOTICES AWAITING NOTIFICATION"
+    ],
+    "absent": [
+      "CONFLICT NOTICES NEVER REPORTED",
+      "CONFLICT NOTICES WHOSE NOTIFICATION FAILED",
+      "DATA_INTEGRITY_CONFLICT"
+    ],
+    "headline": 1,
+    "silentKeys": []
+  },
+  "assertions": [
+    "diagnostics.reconciles is true: accounted actions equal distinct action ids",
+    "notices_total = 1, pending = 1, failed = 0, exhausted = 0",
+    "notice_duplicate_keys = []",
+    "the rendered reply contains the section heading \"CONFLICT NOTICES AWAITING NOTIFICATION\"",
+    "the rendered reply does NOT contain \"CONFLICT NOTICES NEVER REPORTED\"",
+    "the rendered reply does NOT contain \"CONFLICT NOTICES WHOSE NOTIFICATION FAILED\"",
+    "the rendered reply does NOT contain \"DATA_INTEGRITY_CONFLICT\"",
+    "the reply contains \"Conflict notices not yet reported to you: 1\"",
+    "if nothing was dropped, the reply contains no \"OMITTED TO FIT ONE MESSAGE\" block"
+  ],
+  "target": {
+    "workflow": "wf5",
+    "unit_file": "harness/units/wf5/build-daily-digest.js"
+  },
+  "harness": {
+    "adapter": "digest-notices"
+  }
+}

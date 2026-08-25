@@ -1,0 +1,72 @@
+{
+  "id": "wf5-guarded-replay-first-delivery-new-inbound",
+  "workflow": "wf5",
+  "unit": "read-before-mutate replay gate (Decide / Allow Mutations)",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "c6YPmuWf3cevjZ3r",
+    "name": "QA - Guarded Replay Test"
+  },
+  "description": "An idempotency key that is not yet on the register yields NEW_INBOUND with allow_mutations true.",
+  "why_it_exists": "QA - Replay Write Test (2026-08-20, one day earlier) had just shown that appendOrUpdate cannot be a no-op: update-on-match is exactly what it does, so it happily overwrote the stored content of a legal communication. The gate was written the same day: the register is read BEFORE any mutation and the mutation branch is gated on a decision, rather than trusting the Sheets node to be idempotent.",
+  "input": {
+    "payload": {
+      "matter_id": "MAT-QA-001",
+      "action_id": "ACT-QA-001",
+      "provider_message_id": "MSG-QA-1",
+      "thread_id": "THREAD-QA-A",
+      "idempotency_key": "MAT-QA-001|MSG-QA-1",
+      "communication_id": "COM-FIRSTRUN",
+      "subject": "Re: QA replay test",
+      "summary": "first delivery",
+      "classification": "ACKNOWLEDGEMENT",
+      "received_at": "2026-08-20T05:00:00.000Z"
+    },
+    "register": [
+      {
+        "communication_id": "COM-SEED-0",
+        "matter_id": "MAT-QA-001",
+        "action_id": "ACT-QA-001",
+        "direction": "OUTBOUND",
+        "channel": "GMAIL",
+        "provider_message_id": "MSG-SEED-0",
+        "thread_id": "THREAD-QA-A",
+        "recipient": "claims@examplecarpark.test",
+        "subject": "Seed row",
+        "summary": "synthetic seed",
+        "classification": "SEED",
+        "received_at": "2026-08-19T00:00:00.000Z",
+        "response_due": "",
+        "next_action": "",
+        "draft_id": "",
+        "approval_id": "",
+        "idempotency_key": "MAT-QA-001|MSG-SEED-0"
+      }
+    ],
+    "compare_fields": [
+      "communication_id",
+      "subject",
+      "summary",
+      "classification",
+      "received_at"
+    ]
+  },
+  "expect": {
+    "decision": "NEW_INBOUND",
+    "allow_mutations": true,
+    "requires_human_review": false,
+    "event_id": "EVT-INBOUND-MSG-QA-1",
+    "event_type": "NEW_INBOUND",
+    "severity": "INFO",
+    "conflict_fields": "",
+    "reason": "First delivery of MSG-QA-1. Recorded."
+  },
+  "assertions": [
+    "The seed row's idempotency_key (MAT-QA-001|MSG-SEED-0) differs from the key under test, so the seed can never be the row the gate matches.",
+    "A register with no matching key produces allow_mutations true, and only then do the Communications, Actions and Matters writes run.",
+    "event_id is derived from provider_message_id alone, so it is stable across runs.",
+    "Rows whose json has no keys other than row_number are not counted as register rows."
+  ],
+  "target": null,
+  "target_unresolved_reason": "QA-only Decide node from c6YPmuWf3cevjZ3r. It is the idempotency-key-shaped ANCESTOR of Build Reply Context and compares downstream products (summary, classification), which the deployed resolver deliberately does not. Binding it to build-reply-context.js would assert the superseded rule against the corrected code."
+}

@@ -1,0 +1,23 @@
+{
+  "_provenance": {
+    "spreadsheet_id": "SHEET_ID_PLACEHOLDER",
+    "recovered_from": [
+      "NslQM7zGpacyCwTS (ZZ CORRUPT IMPORT - DO NOT USE) - 193-node merged snapshot of WF1-WF5+WF9 dated 2026-08-18; every Google Sheets node's ordered column mapping",
+      "ExgwKCZsekbzUBM4 (QA - Create B1 Harness Spreadsheet) - literal ordered Matters and Actions header arrays",
+      "t64Pc7BbZruFl57G (QA - Create ConflictNotices Tab) - literal ordered 15-column ConflictNotices header array",
+      "zISJ9EDsxKUDA5U5 (QA - Add unmapped_facts_json Column) - Matters column N addition, 2026-08-21",
+      "kBcbUbZAwGifd9rZ / XevQwFviJHUobw0U (referenced, not read) - Communications column R = ingress_fingerprint, 2026-08-21"
+    ],
+    "notes": "Column order is the write order used by the production Sheets nodes and is authoritative for A1-notation ranges. Matters gained unmapped_facts_json at column N on 2026-08-21. Communications gained ingress_fingerprint at column R on 2026-08-21, taking it to the 18-column schema the QA - Ingress Round Trip harness asserts."
+  },
+  "Matters": ["matter_id","title","playbook_id","jurisdiction","status","owner_chat_id","facts_json","missing_facts_json","risk_flags_json","required_evidence_json","created_at","updated_at","last_activity_at","unmapped_facts_json"],
+  "Actions": ["action_id","matter_id","action_type","description","status","priority","depends_on_json","recipient","channel","requires_approval","draft_id","approval_id","due_at","deadline_basis","blocked_reason","idempotency_key","created_at","updated_at"],
+  "Drafts": ["draft_id","matter_id","action_id","version","content","changes_summary","source_refs_json","review_status","content_hash","created_at","created_by","draft_type","cover_note"],
+  "Approvals": ["approval_id","matter_id","action_id","draft_id","token_hash_or_reference","delivery_mode","status","requested_at","decided_at","decided_by_chat_id","decision"],
+  "Communications": ["communication_id","matter_id","action_id","direction","channel","provider_message_id","thread_id","recipient","subject","summary","classification","received_at","response_due","next_action","draft_id","approval_id","idempotency_key","ingress_fingerprint"],
+  "Evidence": ["evidence_id","matter_id","file_name","file_type","drive_url","drive_file_id","source","uploaded_at","hash","size_bytes","extraction_status","extracted_chars","extracted_text_drive_url","extracted_text_file_id","reliability","notes"],
+  "Sources": ["source_id","matter_id","title","url","publisher","retrieved_at","jurisdiction","source_type","relevance","pinpoints","verification_status"],
+  "Events": ["event_id","event_type","severity","matter_id","action_id","workflow","node","message","chat_id","created_at"],
+  "Sessions": ["chat_id","active_matter_id","awaiting","awaiting_ref","last_route","updated_at"],
+  "ConflictNotices": ["conflict_key","integrity_code","matter_id","action_ids_json","fingerprints_json","conflict_types_json","occurrence_count","first_seen_at","last_seen_at","notified_at","notification_status","notification_attempts","last_notification_error","source_workflow","execution_id"]
+}

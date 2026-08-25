@@ -1,0 +1,26 @@
+{
+  "id": "wf4-pending-approval-references-latest-draft",
+  "workflow": "wf4",
+  "unit": "Approval Gate check 5 (latest-version) vs the Approvals register",
+  "kind": "invariant",
+  "source_qa_workflow": {
+    "id": "3TVCLIVFGlBNSwK4",
+    "name": "QA - Daily Report State Census"
+  },
+  "description": "Every PENDING approval references the highest draft version that exists for its action.",
+  "why_it_exists": "The gate refuses at decision time when a newer draft exists (STALE, 'Approve that one instead'), but a register full of PENDING approvals pointing at superseded drafts means the owner is repeatedly offered decisions that cannot be actioned. The census pairs each pending approval's draft_version with latest_version_for_action to make the gap visible before the owner hits it.",
+  "input": {},
+  "expect": {
+    "approvals_pending_detail": "for every PENDING approval, draft_version equals latest_version_for_action",
+    "latest_version_for_action": "max(parseInt(version)) over all Drafts rows sharing that action_id",
+    "no_orphan_drafts": "every PENDING approval's draft_id resolves to a Drafts row (never '(no draft row)')"
+  },
+  "assertions": [
+    "For each PENDING approval, the version of the draft it names equals the maximum version recorded for that approval's action_id.",
+    "Every PENDING approval's draft_id matches an existing Drafts row.",
+    "An approval whose draft_version is behind the latest is stale by construction and must be SUPERSEDED rather than left decidable.",
+    "The gate's own STALE checks (content_hash equality against token_hash_or_reference, and latest-version-in-chain) must still fire independently at decision time; this invariant is about register hygiene, not a replacement for them."
+  ],
+  "target": null,
+  "target_unresolved_reason": "kind is \"invariant\": not executed by harness/run.js."
+}

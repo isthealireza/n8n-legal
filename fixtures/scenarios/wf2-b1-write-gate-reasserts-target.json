@@ -1,0 +1,32 @@
+{
+  "id": "wf2-b1-write-gate-reasserts-target",
+  "workflow": "wf2",
+  "unit": "Assert QA Before Upsert / Assert QA Before Append",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "olEuL3AIVr4ER0bT",
+    "name": "QA - WF2 B1 Boundary Harness"
+  },
+  "description": "Immediately before each Sheets write the harness re-asserts qa_ok, that the target is the expected QA id, and that the target is not the production id.",
+  "why_it_exists": "Between the preflight and the write sit a planner, a validator and several transforms, any of which could be edited later to change the target. The gate is duplicated in front of every write node so the guard cannot be bypassed by adding a branch.",
+  "input": {
+    "gate_state": {
+      "qa_ok": true,
+      "qa_spreadsheet_id": "SHEET_ID_PLACEHOLDER",
+      "prod_spreadsheet_id": "SHEET_ID_PLACEHOLDER"
+    }
+  },
+  "expect": {
+    "throws": true,
+    "error": "QA GATE: unexpected target spreadsheet."
+  },
+  "assertions": [
+    "qa_ok not exactly true throws 'QA GATE: preflight did not pass. Refusing to write.'",
+    "A target that is not the one hardcoded QA id throws 'QA GATE: unexpected target spreadsheet.' even if it is also not production.",
+    "A target equal to the production id throws 'QA GATE: production spreadsheet. Refusing.'",
+    "The gate is an allowlist of one id, not a denylist of production - an unknown third spreadsheet is refused too.",
+    "There is one such gate in front of the Matters upsert and a second in front of the Actions append; removing either leaves that write unguarded."
+  ],
+  "target": null,
+  "target_unresolved_reason": "QA-harness-only nodes (Assert QA Before Upsert / Append). No production unit."
+}

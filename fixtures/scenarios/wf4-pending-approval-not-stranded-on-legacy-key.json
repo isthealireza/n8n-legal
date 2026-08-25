@@ -1,0 +1,24 @@
+{
+  "id": "wf4-pending-approval-not-stranded-on-legacy-key",
+  "workflow": "wf4",
+  "unit": "Approval Gate idempotency checks vs pre-F-02 Communications rows",
+  "kind": "invariant",
+  "source_qa_workflow": {
+    "id": "vrP4KZLwrsAbekc1",
+    "name": "QA - Communications Delivery Key Census"
+  },
+  "description": "No approval that is still PENDING has its prior Communications activity recorded under an old 8-character delivery key.",
+  "why_it_exists": "This is the exact cross-check the census was built to run. A PENDING approval whose earlier attempt was written under the old key format will, on decision, derive a 16-character key that matches nothing - so the gate's duplicate, pending and uncertain checks all look at an empty result set and the send proceeds as if it had never been attempted. The one-time append effect is harmless on decided approvals and dangerous on undecided ones.",
+  "input": {},
+  "expect": {
+    "pending_approvals_with_old_format_key": [],
+    "cross_check": "collect approval_id from every Communications row whose idempotency_key matches ^SND-[0-9a-f]{8}(\\|DRY)?$; intersect with the approval_id of every Approvals row whose status is PENDING; the intersection must be empty."
+  },
+  "assertions": [
+    "The set of approval_ids appearing on old-8-char-key Communications rows and the set of PENDING approval_ids do not intersect.",
+    "Every Actions row with status AWAITING_APPROVAL is reported alongside its action_id, matter_id, draft_id and approval_id so an orphaned approval can be traced.",
+    "If the intersection is non-empty, the correct remedy is a human decision about the affected approval, not a key rewrite - rewriting a stored key would break the collision detection in check 7d, which relies on the key's own pre-image."
+  ],
+  "target": null,
+  "target_unresolved_reason": "kind is \"invariant\": not executed by harness/run.js."
+}

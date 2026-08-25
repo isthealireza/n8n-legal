@@ -1,0 +1,55 @@
+{
+  "id": "sheet-schema-snapshot-and-outbound-census",
+  "workflow": "admin-sheet-migration",
+  "unit": "Sheet Schema Probe",
+  "kind": "integration",
+  "source_qa_workflow": {
+    "id": "SEzZkM8OTnQIPpwl",
+    "name": "QA - Sheet Schema Probe"
+  },
+  "description": "Reads seven tabs with headerRow=firstDataRow=1 so the live column names come back as object keys, and censuses Communications outbound rows by delivery-key format.",
+  "why_it_exists": "Two separate failures. First, idempotency claims were being checked against n8n's cached node schema rather than the sheet. Second, the WF4 outbound fix changed the delivery-key FORMAT: the duplicate-send check compares the new key literally against idempotency_key values already stored on OUTBOUND and OUTBOUND_PENDING rows, so any pre-existing row in the old format would stop matching and the block on re-sending an already-sent legal communication would silently lift.",
+  "input": {
+    "spreadsheet_id": "SHEET_ID_PLACEHOLDER",
+    "tabs": [
+      "Communications",
+      "Events",
+      "Actions",
+      "Matters",
+      "Sources",
+      "Drafts",
+      "Approvals"
+    ],
+    "read_options": {
+      "headerRow": 1,
+      "firstDataRow": 1,
+      "returnAllMatches": true,
+      "alwaysOutputData": true,
+      "executeOnce": true
+    }
+  },
+  "expect": {
+    "snapshot": {
+      "per_tab": [
+        "headers",
+        "header_count",
+        "header_hash"
+      ],
+      "header_hash_algorithm": "FNV-1a 32-bit over headers joined by '|', prefixed 'H-'"
+    },
+    "outbound_census": {
+      "by_direction": {},
+      "outbound_like_rows": 0,
+      "key_format_migration_safe": true
+    }
+  },
+  "assertions": [
+    "Setting firstDataRow equal to headerRow makes the header row itself arrive as a data row, which is the only way to see column names on a tab that holds no data.",
+    "That same convention means the header row must be excluded from the census by identity - a row whose communication_id literally equals the string 'communication_id' is the header, not data.",
+    "key_format_migration_safe is true only when zero rows have a direction beginning with OUTBOUND; a single old-format outbound row makes the WF4 key-format change unsafe to deploy.",
+    "The snapshot is evidence, not a verdict - retrieved_at records provenance and a downstream linter decides whether the snapshot is fresh enough to validate against.",
+    "Every node is a Sheets read; the workflow writes nothing."
+  ],
+  "target": null,
+  "target_unresolved_reason": "kind is \"integration\": not executed by harness/run.js."
+}

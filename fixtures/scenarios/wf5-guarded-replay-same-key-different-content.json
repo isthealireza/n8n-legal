@@ -1,0 +1,91 @@
+{
+  "id": "wf5-guarded-replay-same-key-different-content",
+  "workflow": "wf5",
+  "unit": "read-before-mutate replay gate (Decide / Allow Mutations)",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "c6YPmuWf3cevjZ3r",
+    "name": "QA - Guarded Replay Test"
+  },
+  "description": "A replay of the same idempotency key with deliberately different content yields IDEMPOTENCY_CONFLICT, blocks all mutations, names the differing fields, and requires human review.",
+  "why_it_exists": "This is the case QA - Replay Write Test failed: with only appendOrUpdate, the second write silently replaced communication_id, subject, summary, classification and received_at on the stored row. The gate exists so a contradicting redelivery is refused and reported rather than applied.",
+  "input": {
+    "payload": {
+      "matter_id": "MAT-QA-001",
+      "action_id": "ACT-QA-001",
+      "provider_message_id": "MSG-QA-1",
+      "thread_id": "THREAD-QA-A",
+      "idempotency_key": "MAT-QA-001|MSG-QA-1",
+      "communication_id": "COM-REPLAYRUN",
+      "subject": "Re: QA replay test SECOND DELIVERY",
+      "summary": "replay delivery with deliberately different content",
+      "classification": "OFFER",
+      "received_at": "2026-08-20T06:00:00.000Z"
+    },
+    "register": [
+      {
+        "communication_id": "COM-SEED-0",
+        "matter_id": "MAT-QA-001",
+        "action_id": "ACT-QA-001",
+        "direction": "OUTBOUND",
+        "channel": "GMAIL",
+        "provider_message_id": "MSG-SEED-0",
+        "thread_id": "THREAD-QA-A",
+        "recipient": "claims@examplecarpark.test",
+        "subject": "Seed row",
+        "summary": "synthetic seed",
+        "classification": "SEED",
+        "received_at": "2026-08-19T00:00:00.000Z",
+        "response_due": "",
+        "next_action": "",
+        "draft_id": "",
+        "approval_id": "",
+        "idempotency_key": "MAT-QA-001|MSG-SEED-0"
+      },
+      {
+        "communication_id": "COM-FIRSTRUN",
+        "matter_id": "MAT-QA-001",
+        "action_id": "ACT-QA-001",
+        "direction": "INBOUND",
+        "channel": "GMAIL",
+        "provider_message_id": "MSG-QA-1",
+        "thread_id": "THREAD-QA-A",
+        "recipient": "claims@examplecarpark.test",
+        "subject": "Re: QA replay test",
+        "summary": "first delivery",
+        "classification": "ACKNOWLEDGEMENT",
+        "received_at": "2026-08-20T05:00:00.000Z",
+        "response_due": "",
+        "next_action": "",
+        "draft_id": "",
+        "approval_id": "",
+        "idempotency_key": "MAT-QA-001|MSG-QA-1"
+      }
+    ],
+    "compare_fields": [
+      "communication_id",
+      "subject",
+      "summary",
+      "classification",
+      "received_at"
+    ]
+  },
+  "expect": {
+    "decision": "IDEMPOTENCY_CONFLICT",
+    "allow_mutations": false,
+    "requires_human_review": true,
+    "event_id": "EVT-REPLAY-MSG-QA-1",
+    "event_type": "INBOUND_REPLAY_IGNORED_CONFLICT",
+    "severity": "WARNING",
+    "conflict_fields": "communication_id, subject, summary, classification, received_at",
+    "reason": "Key MAT-QA-001|MSG-QA-1 already recorded with different content (communication_id, subject, summary, classification, received_at). Nothing was changed. Human review required."
+  },
+  "assertions": [
+    "Every differing compare field is listed, in the declared compare order, in conflict_fields and in the reason text.",
+    "allow_mutations is false, so Communications, Actions and Matters are untouched.",
+    "requires_human_review is true and severity is WARNING.",
+    "Comparison is on string-coerced values with null/undefined treated as the empty string."
+  ],
+  "target": null,
+  "target_unresolved_reason": "As above (QA-only ancestor logic)."
+}

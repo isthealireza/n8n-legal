@@ -1,0 +1,73 @@
+{
+  "id": "wf4-verify-table-of-contents-is-not-authority",
+  "workflow": "wf4",
+  "unit": "WF4 Distil Sources verification grading (pre-alignment version)",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "rMxfriXtRP8nQGAb",
+    "name": "QA - Source Verification Regression"
+  },
+  "description": "A contents listing that names section 61 but carries no \"NN .\" heading marker is rejected as NO_PINPOINT_FOUND.",
+  "why_it_exists": "Three verification defects were found in live WF4 runs. (1) source_type was HARDCODED to OFFICIAL for every fetched page, so a landing page, a block page or a blog was all stamped official. (2) verification_status was decided by text.length > 400 alone, so navigation chrome on a bare homepage passed as RETRIEVED and was then cited by id in a legal draft - fabricated authority, and the most dangerous defect in the build. (3) execution 300: a federal legislation page returned 1.23 MB of text with no section heading marker and was still graded RETRIEVED, because a table of contents is full of structural words. A heading-marker check now separates a real section body from an index.",
+  "input": {
+    "ctx": {
+      "matter_id": "MAT-TEST-000",
+      "jurisdiction": "WA, Australia",
+      "playbook_name": "regression fixture",
+      "urls": [
+        "https://www.legislation.gov.au/C2009A00028/latest/text/original/epub/OEBPS/document_2/document_2.html"
+      ]
+    },
+    "items": [
+      {
+        "json": {
+          "data": "<html><title>Fair Work Act 2009</title><body>Part 2 2 Contents <a href=\"#x\">61 The National Employment Standards are minimum standards applying to employment</a> section 61 subsection Schedule 1 Division 3 the following words are padding only and carry no heading marker and no digits repeated so that the stripped text passes the four hundred character floor easily the following words are padding only and carry no heading marker and no digits repeated so that the stripped text passes the four hundred character floor easily the following words are padding only and carry no heading marker and no digits repeated so that the stripped text passes the four hundred character floor easily the following words are padding only and carry no heading marker and no digits repeated so that the stripped text passes the four hundred character floor easily the following words are padding only and carry no heading marker and no digits repeated so that the stripped text passes the four hundred character floor easily the following words are padding only and carry no heading marker and no digits repeated so that the stripped text passes the four hundred character floor easily</body></html>"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "now": "2026-08-23T06:00:00.000Z",
+    "nodeOutputs": {
+      "Collect Evidence Text": [
+        {
+          "matter_id": "MAT-TEST-000",
+          "jurisdiction": "WA, Australia",
+          "playbook_name": "regression fixture",
+          "urls": [
+            "https://www.legislation.gov.au/C2009A00028/latest/text/original/epub/OEBPS/document_2/document_2.html"
+          ]
+        }
+      ],
+      "Source Registry": [
+        {
+          "json": {
+            "url": "https://www.legislation.gov.au/C2009A00028/latest/text/original/epub/OEBPS/document_2/document_2.html",
+            "want": [],
+            "cite": ""
+          }
+        }
+      ]
+    }
+  },
+  "expect": {
+    "verification_status": [
+      "NO_PINPOINT_FOUND"
+    ],
+    "research_status": "UNVERIFIED"
+  },
+  "assertions": [
+    "the per-source verification_status list is exactly [\"NO_PINPOINT_FOUND\"]",
+    "research_status is UNVERIFIED",
+    "this is the execution 300 shape: 1.23 MB of structural words with nothing citable in it",
+    "LEGAL_STRUCTURE alone passes, HEADING_MARKER does not, and both are required for legislation and case law"
+  ],
+  "target": {
+    "workflow": "wf4",
+    "unit_file": "harness/units/wf4/distil-sources.js"
+  },
+  "harness": {
+    "adapter": "distil-grading"
+  }
+}

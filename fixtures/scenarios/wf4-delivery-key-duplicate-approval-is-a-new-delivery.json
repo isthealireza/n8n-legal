@@ -1,0 +1,44 @@
+{
+  "workflow": "wf4",
+  "unit": "WF4 Approval Gate delivery-key derivation",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "Rgw4AH2dwwatNfWS",
+    "name": "QA - WF4 Outbound Delivery Key"
+  },
+  "id": "wf4-delivery-key-duplicate-approval-is-a-new-delivery",
+  "description": "A second approval_id over the same action and draft is a distinct delivery decision and must produce a distinct key.",
+  "why_it_exists": "The WF4 outbound delivery key was once derived with $now in the basis, so a second attempt at the same approved delivery produced a different send_key and a different communication_id. An uncertain send result (a timeout after the message had actually gone) therefore resolved to a brand new row on retry, and the same letter could be sent to an insurer twice with no duplicate detectable anywhere in the register. A duplicate approval is a new human decision to send; silently reusing the first delivery identity would let the second approval be swallowed as an already-sent duplicate.",
+  "input": {
+    "approval": {
+      "approval_id": "APR-002"
+    },
+    "action": {
+      "action_id": "ACT-001",
+      "channel": "GMAIL",
+      "recipient": "insurerclaims01@example.com"
+    },
+    "draft": {
+      "draft_id": "DFT-001"
+    },
+    "compare_against": "wf4-delivery-key-first-send",
+    "now": "2026-08-23T06:00:00.000Z"
+  },
+  "expect": {
+    "send_key": "REGENERATE",
+    "differs_from_first_send": true,
+    "note": "The original oracle hashes were computed by a separate Python FNV-1a implementation over the REAL recipient address. That address has been replaced by a same-length synthetic address, so the expected hash must be regenerated from this input with an independent FNV-1a implementation before this assertion means anything. Do not copy the value the JavaScript under test produces. The original assertion was send_key === \"SND-dc3dd0f9\"."
+  },
+  "needs_hash_regen": true,
+  "assertions": [
+    "send_key differs from the first-send key",
+    "send_key equals \"SND-\" + the independently computed FNV-1a of \"apr=APR-002 act=ACT-001 draft=DFT-001 chan=GMAIL to=insurerclaims01@example.com\""
+  ],
+  "target": {
+    "workflow": "wf4",
+    "unit_file": "harness/units/wf4/approval-gate.js"
+  },
+  "harness": {
+    "adapter": "delivery-key"
+  }
+}

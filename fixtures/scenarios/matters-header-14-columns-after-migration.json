@@ -1,0 +1,42 @@
+{
+  "id": "matters-header-14-columns-after-migration",
+  "workflow": "admin-sheet-migration",
+  "unit": "Matters sheet schema after unmapped_facts_json",
+  "kind": "schema",
+  "source_qa_workflow": {
+    "id": "zISJ9EDsxKUDA5U5",
+    "name": "QA - Add unmapped_facts_json Column"
+  },
+  "description": "After the migration the live Matters header row is exactly 14 columns with unmapped_facts_json in position N.",
+  "why_it_exists": "WF2's Finalise Plan writes the unmapped-fact audit copy to this column by name, and Upsert Matter maps it positionally. Position 14 is asserted, not just presence, because an insert elsewhere would shift every later column.",
+  "input": {
+    "range": "Matters!1:1"
+  },
+  "expect": {
+    "columns": [
+      "matter_id",
+      "title",
+      "playbook_id",
+      "jurisdiction",
+      "status",
+      "owner_chat_id",
+      "facts_json",
+      "missing_facts_json",
+      "risk_flags_json",
+      "required_evidence_json",
+      "created_at",
+      "updated_at",
+      "last_activity_at",
+      "unmapped_facts_json"
+    ],
+    "column_count": 14,
+    "unmapped_facts_json_at": 14
+  },
+  "assertions": [
+    "header[13] is 'unmapped_facts_json' and header.length is exactly 14.",
+    "Presence alone is not sufficient - the confirmation fails if the column exists at any other index.",
+    "The confirmation reads the live header row back over HTTP rather than trusting the n8n cached node schema."
+  ],
+  "target": null,
+  "target_unresolved_reason": "kind is \"schema\": not executed by harness/run.js."
+}

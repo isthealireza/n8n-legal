@@ -1,0 +1,46 @@
+{
+  "id": "legal-register-tab-schema-snapshot-2026-08-18",
+  "workflow": "all",
+  "unit": "Google Sheets register schema for every tab",
+  "kind": "schema",
+  "source_qa_workflow": {
+    "id": "NslQM7zGpacyCwTS",
+    "name": "ZZ CORRUPT IMPORT - DO NOT USE"
+  },
+  "description": "The complete ordered column mapping for every tab of the legal register, recovered from the 193-node merged snapshot of WF1-WF5 and WF9.",
+  "why_it_exists": "No single live workflow declares all ten tabs, and the Sheets nodes address columns by name while the migration workflows address them by A1 letter. The two only agree while the order below holds. The corrupt import is retained precisely because it is the one artefact holding every mapping at once.",
+  "input": {
+    "spreadsheet_id": "SHEET_ID_PLACEHOLDER",
+    "snapshot_date": "2026-08-18",
+    "also_present_in": {
+      "id": "Y62WStOAIC4m0VvP",
+      "name": "ZZ BACKUP 2026-08-18 - Legal AI System (Claude)"
+    }
+  },
+  "expect": {
+    "see": "../sheet-schema.json",
+    "tabs": [
+      "Matters",
+      "Actions",
+      "Drafts",
+      "Approvals",
+      "Communications",
+      "Evidence",
+      "Sources",
+      "Events",
+      "Sessions",
+      "ConflictNotices"
+    ]
+  },
+  "assertions": [
+    "Matters was 13 columns at the snapshot date and gained unmapped_facts_json at column N on 2026-08-21, making 14.",
+    "Communications was 17 columns at the snapshot date and gained ingress_fingerprint at column R on 2026-08-21, making 18.",
+    "Log Inbound writes only the first 14 Communications columns; draft_id, approval_id and idempotency_key are written by the outbound path, so an inbound row legitimately has them blank.",
+    "Log Outbound and Log Dry Run write the identical 17-column set - a dry run is distinguished only by direction and by provider_message_id = DRY_RUN, never by a different column shape.",
+    "ConflictNotices does not exist in this snapshot; it was added 2026-08-22 with the 15 columns recorded in conflictnotices-tab-schema.",
+    "This workflow is marked DO NOT USE and carries two live schedule triggers (Daily 08:15 Sweep, Daily 09:00 Follow-up Sweep) - it must stay inactive.",
+    "The tabs are addressed by name, never by sheetId, so renaming a tab breaks every write in the system at once."
+  ],
+  "target": null,
+  "target_unresolved_reason": "kind is \"schema\": not executed by harness/run.js."
+}

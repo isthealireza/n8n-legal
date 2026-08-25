@@ -1,0 +1,113 @@
+{
+  "id": "wf5-guarded-replay-event-row-does-not-multiply",
+  "workflow": "wf5",
+  "unit": "replay audit event write (appendOrUpdate on event_id)",
+  "kind": "integration",
+  "source_qa_workflow": {
+    "id": "c6YPmuWf3cevjZ3r",
+    "name": "QA - Guarded Replay Test"
+  },
+  "description": "Replaying the same conflicting message twice produces exactly one replay audit row, because event_id is derived from the message id and the event write matches on event_id.",
+  "why_it_exists": "QA - Replay Write Test appended events with hand-written distinct ids (EVT-FIRST-001, EVT-REPLAY-002), so every replay grew the Events tab and a genuinely repeating redelivery would have flooded the audit log. Round 3 of the guarded test re-runs the identical replay to prove the audit row is updated in place.",
+  "input": {
+    "spreadsheet": "created fresh per run; must not be SHEET_ID_PLACEHOLDER",
+    "seed_row_per_tab": {
+      "communication_id": "COM-SEED-0",
+      "matter_id": "MAT-QA-001",
+      "action_id": "ACT-QA-001",
+      "direction": "OUTBOUND",
+      "channel": "GMAIL",
+      "provider_message_id": "MSG-SEED-0",
+      "thread_id": "THREAD-QA-A",
+      "recipient": "claims@examplecarpark.test",
+      "subject": "Seed row",
+      "summary": "synthetic seed",
+      "classification": "SEED",
+      "received_at": "2026-08-19T00:00:00.000Z",
+      "response_due": "",
+      "next_action": "",
+      "draft_id": "",
+      "approval_id": "",
+      "idempotency_key": "MAT-QA-001|MSG-SEED-0",
+      "action_type": "SEED",
+      "description": "synthetic seed",
+      "status": "SEED",
+      "event_id": "EVT-SEED-0",
+      "event_type": "SEED",
+      "severity": "INFO",
+      "message": "synthetic seed",
+      "updated_at": "SEED-STAMP"
+    },
+    "rounds": [
+      {
+        "round": "R1",
+        "payload": {
+          "matter_id": "MAT-QA-001",
+          "action_id": "ACT-QA-001",
+          "provider_message_id": "MSG-QA-1",
+          "thread_id": "THREAD-QA-A",
+          "idempotency_key": "MAT-QA-001|MSG-QA-1",
+          "communication_id": "COM-FIRSTRUN",
+          "subject": "Re: QA replay test",
+          "summary": "first delivery",
+          "classification": "ACKNOWLEDGEMENT",
+          "received_at": "2026-08-20T05:00:00.000Z"
+        }
+      },
+      {
+        "round": "R2",
+        "payload": {
+          "matter_id": "MAT-QA-001",
+          "action_id": "ACT-QA-001",
+          "provider_message_id": "MSG-QA-1",
+          "thread_id": "THREAD-QA-A",
+          "idempotency_key": "MAT-QA-001|MSG-QA-1",
+          "communication_id": "COM-REPLAYRUN",
+          "subject": "Re: QA replay test SECOND DELIVERY",
+          "summary": "replay delivery with deliberately different content",
+          "classification": "OFFER",
+          "received_at": "2026-08-20T06:00:00.000Z"
+        }
+      },
+      {
+        "round": "R3",
+        "payload": {
+          "matter_id": "MAT-QA-001",
+          "action_id": "ACT-QA-001",
+          "provider_message_id": "MSG-QA-1",
+          "thread_id": "THREAD-QA-A",
+          "idempotency_key": "MAT-QA-001|MSG-QA-1",
+          "communication_id": "COM-REPLAYRUN",
+          "subject": "Re: QA replay test SECOND DELIVERY",
+          "summary": "replay delivery with deliberately different content",
+          "classification": "OFFER",
+          "received_at": "2026-08-20T06:00:00.000Z"
+        }
+      }
+    ],
+    "action_idempotency_key_under_test": "MAT-QA-001|MSG-QA-1|OWNER_DECISION"
+  },
+  "expect": {
+    "decision_r1": "NEW_INBOUND",
+    "decision_r2": "IDEMPOTENCY_CONFLICT",
+    "decision_r3": "IDEMPOTENCY_CONFLICT",
+    "comms_rows_after_r2": "equals comms_rows_after_r1",
+    "comms_rows_after_r3": "equals comms_rows_after_r1",
+    "content_fields_changed_by_replay": "(none)",
+    "actions_after_r2": "equals actions_after_r1",
+    "matter_stamp_after_r2": "equals matter_stamp_after_r1 (R1-STAMP)",
+    "new_inbound_events_after_r1": 1,
+    "duplicate_labelled_events_after_r1": 0,
+    "replay_events_after_r2": 1,
+    "replay_events_after_r3": 1,
+    "verdict": "FULLY_PROVEN"
+  },
+  "assertions": [
+    "One first delivery produces exactly one NEW_INBOUND event and zero events whose type contains DUPLICATE.",
+    "Two identical conflicting replays produce exactly one event whose type contains REPLAY, not two.",
+    "Communications row count, the compared content fields, Actions row count for the OWNER_DECISION key, and Matters.updated_at are all unchanged across both replays.",
+    "The event write uses appendOrUpdate matched on event_id; a deterministic event_id is what makes the audit row idempotent."
+  ],
+  "target": null,
+  "target_unresolved_reason": "kind is \"integration\": not executed by harness/run.js."
+}

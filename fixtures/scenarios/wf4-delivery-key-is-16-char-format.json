@@ -1,0 +1,54 @@
+{
+  "id": "wf4-delivery-key-is-16-char-format",
+  "workflow": "wf4",
+  "unit": "Approval Gate delivery-key derivation (send_key / dry_key / communication_id)",
+  "kind": "invariant",
+  "source_qa_workflow": {
+    "id": "vrP4KZLwrsAbekc1",
+    "name": "QA - Communications Delivery Key Census"
+  },
+  "description": "Every SND- delivery key on the Communications tab is in the widened 16-hex-character format; any surviving 8-character key is a pre-F-02 legacy row that the current code can no longer match.",
+  "why_it_exists": "F-02 widened the delivery key from 32 to 64 bits. The change is deliberately not backward compatible: a Communications row written under the old 8-character key will not be matched by the new 16-character key, so the first write per approval after the change appends a second row instead of updating the first. The census counts rows by key format to size that one-time effect and to find any approval still stranded on a legacy key.",
+  "input": {},
+  "expect": {
+    "delivery_key_formats": {
+      "old_8_char": {
+        "pattern": "^SND-[0-9a-f]{8}(\\|DRY)?$",
+        "produced_by": "WF4 'Approval Gate' code node BEFORE finding F-02. A single 32-bit FNV-1a pass over deliveryIdentity with offset basis 0x811c9dc5, rendered as ('0000000' + h.toString(16)).slice(-8) = 8 lowercase hex characters.",
+        "companion_ids": [
+          "COM-<8hex>",
+          "COM-DRY-<8hex>"
+        ],
+        "why_replaced": "32 bits reaches roughly a 1% birthday-collision probability by about 10,000 deliveries. A collision means two different approved deliveries share communication_id and send_key, so one silently overwrites the other's Communications row and the sheet can no longer answer whether a particular legal communication was sent."
+      },
+      "new_16_char": {
+        "pattern": "^SND-[0-9a-f]{16}(\\|DRY)?$",
+        "produced_by": "WF4 'Approval Gate' code node AFTER F-02. fnv1aHex(s) = fnv1aPass(s, 0x811c9dc5) + fnv1aPass('K2|' + s + '|K2', 0x01000193) - two independent FNV-1a passes with different offset bases over differently salted input, 8 hex characters each, concatenated to 16. The n8n Code sandbox has no crypto module, which is why this is a doubled FNV rather than a real digest.",
+        "companion_ids": [
+          "COM-<16hex>",
+          "COM-DRY-<16hex>"
+        ],
+        "collision_probability": "the same ~1% point moves beyond about 600 million deliveries"
+      },
+      "delivery_identity_preimage": "apr=<approval_id> act=<action_id> draft=<draft_id> chan=<UPPER(channel||'NONE')> to=<normEmail(recipient)>",
+      "excluded_from_key": [
+        "any clock or timestamp",
+        "delivery_mode"
+      ],
+      "normEmail": "strips 'Name <addr>' to addr, trims, lowercases - so 'A. Smith <A.Smith@Example.COM>' and 'a.smith@example.com' are one delivery"
+    },
+    "old_8char_format_count": 0,
+    "other_key_format_count": 0,
+    "note": "A non-zero old_8char_format_count is not automatically a failure - it is the known, accepted migration residue. It is a failure only when one of those rows belongs to an approval that is still PENDING (see wf4-pending-approval-not-stranded-on-legacy-key)."
+  },
+  "assertions": [
+    "Every Communications.idempotency_key beginning with SND- matches ^SND-[0-9a-f]{16}(\\|DRY)?$.",
+    "No SND- key is in the old format ^SND-[0-9a-f]{8}(\\|DRY)?$, and none is in a third shape.",
+    "The dry-run key is exactly the send key with the literal suffix |DRY; the two must never be confused as separate deliveries.",
+    "communication_id for a real send is 'COM-' + the same hash; for a dry run it is 'COM-DRY-' + the same hash.",
+    "The key is a pure function of approval_id, action_id, draft_id, upper-cased channel and normalised recipient - no clock, no delivery_mode, no randomness.",
+    "Re-deriving the key from a row's own approval_id/action_id/draft_id/channel/recipient must reproduce that row's key; if it does not, the row is hand-edited or the key has collided."
+  ],
+  "target": null,
+  "target_unresolved_reason": "kind is \"invariant\": not executed by harness/run.js."
+}

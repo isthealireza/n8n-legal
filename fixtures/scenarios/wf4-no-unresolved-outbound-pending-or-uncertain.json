@@ -1,0 +1,32 @@
+{
+  "id": "wf4-no-unresolved-outbound-pending-or-uncertain",
+  "workflow": "wf4",
+  "unit": "Approval Gate checks 7b and 7b-2 (fail-closed send blocking)",
+  "kind": "invariant",
+  "source_qa_workflow": {
+    "id": "vrP4KZLwrsAbekc1",
+    "name": "QA - Communications Delivery Key Census"
+  },
+  "description": "No Communications row is left indefinitely in OUTBOUND_PENDING or OUTBOUND_UNCERTAIN, because each one permanently blocks any further send on that delivery key.",
+  "why_it_exists": "OUTBOUND_PENDING means a run reached the send step and nothing confirmed the outcome. OUTBOUND_UNCERTAIN was added by F-04, after it was found that Mark Send Failed stamped every send-path error as OUTBOUND_FAILED - including a network timeout that may have occurred AFTER Gmail accepted the message. Because check 7c deliberately ignores OUTBOUND_FAILED so a known failure does not block a retry, an uncertain outcome was being converted into permission to send the same legal communication twice. Both states now block exactly like a duplicate, so each one is a live, human-owned obstruction that has to be counted and cleared.",
+  "input": {},
+  "expect": {
+    "outbound_pending_count": 0,
+    "outbound_uncertain_count": 0,
+    "blocking_semantics": {
+      "OUTBOUND": "blocks any further send on that action outright (check 7a)",
+      "OUTBOUND_PENDING": "blocks when its idempotency_key equals the current send_key (check 7b)",
+      "OUTBOUND_UNCERTAIN": "blocks when its idempotency_key equals the current send_key (check 7b-2)",
+      "OUTBOUND_FAILED": "deliberately does NOT block - only for outcomes proven never to have reached Gmail (check 7c)",
+      "OUTBOUND_DRY_RUN": "never blocks a later real send"
+    }
+  },
+  "assertions": [
+    "Zero Communications rows have direction OUTBOUND_PENDING.",
+    "Zero Communications rows have direction OUTBOUND_UNCERTAIN.",
+    "Any such row that does exist must be reported with its communication_id, idempotency_key, approval_id, draft_id, action_id and recipient, because clearing it is a human decision (check the sent mail) and not an automatable one.",
+    "OUTBOUND_FAILED must never be used for an outcome that cannot be proven never to have reached Gmail - that is what OUTBOUND_UNCERTAIN is for."
+  ],
+  "target": null,
+  "target_unresolved_reason": "kind is \"invariant\": not executed by harness/run.js."
+}

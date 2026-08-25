@@ -1,0 +1,40 @@
+{
+  "id": "wf5-testonly-live-company-named-test-corp",
+  "workflow": "wf5",
+  "unit": "WF5 ingress resolveTestFlag predicate and the digest isTestMatter predicate",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "RtNgxMxS10ZOJPFG",
+    "name": "QA - WF5 Conflict Notice Digest Sections"
+  },
+  "description": "Live company literally named Test Corp.",
+  "why_it_exists": "On 2026-08-23 a synthetic matter was only detected as TEST because the model happened to emit a risk flag saying so. The model titled it \"Parked vehicle damage - Perth car park (hit and run) - 17 Aug 2026\" with no test marker at all, so one unlucky generation would have counted a synthetic matter as live legal work in the only daily report the owner reads. Fix 1 moved the decision to raw ingress text plus an explicit internal flag, and made it deliberately refuse to fire on ordinary legal English. Case T6 fixes the asymmetry threshold: mislabelling a live matter as test hides real legal work, so the predicate fires only on a leading TEST ONLY / DO NOT USE marker or an explicit internal flag.",
+  "input": {
+    "case_id": "T6",
+    "ingress": {
+      "raw_text": "Test Corp has not paid my invoice for consulting work completed in June."
+    },
+    "classifier_output": {
+      "matter_id": "MAT-20260101-96",
+      "title": "Unpaid consulting invoice - Test Corp",
+      "facts_json": "{\"incident\":\"synthetic or live\",\"test_data_only\":\"FALSE\"}",
+      "risk_flags_json": "[]"
+    },
+    "note": "facts_json.test_data_only is the persisted result of resolveTestFlag(ingress); the digest predicate isTestMatter() then reads matter_id, title, facts_json and risk_flags_json only."
+  },
+  "expect": {
+    "resolveTestFlag": {
+      "test_data_only": false,
+      "basis": "NO_MARKER"
+    },
+    "isTestMatter": false
+  },
+  "assertions": [
+    "resolveTestFlag(ingress).test_data_only is false",
+    "resolveTestFlag(ingress).basis is \"NO_MARKER\"",
+    "the flag persisted into facts_json survives classification and the digest predicate isTestMatter() returns false",
+    "the decision does not depend on any wording the model chose for the title or the risk flags"
+  ],
+  "target": null,
+  "target_unresolved_reason": "Half of the expect is resolveTestFlag(ingress), a WF5 ingress predicate that does not exist: grep finds no resolveTestFlag in any of .raw/wf{1,2,3,4,5,9}.json or in any of the 59 extracted units. Binding to Build Daily Digest would silently drop that half. The isTestMatter half is covered by wf5-digest-is-test-matter-predicate. See harness/FINDINGS.md."
+}

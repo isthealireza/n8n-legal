@@ -1,0 +1,34 @@
+{
+  "id": "matters-column-n-idempotent-rerun",
+  "workflow": "admin-sheet-migration",
+  "unit": "Add unmapped_facts_json Column / already-done detection",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "zISJ9EDsxKUDA5U5",
+    "name": "QA - Add unmapped_facts_json Column"
+  },
+  "description": "Re-running the migration after it has already succeeded is detected as already_done and refused with a distinct, non-alarming message.",
+  "why_it_exists": "A one-shot migration will be re-run by a human who is not sure it ran. Without the already_done branch the second run reports the same scary 'Column N is not empty' as a genuine collision, which is indistinguishable from data loss.",
+  "input": {
+    "range": "Matters!N1:N1000",
+    "values": [
+      [
+        "unmapped_facts_json"
+      ]
+    ]
+  },
+  "expect": {
+    "already_done": true,
+    "safe_to_write": false,
+    "refusal": "Column N already holds the unmapped_facts_json header. Nothing to do.",
+    "branch_taken": "Refused",
+    "wrote": false
+  },
+  "assertions": [
+    "already_done requires both that cell N1 equals 'unmapped_facts_json' and that it is the only non-blank cell in the range.",
+    "A rerun still writes nothing - already_done is reported through the Refused branch, not treated as safe_to_write.",
+    "The already-done refusal text differs from the collision refusal text so the two outcomes are never confused."
+  ],
+  "target": null,
+  "target_unresolved_reason": "Administrative / QA-infrastructure workflow. No WF1-WF5/WF9 Code node implements it."
+}

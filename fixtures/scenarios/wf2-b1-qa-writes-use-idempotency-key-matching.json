@@ -1,0 +1,74 @@
+{
+  "id": "wf2-b1-qa-writes-use-idempotency-key-matching",
+  "workflow": "wf2",
+  "unit": "QA Upsert Matter / QA Append Actions column mapping",
+  "kind": "schema",
+  "source_qa_workflow": {
+    "id": "olEuL3AIVr4ER0bT",
+    "name": "QA - WF2 B1 Boundary Harness"
+  },
+  "description": "The harness's two Sheets writes use the production column mappings, matching Matters on matter_id and Actions on idempotency_key.",
+  "why_it_exists": "Matching Actions on idempotency_key rather than action_id is what makes a re-run of the same plan idempotent while a genuinely new plan appends fresh rows. Recording the matching column is as important as recording the column list.",
+  "input": {
+    "target_spreadsheet": "QA_SHEET_ID_PLACEHOLDER"
+  },
+  "expect": {
+    "Matters": {
+      "operation": "appendOrUpdate",
+      "matchingColumns": [
+        "matter_id"
+      ],
+      "columns": [
+        "matter_id",
+        "title",
+        "playbook_id",
+        "jurisdiction",
+        "status",
+        "owner_chat_id",
+        "facts_json",
+        "missing_facts_json",
+        "risk_flags_json",
+        "required_evidence_json",
+        "created_at",
+        "updated_at",
+        "last_activity_at",
+        "unmapped_facts_json"
+      ]
+    },
+    "Actions": {
+      "operation": "appendOrUpdate",
+      "matchingColumns": [
+        "idempotency_key"
+      ],
+      "columns": [
+        "action_id",
+        "matter_id",
+        "action_type",
+        "description",
+        "status",
+        "priority",
+        "depends_on_json",
+        "recipient",
+        "channel",
+        "requires_approval",
+        "draft_id",
+        "approval_id",
+        "due_at",
+        "deadline_basis",
+        "blocked_reason",
+        "idempotency_key",
+        "created_at",
+        "updated_at"
+      ]
+    }
+  },
+  "assertions": [
+    "Matters status is written from matter_status, and owner_chat_id from chat_id - the field names differ between the item and the sheet.",
+    "created_at is preserved on an existing matter (existing_created_at) and only stamped fresh when is_new_matter is true; updated_at and last_activity_at are always re-stamped.",
+    "unmapped_facts_json defaults to the literal '{}' when absent, so the column is never written blank.",
+    "Actions matches on idempotency_key, so replaying an identical plan updates rather than duplicates, while a new plan stamp always appends.",
+    "convertFieldsToString is on and attemptToConvertTypes is off, so no value is silently retyped by the node."
+  ],
+  "target": null,
+  "target_unresolved_reason": "kind is \"schema\": not executed by harness/run.js."
+}

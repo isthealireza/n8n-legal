@@ -1,0 +1,140 @@
+{
+  "id": "wf5-appendorupdate-is-not-replay-safety",
+  "workflow": "wf5",
+  "unit": "Google Sheets appendOrUpdate semantics on idempotency_key",
+  "kind": "integration",
+  "source_qa_workflow": {
+    "id": "xb9hgu2rpMjw9CUt",
+    "name": "QA - Replay Write Test"
+  },
+  "description": "Writing the same inbound message twice through appendOrUpdate matched on idempotency_key deduplicates the ROW but overwrites the CONTENT, overwrites the matter timestamp, and does not stop a second audit event - so appendOrUpdate alone is not replay safety.",
+  "why_it_exists": "This is the experiment that produced the negative result the whole guarded design rests on (executed 2026-08-20, verdict 'PARTIAL - Communication and action deduplication proven; full replay idempotency not proven'). It also discovered two Sheets facts the harness must encode: appendOrUpdate only exercises its matching path when the tab already has data rows, and a read of a header-only tab returns one item whose json is an empty object.",
+  "input": {
+    "spreadsheet": "created fresh per run; must not be SHEET_ID_PLACEHOLDER",
+    "tabs": [
+      "QA_Communications",
+      "QA_Actions",
+      "QA_Matters",
+      "QA_Events"
+    ],
+    "seed_row_per_tab": {
+      "communication_id": "COM-SEED-0",
+      "matter_id": "MAT-QA-001",
+      "action_id": "ACT-QA-001",
+      "direction": "OUTBOUND",
+      "channel": "GMAIL",
+      "provider_message_id": "MSG-SEED-0",
+      "thread_id": "THREAD-QA-A",
+      "recipient": "claims@examplecarpark.test",
+      "subject": "Seed row",
+      "summary": "synthetic seed",
+      "classification": "SEED",
+      "received_at": "2026-08-19T00:00:00.000Z",
+      "response_due": "",
+      "next_action": "",
+      "draft_id": "",
+      "approval_id": "",
+      "idempotency_key": "MAT-QA-001|MSG-SEED-0",
+      "action_type": "SEED",
+      "description": "synthetic seed",
+      "status": "SEED",
+      "event_id": "EVT-SEED-0",
+      "event_type": "SEED",
+      "severity": "INFO",
+      "message": "synthetic seed",
+      "updated_at": "SEED-STAMP"
+    },
+    "write_first": {
+      "matter_id": "MAT-QA-001",
+      "action_id": "ACT-QA-001",
+      "provider_message_id": "MSG-QA-1",
+      "thread_id": "THREAD-QA-A",
+      "idempotency_key": "MAT-QA-001|MSG-QA-1",
+      "communication_id": "COM-FIRSTRUN",
+      "subject": "Re: QA replay test",
+      "summary": "first delivery",
+      "classification": "ACKNOWLEDGEMENT",
+      "received_at": "2026-08-20T05:00:00.000Z",
+      "direction": "INBOUND",
+      "channel": "GMAIL",
+      "recipient": "me@example.test"
+    },
+    "write_replay": {
+      "matter_id": "MAT-QA-001",
+      "action_id": "ACT-QA-001",
+      "provider_message_id": "MSG-QA-1",
+      "thread_id": "THREAD-QA-A",
+      "idempotency_key": "MAT-QA-001|MSG-QA-1",
+      "communication_id": "COM-REPLAYRUN",
+      "subject": "Re: QA replay test SECOND DELIVERY",
+      "summary": "replay delivery with deliberately different content",
+      "classification": "OFFER",
+      "received_at": "2026-08-20T06:00:00.000Z",
+      "direction": "INBOUND",
+      "channel": "GMAIL",
+      "recipient": "me@example.test"
+    },
+    "action_first": {
+      "action_id": "ACT-QA-001-002",
+      "matter_id": "MAT-QA-001",
+      "action_type": "OWNER_DECISION",
+      "description": "first delivery",
+      "status": "READY",
+      "idempotency_key": "MAT-QA-001|MSG-QA-1|OWNER_DECISION"
+    },
+    "action_replay": {
+      "action_id": "ACT-QA-001-003",
+      "matter_id": "MAT-QA-001",
+      "action_type": "OWNER_DECISION",
+      "description": "replay delivery",
+      "status": "READY",
+      "idempotency_key": "MAT-QA-001|MSG-QA-1|OWNER_DECISION"
+    },
+    "matter_first": {
+      "matter_id": "MAT-QA-001",
+      "status": "AWAITING_REVIEW",
+      "updated_at": "FIRST-RUN-STAMP"
+    },
+    "matter_replay": {
+      "matter_id": "MAT-QA-001",
+      "status": "AWAITING_REVIEW",
+      "updated_at": "REPLAY-RUN-STAMP"
+    },
+    "event_first": {
+      "event_id": "EVT-FIRST-001",
+      "event_type": "INBOUND_REPLY_DUPLICATE",
+      "severity": "INFO",
+      "message": "first"
+    },
+    "event_replay": {
+      "event_id": "EVT-REPLAY-002",
+      "event_type": "INBOUND_REPLY_DUPLICATE",
+      "severity": "INFO",
+      "message": "replay"
+    }
+  },
+  "expect": {
+    "r1_communication_rows_unchanged": true,
+    "r2_original_content_unchanged": false,
+    "r3_actions_unchanged": true,
+    "r4_matter_unchanged_on_replay": false,
+    "r5_inbound_event_no_duplicate": false,
+    "rows_matching_key": 1,
+    "content_fields_changed_by_replay": "communication_id, subject, summary, classification, received_at",
+    "matter_updated_at_after_first": "FIRST-RUN-STAMP",
+    "matter_updated_at_after_replay": "REPLAY-RUN-STAMP",
+    "event_rows_after_replay": "one greater than event_rows_after_first",
+    "verdict": "PARTIAL - Communication and action deduplication proven; full replay idempotency not proven",
+    "note": "The failing expectations are the point of the scenario. A harness that turns them green has changed the meaning of the test, not fixed a bug."
+  },
+  "assertions": [
+    "appendOrUpdate matched on idempotency_key keeps the row count at one for a repeated key - row-level deduplication holds.",
+    "appendOrUpdate OVERWRITES every mapped column on match, so the stored content of the first delivery is destroyed by a contradicting replay. It cannot be a no-op.",
+    "A Matters write matched on matter_id likewise overwrites updated_at on every replay, so the matter looks freshly touched by a message that changed nothing.",
+    "Events written with plain append and hand-written distinct ids multiply on every replay; only a deterministic event_id plus appendOrUpdate prevents this.",
+    "appendOrUpdate's matching path is only exercised when the tab already contains data rows; against an empty tab the first write always appends and proves nothing.",
+    "A Sheets read of a header-only tab returns exactly one item whose json is an empty object, so item counts and row counts are different quantities."
+  ],
+  "target": null,
+  "target_unresolved_reason": "kind is \"integration\": not executed by harness/run.js."
+}

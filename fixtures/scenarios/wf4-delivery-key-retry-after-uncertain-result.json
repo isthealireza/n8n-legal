@@ -1,0 +1,57 @@
+{
+  "workflow": "wf4",
+  "unit": "WF4 Approval Gate delivery-key derivation",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "Rgw4AH2dwwatNfWS",
+    "name": "QA - WF4 Outbound Delivery Key"
+  },
+  "id": "wf4-delivery-key-retry-after-uncertain-result",
+  "description": "Deriving the key a second time for the same approval, action, draft, channel and recipient yields the identical key.",
+  "why_it_exists": "The WF4 outbound delivery key was once derived with $now in the basis, so a second attempt at the same approved delivery produced a different send_key and a different communication_id. An uncertain send result (a timeout after the message had actually gone) therefore resolved to a brand new row on retry, and the same letter could be sent to an insurer twice with no duplicate detectable anywhere in the register. This is THE case the old $now code broke: a retry after an uncertain send result must resolve to the same row, not a new one.",
+  "input": {
+    "first_derivation": {
+      "approval": {
+        "approval_id": "APR-001"
+      },
+      "action": {
+        "action_id": "ACT-001",
+        "channel": "GMAIL",
+        "recipient": "insurerclaims01@example.com"
+      },
+      "draft": {
+        "draft_id": "DFT-001"
+      }
+    },
+    "second_derivation": {
+      "approval": {
+        "approval_id": "APR-001"
+      },
+      "action": {
+        "action_id": "ACT-001",
+        "channel": "GMAIL",
+        "recipient": "insurerclaims01@example.com"
+      },
+      "draft": {
+        "draft_id": "DFT-001"
+      }
+    },
+    "now": "2026-08-23T06:00:00.000Z"
+  },
+  "expect": {
+    "send_key_stable": true,
+    "communication_id_stable": true
+  },
+  "assertions": [
+    "the second derivation produces the same send_key as the first",
+    "the second derivation produces the same communication_id_send as the first",
+    "no clock or random source participates, so this holds across process restarts and days"
+  ],
+  "target": {
+    "workflow": "wf4",
+    "unit_file": "harness/units/wf4/approval-gate.js"
+  },
+  "harness": {
+    "adapter": "delivery-key-retry"
+  }
+}

@@ -1,0 +1,255 @@
+{
+  "id": "wf5-digest-is-test-matter-predicate",
+  "workflow": "wf5",
+  "unit": "Build Daily Digest isTestMatter predicate",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "TryzWP4S2VpL8OU0",
+    "name": "QA - Stage 2 Single TEST ONLY Matter"
+  },
+  "description": "The digest's test-matter predicate, copied verbatim from WF5 Build Daily Digest node 983da561, must recognise a synthetic QA matter by id prefix, title wording, recorded facts or risk flags.",
+  "why_it_exists": "QA runs create matters in the same register as real work. If the daily digest cannot tell them apart it reports synthetic matters to the owner as live legal work. The Stage 2 caller re-implements the predicate verbatim and asserts against it, so a drift between the digest's copy and the QA copy is caught rather than assumed away.",
+  "input": {
+    "predicate_source": "verbatim copy of isTestMatter from WF5 'Build Daily Digest', node 983da561",
+    "cases": [
+      {
+        "name": "id prefix MAT-TEST",
+        "matter": {
+          "matter_id": "MAT-TEST-0001",
+          "title": "Ordinary sounding title",
+          "facts_json": "{}",
+          "risk_flags_json": "[]"
+        }
+      },
+      {
+        "name": "id prefix MAT-QA",
+        "matter": {
+          "matter_id": "MAT-QA-001",
+          "title": "Round trip matter",
+          "facts_json": "{}",
+          "risk_flags_json": "[]"
+        }
+      },
+      {
+        "name": "id prefix MAT-SANDBOX",
+        "matter": {
+          "matter_id": "MAT-SANDBOX-9",
+          "title": "Anything",
+          "facts_json": "{}",
+          "risk_flags_json": "[]"
+        }
+      },
+      {
+        "name": "title says TEST ONLY",
+        "matter": {
+          "matter_id": "MAT-20260101-001",
+          "title": "TEST ONLY - DO NOT USE. Synthetic QA matter",
+          "facts_json": "{}",
+          "risk_flags_json": "[]"
+        }
+      },
+      {
+        "name": "title says DO NOT USE only",
+        "matter": {
+          "matter_id": "MAT-20260101-002",
+          "title": "Car park damage - do not use",
+          "facts_json": "{}",
+          "risk_flags_json": "[]"
+        }
+      },
+      {
+        "name": "facts flag test_data_only",
+        "matter": {
+          "matter_id": "MAT-20260101-003",
+          "title": "Car park damage",
+          "facts_json": "{\"test_data_only\":\"true\"}",
+          "risk_flags_json": "[]"
+        }
+      },
+      {
+        "name": "facts flag matter_flagged_test_only",
+        "matter": {
+          "matter_id": "MAT-20260101-004",
+          "title": "Car park damage",
+          "facts_json": "{\"matter_flagged_test_only\":\"TRUE\"}",
+          "risk_flags_json": "[]"
+        }
+      },
+      {
+        "name": "facts flag is_test",
+        "matter": {
+          "matter_id": "MAT-20260101-005",
+          "title": "Car park damage",
+          "facts_json": "{\"is_test\":\"True\"}",
+          "risk_flags_json": "[]"
+        }
+      },
+      {
+        "name": "risk flag SYNTHETIC",
+        "matter": {
+          "matter_id": "MAT-20260101-006",
+          "title": "Car park damage",
+          "facts_json": "{}",
+          "risk_flags_json": "[\"SYNTHETIC_DATA\"]"
+        }
+      },
+      {
+        "name": "risk flag TEST_ONLY",
+        "matter": {
+          "matter_id": "MAT-20260101-007",
+          "title": "Car park damage",
+          "facts_json": "{}",
+          "risk_flags_json": "[\"TEST_ONLY\"]"
+        }
+      },
+      {
+        "name": "malformed facts_json",
+        "matter": {
+          "matter_id": "MAT-20260101-008",
+          "title": "Car park damage",
+          "facts_json": "{not json",
+          "risk_flags_json": "[]"
+        }
+      },
+      {
+        "name": "genuinely live matter",
+        "matter": {
+          "matter_id": "MAT-20260101-009",
+          "title": "Car park damage, Perth",
+          "facts_json": "{\"vehicle\":\"sedan\"}",
+          "risk_flags_json": "[\"LIMITATION_PERIOD\"]"
+        }
+      },
+      {
+        "name": "null matter",
+        "matter": null
+      }
+    ],
+    "now": "2026-08-23T06:00:00.000Z",
+    "items": [
+      {}
+    ],
+    "nodeOutputs": {
+      "Load Matters (Digest)": [
+        {
+          "matter_id": "MAT-TEST-0001",
+          "title": "Ordinary sounding title",
+          "facts_json": "{}",
+          "risk_flags_json": "[]"
+        },
+        {
+          "matter_id": "MAT-QA-001",
+          "title": "Round trip matter",
+          "facts_json": "{}",
+          "risk_flags_json": "[]"
+        },
+        {
+          "matter_id": "MAT-SANDBOX-9",
+          "title": "Anything",
+          "facts_json": "{}",
+          "risk_flags_json": "[]"
+        },
+        {
+          "matter_id": "MAT-20260101-001",
+          "title": "TEST ONLY - DO NOT USE. Synthetic QA matter",
+          "facts_json": "{}",
+          "risk_flags_json": "[]"
+        },
+        {
+          "matter_id": "MAT-20260101-002",
+          "title": "Car park damage - do not use",
+          "facts_json": "{}",
+          "risk_flags_json": "[]"
+        },
+        {
+          "matter_id": "MAT-20260101-003",
+          "title": "Car park damage",
+          "facts_json": "{\"test_data_only\":\"true\"}",
+          "risk_flags_json": "[]"
+        },
+        {
+          "matter_id": "MAT-20260101-004",
+          "title": "Car park damage",
+          "facts_json": "{\"matter_flagged_test_only\":\"TRUE\"}",
+          "risk_flags_json": "[]"
+        },
+        {
+          "matter_id": "MAT-20260101-005",
+          "title": "Car park damage",
+          "facts_json": "{\"is_test\":\"True\"}",
+          "risk_flags_json": "[]"
+        },
+        {
+          "matter_id": "MAT-20260101-006",
+          "title": "Car park damage",
+          "facts_json": "{}",
+          "risk_flags_json": "[\"SYNTHETIC_DATA\"]"
+        },
+        {
+          "matter_id": "MAT-20260101-007",
+          "title": "Car park damage",
+          "facts_json": "{}",
+          "risk_flags_json": "[\"TEST_ONLY\"]"
+        },
+        {
+          "matter_id": "MAT-20260101-008",
+          "title": "Car park damage",
+          "facts_json": "{not json",
+          "risk_flags_json": "[]"
+        },
+        {
+          "matter_id": "MAT-20260101-009",
+          "title": "Car park damage, Perth",
+          "facts_json": "{\"vehicle\":\"sedan\"}",
+          "risk_flags_json": "[\"LIMITATION_PERIOD\"]"
+        }
+      ],
+      "Load Actions (Digest)": [],
+      "Load Approvals (Digest)": [],
+      "Load Evidence (Digest)": [],
+      "Load Events (Digest)": [],
+      "Load Drafts (Digest)": [],
+      "Load Conflict Notices (Digest)": []
+    }
+  },
+  "expect": {
+    "results": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false
+    ],
+    "rules": {
+      "id": "/^MAT-TEST\\b|^MAT-QA\\b|^MAT-SANDBOX\\b/ on the trimmed upper-cased matter_id",
+      "title": "/\\bTEST[ _-]ONLY\\b|\\bDO NOT USE\\b/ on the trimmed upper-cased title",
+      "facts": "any of test_data_only, matter_flagged_test_only, is_test whose trimmed upper-cased value is exactly 'TRUE'",
+      "risks": "any risk flag matching /TEST[_ ]ONLY|SYNTHETIC|DO[_ ]NOT[_ ]USE/i",
+      "parse_failure": "a facts_json or risk_flags_json that does not parse is treated as empty, never as a match",
+      "null_input": "returns false"
+    }
+  },
+  "assertions": [
+    "Each of the four independent signals - id prefix, title wording, recorded fact flag, risk flag - is sufficient on its own.",
+    "Matching is case-insensitive and whitespace-tolerant on the title and the fact flag values.",
+    "Malformed facts_json or risk_flags_json must not throw and must not be treated as a match.",
+    "A null or undefined matter returns false rather than throwing.",
+    "A live matter with an ordinary title, ordinary facts and a real risk flag is NOT classified as a test matter.",
+    "This predicate must stay byte-identical to the copy in WF5 Build Daily Digest; a drift means the digest and the QA harness disagree about what counts as live work."
+  ],
+  "target": {
+    "workflow": "wf5",
+    "unit_file": "harness/units/wf5/build-daily-digest.js"
+  },
+  "harness": {
+    "adapter": "digest-testmatter"
+  }
+}

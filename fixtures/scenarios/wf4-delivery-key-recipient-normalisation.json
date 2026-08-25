@@ -1,0 +1,43 @@
+{
+  "workflow": "wf4",
+  "unit": "WF4 Approval Gate delivery-key derivation",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "Rgw4AH2dwwatNfWS",
+    "name": "QA - WF4 Outbound Delivery Key"
+  },
+  "id": "wf4-delivery-key-recipient-normalisation",
+  "description": "One recipient written two ways - display name, angle brackets, mixed case, mixed-case channel - collapses to one delivery key.",
+  "why_it_exists": "Without normalisation a display name or a single capital letter in the address made the same delivery look new, and the same letter would be sent twice. normEmail() extracts the address from angle brackets, trims and lowercases; the channel is trimmed and uppercased.",
+  "input": {
+    "approval": {
+      "approval_id": "APR-001"
+    },
+    "action": {
+      "action_id": "ACT-001",
+      "channel": "gmail",
+      "recipient": "Claims Team <InsurerClaims01@Example.COM>"
+    },
+    "draft": {
+      "draft_id": "DFT-001"
+    },
+    "compare_against": "wf4-delivery-key-first-send",
+    "sanitisation_note": "The original fixture used \"Claims Team <InsurerClaims01@Example.COM>\"; the replacement preserves the 27-character address length and the mixed-case display-name shape.",
+    "now": "2026-08-23T06:00:00.000Z"
+  },
+  "expect": {
+    "send_key_equals_first_send": true
+  },
+  "assertions": [
+    "send_key is identical to the plain-lowercase first-send key",
+    "normEmail() strips the display name and angle brackets and lowercases the address",
+    "the channel is uppercased before entering the basis"
+  ],
+  "target": {
+    "workflow": "wf4",
+    "unit_file": "harness/units/wf4/approval-gate.js"
+  },
+  "harness": {
+    "adapter": "delivery-key"
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "id": "wf5-inbound-idempotency-key-stable-across-replay",
+  "workflow": "wf5",
+  "unit": "Log Inbound / Append Next Action idempotency_key expressions",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "4pok4hCJGh60NbM2",
+    "name": "QA - Inbound Key Stability"
+  },
+  "description": "Two deliveries of the same Gmail message, differing only in write-time fields, must produce byte-identical idempotency keys.",
+  "why_it_exists": "communication_id is generated inside Validate Reply JSON as 'COM-' + new Date().toISOString(), so it genuinely differs between two runs. If the idempotency key were built from it, or from any other write-time value, replay protection would fail and the same inbound reply would be logged twice and would spawn a second next action.",
+  "input": {
+    "first": {
+      "delivery": "first",
+      "provider_message_id": "MSG-IN-1",
+      "thread_id": "THREAD-AAA",
+      "to_address": "owner@example.com",
+      "subject": "Re: [MAT-20260101-001] parked vehicle damage",
+      "matter_id": "MAT-20260101-001",
+      "next_action_type": "OWNER_DECISION",
+      "communication_id": "COM-20260101050856",
+      "received_at": "2026-01-01T05:08:56.000Z"
+    },
+    "replay": {
+      "delivery": "replay",
+      "provider_message_id": "MSG-IN-1",
+      "thread_id": "THREAD-AAA",
+      "to_address": "owner@example.com",
+      "subject": "Re: [MAT-20260101-001] parked vehicle damage",
+      "matter_id": "MAT-20260101-001",
+      "next_action_type": "OWNER_DECISION",
+      "communication_id": "COM-20260101061142",
+      "received_at": "2026-01-01T06:11:42.000Z"
+    }
+  },
+  "expect": {
+    "idempotency_key": "MAT-20260101-001|MSG-IN-1",
+    "action_idempotency_key": "MAT-20260101-001|MSG-IN-1|OWNER_DECISION",
+    "identical_across_deliveries": true
+  },
+  "assertions": [
+    "K1: the Log Inbound idempotency_key is identical across a replay.",
+    "K2: the Append Next Action idempotency_key is identical across a replay.",
+    "K3: the key matches /^[^|]+\\|[^|]+$/ and contains neither the substring 'undefined' nor 'null' - an unresolved expression must not silently become part of a key.",
+    "K4: at least one mapped column (communication_id) does differ across the replay, proving the fixture is a genuine replay and not a copy of one item.",
+    "K5: the key is stable while that volatile column changes.",
+    "K6: the key derives only from matter_id and the Gmail provider message id - no clock, no counter, no row number.",
+    "The keys are evaluated by an n8n Set node, not by test code, so what is compared is the expression engine's own output for the exact strings mapped in production.",
+    "MERGED from wf5-duplicate-reply-produces-identical-keys (VelAeCU71KHELUJP): two deliveries of the same provider_message_id on the same matter produce byte-identical Log Inbound and Append Next Action idempotency keys.",
+    "MERGED: the keys are matter_id|provider_message_id and matter_id|provider_message_id|next_action_type; neither communication_id nor received_at enters either key."
+  ],
+  "merged_from": [
+    "wf5-duplicate-reply-produces-identical-keys"
+  ],
+  "target": null,
+  "target_unresolved_reason": "The two keys are n8n Set-node expressions on Log Inbound / Append Next Action, not a Code node. Nothing in harness/units/ evaluates them."
+}

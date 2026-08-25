@@ -1,0 +1,45 @@
+{
+  "id": "wf2-legacy-positional-action-ids-collide",
+  "workflow": "wf2",
+  "unit": "Validate Plan JSON action id minting (pre-Finalise-Plan)",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "T6jGZRxNd9pVOfHi",
+    "name": "QA - 2 Matter Classification and Planning"
+  },
+  "description": "The isolated QA clone of WF2 still mints action ids and idempotency keys purely positionally, so a re-plan on the same matter reuses both.",
+  "why_it_exists": "This is the defect that Finalise Plan's plan-stamped ids were built to fix, preserved here in its original form. It is kept as a regression fixture: any future id scheme must not reproduce it.",
+  "input": {
+    "matter_id": "MAT-20260101-001",
+    "plan_1_actions": 3,
+    "plan_2_actions": 3,
+    "replan": true
+  },
+  "expect": {
+    "plan_1_action_ids": [
+      "ACT-20260101-001-001",
+      "ACT-20260101-001-002",
+      "ACT-20260101-001-003"
+    ],
+    "plan_2_action_ids": [
+      "ACT-20260101-001-001",
+      "ACT-20260101-001-002",
+      "ACT-20260101-001-003"
+    ],
+    "plan_1_idempotency_keys": [
+      "MAT-20260101-001|001",
+      "MAT-20260101-001|002",
+      "MAT-20260101-001|003"
+    ],
+    "ids_collide_across_plans": true
+  },
+  "assertions": [
+    "Action ids are matter_id with MAT- replaced by ACT- plus a one-based positional sequence, and the idempotency key is matter_id plus that same sequence.",
+    "A second plan on the same matter therefore produces identical ids for different actions, and depends_on_json is built from the same positional scheme so a dependency can resolve into the wrong plan.",
+    "requires_approval is forced to TRUE for SEND_DOCUMENT, CONTACT_INSURER, SEND_DEMAND, FOLLOW_UP, SEND_EMAIL, FILE_DOCUMENT, or for any action whose channel is GMAIL - that hardening is correct and must be preserved by any replacement.",
+    "An action with a due_at but no deadline_basis is defaulted to UNVERIFIED_ESTIMATE, so no invented deadline is ever presented as established.",
+    "The required-versus-optional conflation is also present here: requiresInfo is raw.requires_information || missing.length > 0, with every required fact absent from facts added to missing regardless of whether it is optional."
+  ],
+  "target": null,
+  "target_unresolved_reason": "Asserts the PRE-fix positional id scheme of the QA clone T6jGZRxNd9pVOfHi. The deployed Validate Plan JSON no longer mints ids that way (Finalise Plan stamps them), so there is no unit that exhibits this behaviour. Kept as a regression record."
+}

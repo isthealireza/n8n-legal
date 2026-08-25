@@ -1,0 +1,24 @@
+{
+  "id": "wf5-actions-no-conflicting-status-on-one-action-id",
+  "workflow": "wf5",
+  "unit": "Actions register integrity",
+  "kind": "invariant",
+  "source_qa_workflow": {
+    "id": "3TVCLIVFGlBNSwK4",
+    "name": "QA - Daily Report State Census"
+  },
+  "description": "Where an action_id does appear more than once, its rows must not disagree about status.",
+  "why_it_exists": "A duplicate row is recoverable if both copies say the same thing. Two rows for one action_id carrying different statuses means the register itself cannot answer whether the action is done, and 'last row wins' is a guess, not a fact. The census separates plain duplicates from conflicting duplicates for exactly this reason.",
+  "input": {},
+  "expect": {
+    "duplicate_ids_with_conflicting_status": [],
+    "resolution_rule": "none - a conflicting duplicate must be escalated, never auto-resolved by taking the last row"
+  },
+  "assertions": [
+    "For every action_id with more than one row, the set of upper-cased status values across those rows has size 1.",
+    "Any conflicting action_id is reported with every row's sheet row number, status and blocked_reason (first 60 characters).",
+    "The harness must not silently pick a winner between conflicting statuses."
+  ],
+  "target": null,
+  "target_unresolved_reason": "kind is \"invariant\": not executed by harness/run.js."
+}

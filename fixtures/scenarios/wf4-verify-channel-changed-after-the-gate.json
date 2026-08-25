@@ -1,0 +1,202 @@
+{
+  "workflow": "wf4",
+  "unit": "WF4 Integrity Guard and Verify Selected Row fail-closed gates",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "hTz7VbLHENx8ZB1N",
+    "name": "QA - WF4 Integrity Guard Runtime"
+  },
+  "id": "wf4-verify-channel-changed-after-the-gate",
+  "description": "If the Approval Gate resolved a different channel than the verified register row, the branch halts.",
+  "why_it_exists": "On the real MAT-20260101-002 snapshot the Actions register held TWO generations of rows written 39 minutes apart, so six action_ids each resolved to two rows carrying different action_types, recipients and channels. Approval Gate re-queried by action_id and simply took the last match, meaning WF4 could draft, approve and send against a row nobody chose - for example sending a CONTACT_INSURER letter to a car park manager. The Integrity Guard refuses to choose between duplicate rows, and Verify Selected Row re-checks the chosen row immediately before any writer or Gmail node runs. Channel is the second field that decides where a message goes; an action the register marks MANUAL must not be emailed.",
+  "input": {
+    "case_id": "C5C",
+    "config": {
+      "matter_id": "MAT-QA-CLEAN",
+      "route_group": "APPROVAL",
+      "approval_id": "APR-QACLEAN"
+    },
+    "actions": [
+      {
+        "action_id": "ACT-QA-CLEAN-001",
+        "matter_id": "MAT-QA-CLEAN",
+        "action_type": "CONTACT_INSURER",
+        "status": "AWAITING_APPROVAL",
+        "priority": "HIGH",
+        "depends_on_json": "[]",
+        "recipient": "claims@insurer.example",
+        "channel": "GMAIL",
+        "requires_approval": "TRUE",
+        "draft_id": "DRF-QA-CLEAN-001-v1",
+        "approval_id": "APR-QACLEAN",
+        "due_at": "",
+        "deadline_basis": "",
+        "blocked_reason": "",
+        "idempotency_key": "MAT-QA-CLEAN|PQA|001",
+        "created_at": "2026-08-21T00:00:00Z",
+        "updated_at": "2026-08-21T00:00:00Z"
+      },
+      {
+        "action_id": "ACT-QA-AMBIG-001",
+        "matter_id": "MAT-QA-OTHER",
+        "action_type": "CONTACT_INSURER",
+        "status": "READY",
+        "priority": "HIGH",
+        "depends_on_json": "[]",
+        "recipient": "one@x.example",
+        "channel": "GMAIL",
+        "requires_approval": "TRUE",
+        "draft_id": "",
+        "approval_id": "",
+        "due_at": "",
+        "deadline_basis": "",
+        "blocked_reason": "",
+        "idempotency_key": "MAT-QA-OTHER|A",
+        "created_at": "2026-08-21T01:00:00Z",
+        "updated_at": "2026-08-21T01:00:00Z"
+      },
+      {
+        "action_id": "ACT-QA-AMBIG-001",
+        "matter_id": "MAT-QA-OTHER",
+        "action_type": "FOLLOW_UP",
+        "status": "READY",
+        "priority": "HIGH",
+        "depends_on_json": "[]",
+        "recipient": "two@y.example",
+        "channel": "MANUAL",
+        "requires_approval": "TRUE",
+        "draft_id": "",
+        "approval_id": "",
+        "due_at": "",
+        "deadline_basis": "",
+        "blocked_reason": "",
+        "idempotency_key": "MAT-QA-OTHER|B",
+        "created_at": "2026-08-21T02:00:00Z",
+        "updated_at": "2026-08-21T02:00:00Z"
+      }
+    ],
+    "approvals": [
+      {
+        "approval_id": "APR-A1B2C3D4E5F60718",
+        "matter_id": "MAT-20260101-002",
+        "action_id": "ACT-20260101-002-003",
+        "draft_id": "DRF-20260101-002-003-v1",
+        "status": "PENDING"
+      },
+      {
+        "approval_id": "APR-QACLEAN",
+        "matter_id": "MAT-QA-CLEAN",
+        "action_id": "ACT-QA-CLEAN-001",
+        "draft_id": "DRF-QA-CLEAN-001-v1",
+        "status": "PENDING"
+      }
+    ],
+    "injected_fault": {
+      "where": "between Approval Gate and Verify Selected Row",
+      "channel": "MANUAL"
+    },
+    "register_row_channel": "GMAIL",
+    "now": "2026-08-23T06:00:00.000Z",
+    "nodeOutputs": {
+      "Config": [
+        {
+          "matter_id": "MAT-QA-CLEAN",
+          "route_group": "APPROVAL",
+          "approval_id": "APR-QACLEAN"
+        }
+      ],
+      "Load Actions": [
+        {
+          "action_id": "ACT-QA-CLEAN-001",
+          "matter_id": "MAT-QA-CLEAN",
+          "action_type": "CONTACT_INSURER",
+          "status": "AWAITING_APPROVAL",
+          "priority": "HIGH",
+          "depends_on_json": "[]",
+          "recipient": "claims@insurer.example",
+          "channel": "GMAIL",
+          "requires_approval": "TRUE",
+          "draft_id": "DRF-QA-CLEAN-001-v1",
+          "approval_id": "APR-QACLEAN",
+          "due_at": "",
+          "deadline_basis": "",
+          "blocked_reason": "",
+          "idempotency_key": "MAT-QA-CLEAN|PQA|001",
+          "created_at": "2026-08-21T00:00:00Z",
+          "updated_at": "2026-08-21T00:00:00Z"
+        },
+        {
+          "action_id": "ACT-QA-AMBIG-001",
+          "matter_id": "MAT-QA-OTHER",
+          "action_type": "CONTACT_INSURER",
+          "status": "READY",
+          "priority": "HIGH",
+          "depends_on_json": "[]",
+          "recipient": "one@x.example",
+          "channel": "GMAIL",
+          "requires_approval": "TRUE",
+          "draft_id": "",
+          "approval_id": "",
+          "due_at": "",
+          "deadline_basis": "",
+          "blocked_reason": "",
+          "idempotency_key": "MAT-QA-OTHER|A",
+          "created_at": "2026-08-21T01:00:00Z",
+          "updated_at": "2026-08-21T01:00:00Z"
+        },
+        {
+          "action_id": "ACT-QA-AMBIG-001",
+          "matter_id": "MAT-QA-OTHER",
+          "action_type": "FOLLOW_UP",
+          "status": "READY",
+          "priority": "HIGH",
+          "depends_on_json": "[]",
+          "recipient": "two@y.example",
+          "channel": "MANUAL",
+          "requires_approval": "TRUE",
+          "draft_id": "",
+          "approval_id": "",
+          "due_at": "",
+          "deadline_basis": "",
+          "blocked_reason": "",
+          "idempotency_key": "MAT-QA-OTHER|B",
+          "created_at": "2026-08-21T02:00:00Z",
+          "updated_at": "2026-08-21T02:00:00Z"
+        }
+      ],
+      "Load Approvals": [
+        {
+          "approval_id": "APR-A1B2C3D4E5F60718",
+          "matter_id": "MAT-20260101-002",
+          "action_id": "ACT-20260101-002-003",
+          "draft_id": "DRF-20260101-002-003-v1",
+          "status": "PENDING"
+        },
+        {
+          "approval_id": "APR-QACLEAN",
+          "matter_id": "MAT-QA-CLEAN",
+          "action_id": "ACT-QA-CLEAN-001",
+          "draft_id": "DRF-QA-CLEAN-001-v1",
+          "status": "PENDING"
+        }
+      ]
+    }
+  },
+  "expect": {
+    "verify_integrity_ok": false,
+    "integrity_code": "CHANNEL_MISMATCH",
+    "reaches": "Halt - Data Integrity Conflict"
+  },
+  "assertions": [
+    "integrity_code is CHANNEL_MISMATCH",
+    "integrity_detail carries both the gate channel and the row channel",
+    "KNOWN GAP: the production check is `U(gate.channel) !== U(row.channel) && U(gate.channel) !== \"NONE\"`, so a gate channel of NONE bypasses this comparison entirely. This suite never injects channel NONE, so that path is untested."
+  ],
+  "target": {
+    "workflow": "wf4",
+    "unit_file": "harness/units/wf4/verify-selected-row.js"
+  },
+  "harness": {
+    "adapter": "verify-selected-row"
+  }
+}

@@ -1,0 +1,143 @@
+{
+  "id": "wf5-ingress-first-delivery-accept",
+  "workflow": "wf5",
+  "unit": "Build Reply Context (resolveReply) - first delivery",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "XevQwFviJHUobw0U",
+    "name": "QA - Ingress Round Trip"
+  },
+  "description": "A never-before-seen inbound reply on a thread with exactly one registered matter, from a recorded party, is ACCEPTed on THREAD basis with a deterministic communication_id and a freshly computed ingress fingerprint.",
+  "why_it_exists": "Before the round trip was built (QA workflow created 2026-08-21), communication_id was regenerated per run (WF4's pre-F-02 equivalent stamped ids with $now), so the id in the Telegram notice did not match the id written to the sheet. The resolver now derives communication_id as 'COM-' + provider_message_id so first delivery, replay and the owner notice all name the same row.",
+  "input": {
+    "event": {
+      "provider_message_id": "MSG-RT-1",
+      "thread_id": "THREAD-AAA",
+      "from": "Claims Team <claims@examplecarpark.test>",
+      "subject": "Re: [MAT-QA-001] round trip",
+      "body": "First delivery body.",
+      "received_at": "2026-08-21T02:00:00.000Z"
+    },
+    "communications_register": [
+      {
+        "communication_id": "COM-OUT-1",
+        "matter_id": "MAT-QA-001",
+        "action_id": "ACT-QA-001",
+        "direction": "OUTBOUND",
+        "channel": "GMAIL",
+        "provider_message_id": "MSG-OUT-1",
+        "thread_id": "THREAD-AAA",
+        "recipient": "claims@examplecarpark.test",
+        "subject": "Preserve footage request",
+        "summary": "seed outbound",
+        "classification": "",
+        "received_at": "2026-08-20T00:00:00.000Z",
+        "response_due": "",
+        "next_action": "",
+        "draft_id": "",
+        "approval_id": "",
+        "idempotency_key": "ACT-QA-001|seed",
+        "ingress_fingerprint": ""
+      }
+    ],
+    "real_outbound_directions": [
+      "OUTBOUND",
+      "OUTBOUND_PENDING"
+    ],
+    "now": "2026-08-23T06:00:00.000Z",
+    "items": [
+      {
+        "communication_id": "COM-OUT-1",
+        "matter_id": "MAT-QA-001",
+        "action_id": "ACT-QA-001",
+        "direction": "OUTBOUND",
+        "channel": "GMAIL",
+        "provider_message_id": "MSG-OUT-1",
+        "thread_id": "THREAD-AAA",
+        "recipient": "claims@examplecarpark.test",
+        "subject": "Preserve footage request",
+        "summary": "seed outbound",
+        "classification": "",
+        "received_at": "2026-08-20T00:00:00.000Z",
+        "response_due": "",
+        "next_action": "",
+        "draft_id": "",
+        "approval_id": "",
+        "idempotency_key": "ACT-QA-001|seed",
+        "ingress_fingerprint": ""
+      }
+    ],
+    "nodeOutputs": {
+      "Match Reply to Matter": [
+        {
+          "provider_message_id": "MSG-RT-1",
+          "thread_id": "THREAD-AAA",
+          "from_address": "Claims Team <claims@examplecarpark.test>",
+          "subject": "Re: [MAT-QA-001] round trip",
+          "body_text": "First delivery body.",
+          "received_at": "2026-08-21T02:00:00.000Z"
+        }
+      ],
+      "Load Matters (Reply)": [
+        {
+          "matter_id": "MAT-QA-001"
+        }
+      ],
+      "Load Actions (Reply)": [],
+      "Load Comms (Reply)": [
+        {
+          "communication_id": "COM-OUT-1",
+          "matter_id": "MAT-QA-001",
+          "action_id": "ACT-QA-001",
+          "direction": "OUTBOUND",
+          "channel": "GMAIL",
+          "provider_message_id": "MSG-OUT-1",
+          "thread_id": "THREAD-AAA",
+          "recipient": "claims@examplecarpark.test",
+          "subject": "Preserve footage request",
+          "summary": "seed outbound",
+          "classification": "",
+          "received_at": "2026-08-20T00:00:00.000Z",
+          "response_due": "",
+          "next_action": "",
+          "draft_id": "",
+          "approval_id": "",
+          "idempotency_key": "ACT-QA-001|seed",
+          "ingress_fingerprint": ""
+        }
+      ]
+    }
+  },
+  "expect": {
+    "decision": "ACCEPT",
+    "basis": "THREAD",
+    "matter_id": "MAT-QA-001",
+    "communication_id": "COM-MSG-RT-1",
+    "event_id": "EVT-INBOUND-MSG-RT-1",
+    "event_type": "NEW_INBOUND",
+    "severity": "INFO",
+    "requires_human_review": false,
+    "stored_fingerprint": "",
+    "sender_address": "claims@examplecarpark.test",
+    "ingress_fingerprint": "REGENERATE",
+    "ingress_fingerprint_spec": "ingressFingerprint(e) = 'ING-' + fnv1a32(parts) + '-' + canon(e.body).length, where parts = ['pmid=' + trim(pmid), 'thread=' + trim(thread_id), 'from=' + emailOf(from), 'subject=' + canon(subject), 'body=' + canon(body), 'ts=' + trim(received_at)].join(' '); canon collapses all whitespace runs to a single space and trims; emailOf extracts the address inside angle brackets and lowercases it; fnv1a32 is a single 32-bit FNV-1a pass (offset basis 0x811c9dc5) rendered as 8 lowercase hex characters.",
+    "needs_hash_regen": true,
+    "reason": "First delivery of MSG-RT-1. Recorded.",
+    "_correction_2026-08-25": "expect.ingress_fingerprint was the prose \"computed, not asserted literally\". Replaced by the sentinel REGENERATE, which harness/run.js resolves through the INDEPENDENT ingressFingerprint in harness/oracles.js (never through the unit). The spec in ingress_fingerprint_spec is unchanged and is what oracles.js implements."
+  },
+  "assertions": [
+    "A thread with exactly one distinct matter_id across OUTBOUND/OUTBOUND_PENDING/INBOUND rows resolves that matter on basis THREAD.",
+    "The sender address, extracted from 'Name <addr>' and lowercased, must appear as the recipient of at least one real OUTBOUND row on that matter, or the decision is BLOCKED/SENDER_NOT_A_PARTY.",
+    "communication_id is exactly 'COM-' + provider_message_id and is not derived from a clock, a counter, or randomness.",
+    "event_id is exactly 'EVT-INBOUND-' + provider_message_id.",
+    "ingress_fingerprint matches /^ING-[0-9a-f]{8}-[0-9]+$/ and its trailing segment equals the whitespace-canonicalised body length (20 for 'First delivery body.').",
+    "The resolver performs no I/O, reads no clock, and is a pure function of (event, register)."
+  ],
+  "target": {
+    "workflow": "wf5",
+    "unit_file": "harness/units/wf5/build-reply-context.js"
+  },
+  "harness": {
+    "adapter": "reply-policy"
+  }
+}

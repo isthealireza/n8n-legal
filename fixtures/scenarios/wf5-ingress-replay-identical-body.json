@@ -1,0 +1,197 @@
+{
+  "id": "wf5-ingress-replay-identical-body",
+  "workflow": "wf5",
+  "unit": "Build Reply Context (resolveReply) - replay detection",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "XevQwFviJHUobw0U",
+    "name": "QA - Ingress Round Trip"
+  },
+  "description": "A byte-identical redelivery of an already-recorded inbound message returns ALREADY_RECORDED and mutates nothing.",
+  "why_it_exists": "Gmail redelivers. An earlier harness compared summary, classification and a regenerated communication_id - all downstream products - so every ordinary retry was reported as a conflict. The fingerprint is therefore computed only from stable ingress fields (pmid, thread, sender, subject, raw body, provider timestamp) before classification runs.",
+  "input": {
+    "event": {
+      "provider_message_id": "MSG-RT-1",
+      "thread_id": "THREAD-AAA",
+      "from": "Claims Team <claims@examplecarpark.test>",
+      "subject": "Re: [MAT-QA-001] round trip",
+      "body": "First delivery body.",
+      "received_at": "2026-08-21T02:00:00.000Z"
+    },
+    "communications_register": [
+      {
+        "communication_id": "COM-OUT-1",
+        "matter_id": "MAT-QA-001",
+        "action_id": "ACT-QA-001",
+        "direction": "OUTBOUND",
+        "channel": "GMAIL",
+        "provider_message_id": "MSG-OUT-1",
+        "thread_id": "THREAD-AAA",
+        "recipient": "claims@examplecarpark.test",
+        "subject": "Preserve footage request",
+        "summary": "seed outbound",
+        "classification": "",
+        "received_at": "2026-08-20T00:00:00.000Z",
+        "response_due": "",
+        "next_action": "",
+        "draft_id": "",
+        "approval_id": "",
+        "idempotency_key": "ACT-QA-001|seed",
+        "ingress_fingerprint": ""
+      },
+      {
+        "communication_id": "COM-MSG-RT-1",
+        "matter_id": "MAT-QA-001",
+        "action_id": "ACT-QA-001",
+        "direction": "INBOUND",
+        "channel": "GMAIL",
+        "provider_message_id": "MSG-RT-1",
+        "thread_id": "THREAD-AAA",
+        "recipient": "me@example.test",
+        "subject": "Re: [MAT-QA-001] round trip",
+        "summary": "classifier output for first delivery",
+        "classification": "ACKNOWLEDGEMENT",
+        "received_at": "2026-08-21T02:00:00.000Z",
+        "response_due": "",
+        "next_action": "",
+        "draft_id": "",
+        "approval_id": "",
+        "idempotency_key": "MAT-QA-001|MSG-RT-1",
+        "ingress_fingerprint": "<computed by ingressFingerprint(EV_FIRST); recompute, do not hard-code>"
+      }
+    ],
+    "now": "2026-08-23T06:00:00.000Z",
+    "items": [
+      {
+        "communication_id": "COM-OUT-1",
+        "matter_id": "MAT-QA-001",
+        "action_id": "ACT-QA-001",
+        "direction": "OUTBOUND",
+        "channel": "GMAIL",
+        "provider_message_id": "MSG-OUT-1",
+        "thread_id": "THREAD-AAA",
+        "recipient": "claims@examplecarpark.test",
+        "subject": "Preserve footage request",
+        "summary": "seed outbound",
+        "classification": "",
+        "received_at": "2026-08-20T00:00:00.000Z",
+        "response_due": "",
+        "next_action": "",
+        "draft_id": "",
+        "approval_id": "",
+        "idempotency_key": "ACT-QA-001|seed",
+        "ingress_fingerprint": ""
+      },
+      {
+        "communication_id": "COM-MSG-RT-1",
+        "matter_id": "MAT-QA-001",
+        "action_id": "ACT-QA-001",
+        "direction": "INBOUND",
+        "channel": "GMAIL",
+        "provider_message_id": "MSG-RT-1",
+        "thread_id": "THREAD-AAA",
+        "recipient": "me@example.test",
+        "subject": "Re: [MAT-QA-001] round trip",
+        "summary": "classifier output for first delivery",
+        "classification": "ACKNOWLEDGEMENT",
+        "received_at": "2026-08-21T02:00:00.000Z",
+        "response_due": "",
+        "next_action": "",
+        "draft_id": "",
+        "approval_id": "",
+        "idempotency_key": "MAT-QA-001|MSG-RT-1",
+        "ingress_fingerprint": "ING-a7728903-20"
+      }
+    ],
+    "nodeOutputs": {
+      "Match Reply to Matter": [
+        {
+          "provider_message_id": "MSG-RT-1",
+          "thread_id": "THREAD-AAA",
+          "from_address": "Claims Team <claims@examplecarpark.test>",
+          "subject": "Re: [MAT-QA-001] round trip",
+          "body_text": "First delivery body.",
+          "received_at": "2026-08-21T02:00:00.000Z"
+        }
+      ],
+      "Load Matters (Reply)": [
+        {
+          "matter_id": "MAT-QA-001"
+        }
+      ],
+      "Load Actions (Reply)": [],
+      "Load Comms (Reply)": [
+        {
+          "communication_id": "COM-OUT-1",
+          "matter_id": "MAT-QA-001",
+          "action_id": "ACT-QA-001",
+          "direction": "OUTBOUND",
+          "channel": "GMAIL",
+          "provider_message_id": "MSG-OUT-1",
+          "thread_id": "THREAD-AAA",
+          "recipient": "claims@examplecarpark.test",
+          "subject": "Preserve footage request",
+          "summary": "seed outbound",
+          "classification": "",
+          "received_at": "2026-08-20T00:00:00.000Z",
+          "response_due": "",
+          "next_action": "",
+          "draft_id": "",
+          "approval_id": "",
+          "idempotency_key": "ACT-QA-001|seed",
+          "ingress_fingerprint": ""
+        },
+        {
+          "communication_id": "COM-MSG-RT-1",
+          "matter_id": "MAT-QA-001",
+          "action_id": "ACT-QA-001",
+          "direction": "INBOUND",
+          "channel": "GMAIL",
+          "provider_message_id": "MSG-RT-1",
+          "thread_id": "THREAD-AAA",
+          "recipient": "me@example.test",
+          "subject": "Re: [MAT-QA-001] round trip",
+          "summary": "classifier output for first delivery",
+          "classification": "ACKNOWLEDGEMENT",
+          "received_at": "2026-08-21T02:00:00.000Z",
+          "response_due": "",
+          "next_action": "",
+          "draft_id": "",
+          "approval_id": "",
+          "idempotency_key": "MAT-QA-001|MSG-RT-1",
+          "ingress_fingerprint": "ING-a7728903-20"
+        }
+      ]
+    }
+  },
+  "expect": {
+    "decision": "ALREADY_RECORDED",
+    "basis": "ALREADY_RECORDED",
+    "matter_id": "MAT-QA-001",
+    "communication_id": "COM-MSG-RT-1",
+    "stored_fingerprint": "REGENERATE",
+    "event_id": "EVT-REPLAY-MSG-RT-1",
+    "event_type": "INBOUND_REPLAY_IGNORED",
+    "severity": "INFO",
+    "requires_human_review": false,
+    "needs_hash_regen": true,
+    "ingress_fingerprint_spec": "ingressFingerprint(e) = 'ING-' + fnv1a32(parts) + '-' + canon(e.body).length, where parts = ['pmid=' + trim(pmid), 'thread=' + trim(thread_id), 'from=' + emailOf(from), 'subject=' + canon(subject), 'body=' + canon(body), 'ts=' + trim(received_at)].join(' '); canon collapses all whitespace runs to a single space and trims; emailOf extracts the address inside angle brackets and lowercases it; fnv1a32 is a single 32-bit FNV-1a pass (offset basis 0x811c9dc5) rendered as 8 lowercase hex characters.",
+    "note": "The stored fingerprint on the fixture row must be recomputed with ingressFingerprint(EV_FIRST) before the case runs; it is intentionally not hard-coded so a change to the hash function fails loudly rather than silently.",
+    "reason_shape": "Already recorded, raw message identical. Ignored.",
+    "_correction_2026-08-25": "Two corrections. (1) expect.stored_fingerprint was the prose \"equals the incoming ingress_fingerprint\"; replaced by REGENERATE, resolved through harness/oracles.js. (2) expect.reason was the paraphrase \"Already recorded, raw message identical. Ignored.\"; the node emits \"Message <id> is already recorded on <matter> and the raw message is identical. Ignored.\" The paraphrase was never an oracle from the QA workflow, so it is demoted to reason_shape (informational). decision, basis, event_id, event_type and severity are unchanged and still asserted."
+  },
+  "assertions": [
+    "A prior INBOUND row is located by provider_message_id, not by idempotency_key or by content.",
+    "When the stored fingerprint equals the recomputed fingerprint the decision is ALREADY_RECORDED with severity INFO and requires_human_review false.",
+    "communication_id returned on replay is the stored value and is identical to the value returned on first delivery.",
+    "event_id is 'EVT-REPLAY-' + provider_message_id, distinct from the first-delivery event id, so the replay audit row cannot overwrite the NEW_INBOUND audit row.",
+    "No field of the stored Communications row is proposed for change."
+  ],
+  "target": {
+    "workflow": "wf5",
+    "unit_file": "harness/units/wf5/build-reply-context.js"
+  },
+  "harness": {
+    "adapter": "reply-policy"
+  }
+}

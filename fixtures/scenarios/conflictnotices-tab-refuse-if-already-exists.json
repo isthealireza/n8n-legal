@@ -1,0 +1,57 @@
+{
+  "id": "conflictnotices-tab-refuse-if-already-exists",
+  "workflow": "admin-sheet-migration",
+  "unit": "Create ConflictNotices Tab / Decide (read before mutate)",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "t64Pc7BbZruFl57G",
+    "name": "QA - Create ConflictNotices Tab"
+  },
+  "description": "The tab-creation migration must inventory every tab first and refuse outright if a tab named ConflictNotices already exists.",
+  "why_it_exists": "A second run of a one-shot tab migration would otherwise addSheet over, or alongside, a ConflictNotices tab that already holds live conflict-notice rows. The whole migration is gated on a prior GET of the spreadsheet's sheet inventory (built 2026-08-22).",
+  "input": {
+    "spreadsheet_id": "SHEET_ID_PLACEHOLDER",
+    "sheets": [
+      {
+        "properties": {
+          "sheetId": 0,
+          "title": "Matters",
+          "index": 0,
+          "gridProperties": {
+            "rowCount": 1000,
+            "columnCount": 14
+          }
+        }
+      },
+      {
+        "properties": {
+          "sheetId": 11,
+          "title": "ConflictNotices",
+          "index": 9,
+          "gridProperties": {
+            "rowCount": 1000,
+            "columnCount": 15
+          }
+        }
+      }
+    ]
+  },
+  "expect": {
+    "already_exists": true,
+    "safe_to_create": false,
+    "refusal": "ConflictNotices already exists. Refusing to create or overwrite it.",
+    "branch_taken": "Refused",
+    "created": false,
+    "http_calls_made": [
+      "GET spreadsheets metadata"
+    ]
+  },
+  "assertions": [
+    "When any existing tab title equals 'ConflictNotices' exactly (case sensitive), safe_to_create is false.",
+    "The IF node routes to the Refused branch, so no addSheet batchUpdate and no header PUT is ever issued.",
+    "The refusal carries the existing tab's sheetId, index and grid size so a human can see what it refused to touch.",
+    "The inventory taken before the decision is returned with the refusal."
+  ],
+  "target": null,
+  "target_unresolved_reason": "Administrative / QA-infrastructure workflow. No WF1-WF5/WF9 Code node implements it."
+}

@@ -1,0 +1,29 @@
+{
+  "id": "wf2-b1-preflight-qa-id-not-production",
+  "workflow": "wf2",
+  "unit": "QA Preflight",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "olEuL3AIVr4ER0bT",
+    "name": "QA - WF2 B1 Boundary Harness"
+  },
+  "description": "The harness throws before any node runs if its QA spreadsheet id is empty, equals the production id, or the case id is not one of C1/C2/C3.",
+  "why_it_exists": "The harness copies four production nodes byte-for-byte, including their Sheets writes. The only thing standing between a test run and the live legal register is this id comparison, so it is asserted at the very first Code node and again immediately before each write.",
+  "input": {
+    "case_id": "C4",
+    "qa_spreadsheet_id": "QA_SHEET_ID_PLACEHOLDER",
+    "prod_spreadsheet_id": "SHEET_ID_PLACEHOLDER"
+  },
+  "expect": {
+    "throws": true,
+    "error": "QA PREFLIGHT: case_id must be C1, C2 or C3. Got: C4"
+  },
+  "assertions": [
+    "An empty QA spreadsheet id throws 'QA PREFLIGHT: no QA spreadsheet id.'",
+    "A QA id equal to the production id throws 'QA PREFLIGHT: QA id equals the production id. Stopping.'",
+    "case_id is upper-cased before validation and must be one of C1, C2, C3.",
+    "Both the QA id and the production id are carried forward on the item so every later gate can re-compare them without re-deriving either."
+  ],
+  "target": null,
+  "target_unresolved_reason": "QA-harness-only node (QA Preflight). No production unit."
+}

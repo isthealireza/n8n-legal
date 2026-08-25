@@ -1,0 +1,33 @@
+{
+  "id": "wf5-actions-no-duplicate-action-id",
+  "workflow": "wf5",
+  "unit": "Daily report / Build Daily Digest open-action counting",
+  "kind": "invariant",
+  "source_qa_workflow": {
+    "id": "3TVCLIVFGlBNSwK4",
+    "name": "QA - Daily Report State Census"
+  },
+  "description": "The Actions tab holds at most one row per action_id, so the row-level open count and the distinct-action open count agree.",
+  "why_it_exists": "The daily report was reporting numbers that did not reconcile. The census (2026-08-22) was written to find out whether that was an arithmetic bug in the digest or duplicate rows in the register, by computing actions_total_rows, distinct_action_ids, open_rows and distinct_open_action_ids side by side. If rows exceed distinct ids, the digest over-reports open work by exactly the duplicate count and no change to the digest can fix it.",
+  "input": {},
+  "expect": {
+    "actions_total_rows": "equals distinct_action_ids",
+    "open_rows": "equals distinct_open_action_ids",
+    "duplicate_action_ids": [],
+    "done_statuses": [
+      "COMPLETED",
+      "SENT",
+      "FAILED"
+    ],
+    "open_definition": "an Actions row whose upper-cased status is not one of the done statuses"
+  },
+  "assertions": [
+    "No action_id appears on more than one Actions row.",
+    "actions_total_rows equals distinct_action_ids.",
+    "open_rows equals distinct_open_action_ids; a divergence is the size of the digest's over-count.",
+    "Every duplicate found must be reported with its sheet row number, status, matter_id and idempotency_key, because de-duplicating rows in a legal register is a human decision.",
+    "The status breakdown computed per row and the status breakdown computed per distinct action (taking the last row for each id) must be identical."
+  ],
+  "target": null,
+  "target_unresolved_reason": "kind is \"invariant\": not executed by harness/run.js."
+}

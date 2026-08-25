@@ -1,0 +1,91 @@
+{
+  "id": "wf4-source-retrieval-pinpoint-anchoring",
+  "workflow": "wf4",
+  "unit": "Distil Sources retrieval and pinpoint excerpt",
+  "kind": "integration",
+  "source_qa_workflow": {
+    "id": "hNw2SnG6NB5KO88z",
+    "name": "QA - Source Retrieval Probe"
+  },
+  "description": "A GET-only probe of official WA and federal legal source URLs that runs the production verification logic plus a scored, pinpoint-centred excerpt.",
+  "why_it_exists": "Every Act's HTML opens with a table of contents that repeats each section heading verbatim, so first-match anchoring returned the contents listing and last-match anchoring returned whichever later section happened to reuse the phrase. Citations were being stored against the contents page instead of the provision.",
+  "input": {
+    "candidates": [
+      {
+        "label": "Limitation Act 2005 (WA) s 13",
+        "url": "https://www.legislation.wa.gov.au/legislation/statutes.nsf/RedirectURL?OpenAgent&query=mrdoc_47979.htm",
+        "want": [
+          "General limitation period",
+          "An action on any cause of action cannot be commenced"
+        ]
+      },
+      {
+        "label": "Road Traffic Act 1974 (WA) ss 55-56",
+        "url": "https://www.legislation.wa.gov.au/legislation/statutes.nsf/RedirectURL?OpenAgent&query=mrdoc_48198.htm",
+        "want": [
+          "Driver in incident occasioning property damage to stop and give information",
+          "report incident to police"
+        ]
+      },
+      {
+        "label": "Magistrates Court (Civil Proceedings) Act 2004 (WA) s 4",
+        "url": "https://www.legislation.wa.gov.au/legislation/statutes.nsf/RedirectURL?OpenAgent&query=mrdoc_48918.htm",
+        "want": [
+          "Term used: jurisdictional limit"
+        ]
+      },
+      {
+        "label": "Motor Vehicle (Third Party Insurance) Act 1943 (WA) s 4",
+        "url": "https://www.legislation.wa.gov.au/legislation/statutes.nsf/RedirectURL?OpenAgent&query=mrdoc_47506.htm",
+        "want": [
+          "Insurance against third party risks"
+        ]
+      },
+      {
+        "label": "Minimum Conditions of Employment Act 1993 (WA) s 9A",
+        "url": "https://www.legislation.wa.gov.au/legislation/statutes.nsf/RedirectURL?OpenAgent&query=mrdoc_48248.htm",
+        "want": [
+          "Maximum hours of work"
+        ]
+      },
+      {
+        "label": "FW Act epub part 2",
+        "url": "https://www.legislation.gov.au/C2009A00028/latest/text/original/epub/OEBPS/document_2/document_2.html",
+        "want": [
+          "The National Employment Standards are minimum standards"
+        ]
+      },
+      {
+        "label": "FW Act epub part 3",
+        "url": "https://www.legislation.gov.au/C2009A00028/latest/text/original/epub/OEBPS/document_3/document_3.html",
+        "want": [
+          "The National Employment Standards are minimum standards"
+        ]
+      }
+    ]
+  },
+  "expect": {
+    "verdicts": [
+      "RETRIEVED",
+      "RETRIEVAL_FAILED",
+      "BLOCKED_BY_SITE",
+      "LANDING_PAGE_NOT_AUTHORITY",
+      "NO_PINPOINT_FOUND",
+      "NO_TARGET_DECLARED",
+      "PINPOINT_NOT_FOUND"
+    ],
+    "excerpt_mode": "PINPOINT_SCORED",
+    "excerpt_max_chars": 9000
+  },
+  "assertions": [
+    "In the stripped body text a real heading is preceded by a section-number marker rendered as digits, a space and a dot ('55 .Driver in incident...'), while the contents listing has none ('55.Driver in incident...'); scoring on that marker makes the body win without hardcoding each heading's spacing.",
+    "A candidate occurrence scores +10 for the heading marker, +4 for provision-like text following it ('(1)', '(a)', 'means ', 'must ', 'is not to be'), and -3 when followed only by a page number.",
+    "Stripped text of 400 characters or fewer is RETRIEVAL_FAILED, not an empty excerpt.",
+    "A URL whose path is empty is LANDING_PAGE_NOT_AUTHORITY however much text it returns - a landing page is never a citable authority.",
+    "Text matching the blocked pattern (enable javascript, access denied, are you a robot, request blocked, captcha, 403 forbidden, cloudflare) in its first 3000 characters is BLOCKED_BY_SITE, which is how an Angular app shell is caught.",
+    "Text without any legal structure marker (section N, s N, Part, Division, Schedule, subsection) is NO_PINPOINT_FOUND.",
+    "The probe issues GET requests only, with neverError and a 30 second timeout so a transport failure is classified rather than thrown, and writes nothing to any sheet."
+  ],
+  "target": null,
+  "target_unresolved_reason": "kind is \"integration\": not executed by harness/run.js."
+}

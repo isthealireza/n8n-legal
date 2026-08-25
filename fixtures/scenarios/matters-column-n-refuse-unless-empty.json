@@ -1,0 +1,46 @@
+{
+  "id": "matters-column-n-refuse-unless-empty",
+  "workflow": "admin-sheet-migration",
+  "unit": "Add unmapped_facts_json Column / Decide (read before mutate)",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "zISJ9EDsxKUDA5U5",
+    "name": "QA - Add unmapped_facts_json Column"
+  },
+  "description": "The column-adding migration reads Matters!N1:N1000 first and refuses to write unless every cell in column N is blank.",
+  "why_it_exists": "A PUT to Matters!N1 would overwrite whatever header already sits there and orphan the data underneath it. The migration therefore proves the column is unused across the full 1000-row range before writing one cell (added 2026-08-21).",
+  "input": {
+    "range": "Matters!N1:N1000",
+    "values": [
+      [
+        "some_other_header"
+      ],
+      [
+        "value-1"
+      ],
+      [
+        "value-2"
+      ]
+    ]
+  },
+  "expect": {
+    "cells_seen": 3,
+    "non_empty": [
+      "some_other_header",
+      "value-1",
+      "value-2"
+    ],
+    "safe_to_write": false,
+    "already_done": false,
+    "refusal": "Column N is not empty. Refusing to write. Found: [\"some_other_header\",\"value-1\",\"value-2\"]",
+    "branch_taken": "Refused"
+  },
+  "assertions": [
+    "safe_to_write is true only when the count of non-blank cells in N1:N1000 is exactly zero.",
+    "Cells are trimmed before the emptiness test, so a cell holding only spaces counts as non-empty.",
+    "The refusal names at most the first five offending values, so the refusal message cannot itself leak a column of client data.",
+    "On the refusal branch no PUT is issued to Matters!N1."
+  ],
+  "target": null,
+  "target_unresolved_reason": "Administrative / QA-infrastructure workflow. No WF1-WF5/WF9 Code node implements it."
+}

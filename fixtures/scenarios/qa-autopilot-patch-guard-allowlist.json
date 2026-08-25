@@ -1,0 +1,45 @@
+{
+  "id": "qa-autopilot-patch-guard-allowlist",
+  "workflow": "qa-autopilot",
+  "unit": "Patch Guard",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "9vnlGSbNFSkg0qnc",
+    "name": "QA Autopilot — Legal AI"
+  },
+  "description": "A model-proposed patch is rejected unless it targets the QA clone, names a node on the safe-patch allowlist, and clears every safety flag.",
+  "why_it_exists": "The autopilot lets a model write a patch and apply it. The guard is the only thing preventing that loop from editing production, weakening an approval gate, or enabling dispatch.",
+  "input": {
+    "fixer_output": {
+      "target_workflow_id": "WF2_PRODUCTION_ID",
+      "target_node_name": "Approval Gate",
+      "change_type": "EDIT_CODE",
+      "patch": {
+        "jsCode": "..."
+      },
+      "safety_flags": {
+        "weakens_approval": true,
+        "patch_risk": "HIGH"
+      }
+    }
+  },
+  "expect": {
+    "patch_approved": false,
+    "patch_reject_reasons": [
+      "target WF ID not T6jGZRxNd9pVOfHi: got WF2_PRODUCTION_ID",
+      "target node \"Approval Gate\" not in safe-patch allowlist",
+      "weakens approval gate",
+      "risk=HIGH — manual review required"
+    ]
+  },
+  "assertions": [
+    "The target workflow id must equal the QA clone id exactly; any other id, production included, is rejected.",
+    "The target node must be on the allowlist: Classify and Plan, Validate Plan JSON, Build Questions, QA Telegram Questions, QA Telegram Plan, QA Telegram Planning Failed, Resolve Matter, QA Load Matters, Build Plan Message, Playbook Library.",
+    "Any of changes_credentials, adds_external_endpoint, enables_dispatch, weakens_approval or targets_production rejects the patch outright.",
+    "patch_risk HIGH always requires manual review, and an empty patch object or a NO_AUTO_FIX change_type is rejected.",
+    "All reject reasons are accumulated rather than short-circuited, so a human sees every problem at once.",
+    "The reasons are advisory strings only - the boolean patch_approved is what gates the apply branch, and it is true only when the reason list is empty."
+  ],
+  "target": null,
+  "target_unresolved_reason": "Administrative / QA-infrastructure workflow. No WF1-WF5/WF9 Code node implements it."
+}

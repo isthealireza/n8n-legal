@@ -1,0 +1,39 @@
+{
+  "id": "wf4-live-fetch-negative-federal-register-spa-shell",
+  "workflow": "wf4",
+  "unit": "Live retrieval and verification of the real playbook source policies (GET only)",
+  "kind": "integration",
+  "source_qa_workflow": {
+    "id": "oClbmnidX0swK0oP",
+    "name": "QA - Source Retrieval Fix"
+  },
+  "description": "Live GET of Federal Register of Legislation, Fair Work Act 2009 must grade SPA_SHELL_NOT_TEXT.",
+  "why_it_exists": "WF4 was drafting with no sources at all because Build Draft Context yielded urls: [] (the URL constructor does not exist in the n8n Code sandbox), and separately because the old verification graded navigation chrome and app shells as RETRIEVED. This harness runs the proposed regex host filter and the hardened verification against the REAL playbook source URLs over live GET requests, so the grading is checked against the pages as they actually serve rather than against a fixture.",
+  "input": {
+    "policy": "NEGATIVE_CONTROL",
+    "url": "https://www.legislation.gov.au/C2009A00028/latest/text/original/epub/OEBPS/document_2/document_2.html",
+    "http": {
+      "method": "GET",
+      "responseFormat": "text",
+      "neverError": true,
+      "timeout": 30000,
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1000
+    }
+  },
+  "expect": {
+    "verification_status": "SPA_SHELL_NOT_TEXT",
+    "source_type": "CTH_LEGISLATION"
+  },
+  "assertions": [
+    "classifySource(url) returns CTH_LEGISLATION",
+    "verify(url, rawBody, strippedText, type) returns SPA_SHELL_NOT_TEXT",
+    "GET only; nothing is written to any sheet and no message is sent",
+    "INTEGRATION: this depends on a live third-party government site. A change to that site can flip the result without any code change, so a failure here is a signal to re-inspect the page, not automatically a code regression.",
+    "the raw body matches SPA_SHELL (ng-version=, <app-root, __NEXT_DATA__ or an empty root div) within its first 20000 characters",
+    "this is the page that execution 284 graded RETRIEVED while it contained only a table-of-contents link"
+  ],
+  "target": null,
+  "target_unresolved_reason": "kind is \"integration\": not executed by harness/run.js."
+}

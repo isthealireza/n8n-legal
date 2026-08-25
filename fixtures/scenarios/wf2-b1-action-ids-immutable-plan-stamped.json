@@ -1,0 +1,136 @@
+{
+  "id": "wf2-b1-action-ids-immutable-plan-stamped",
+  "workflow": "wf2",
+  "unit": "Finalise Plan action id minting",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "olEuL3AIVr4ER0bT",
+    "name": "QA - WF2 B1 Boundary Harness"
+  },
+  "description": "Action ids carry a per-plan stamp and depends_on is remapped in the same pass, so a re-plan can never reuse an id or resolve a dependency into an earlier plan.",
+  "why_it_exists": "Validate Plan JSON minted ids purely positionally (ACT-<matter>-003), so a re-plan reused the same id for a different action, making ids non-unique. The first fix - upsert on position - was worse: it silently OVERWROTE the old row, changing what ACT-...-003 meant while Drafts and Approvals rows still referenced it.",
+  "input": {
+    "plan_valid": true,
+    "matter_id": "MAT-QA-000001",
+    "playbook_id": "motor_vehicle_damage_v1",
+    "force_proceed": false,
+    "required_facts": [
+      "incident_description",
+      "incident_datetime",
+      "incident_location",
+      "owner_present",
+      "driver_identity",
+      "own_vehicle_registration",
+      "damage_description"
+    ],
+    "optional_facts": [
+      "other_party_name",
+      "other_party_contact",
+      "other_party_registration",
+      "other_party_insurer",
+      "police_report_number",
+      "witness_details",
+      "insurer_name",
+      "policy_number",
+      "repair_quote_amount",
+      "prior_communications"
+    ],
+    "facts_json": "{\"incident_description\": \"Rear quarter panel struck while the vehicle was parked and unattended.\", \"incident_datetime\": \"UNVERIFIED: unknown; discovered 2026-08-14 about 18:00 AWST; occurred while parked\", \"incident_location\": \"Level 2, Hay Street car park, Perth WA\", \"owner_present\": \"no\", \"driver_identity\": \"vehicle was unattended\", \"own_vehicle_registration\": \"9XYZ876\", \"damage_description\": \"Dent and paint transfer to the rear quarter panel.\"}",
+    "missing_facts_json": "[]",
+    "risk_flags_json": "[]",
+    "questions": [],
+    "actions": [
+      {
+        "action_id": "ACT-QA-000001-001",
+        "action_type": "COLLECT_EVIDENCE",
+        "depends_on_json": "[]"
+      },
+      {
+        "action_id": "ACT-QA-000001-002",
+        "action_type": "OBTAIN_REPAIR_QUOTE",
+        "depends_on_json": "[\"ACT-QA-000001-001\"]"
+      }
+    ],
+    "now": "2026-08-23T06:00:00.000Z",
+    "items": [
+      {
+        "plan_valid": true,
+        "matter_id": "MAT-QA-000001",
+        "playbook_id": "motor_vehicle_damage_v1",
+        "facts_json": "{\"incident_description\": \"Rear quarter panel struck while the vehicle was parked and unattended.\", \"incident_datetime\": \"UNVERIFIED: unknown; discovered 2026-08-14 about 18:00 AWST; occurred while parked\", \"incident_location\": \"Level 2, Hay Street car park, Perth WA\", \"owner_present\": \"no\", \"driver_identity\": \"vehicle was unattended\", \"own_vehicle_registration\": \"9XYZ876\", \"damage_description\": \"Dent and paint transfer to the rear quarter panel.\"}",
+        "missing_facts_json": "[]",
+        "risk_flags_json": "[]",
+        "questions": [],
+        "actions": [
+          {
+            "action_id": "ACT-QA-000001-001",
+            "action_type": "COLLECT_EVIDENCE",
+            "depends_on_json": "[]"
+          },
+          {
+            "action_id": "ACT-QA-000001-002",
+            "action_type": "OBTAIN_REPAIR_QUOTE",
+            "depends_on_json": "[\"ACT-QA-000001-001\"]"
+          }
+        ],
+        "owner_summary": ""
+      }
+    ],
+    "nodeOutputs": {
+      "Resolve Matter": [
+        {
+          "force_proceed": false
+        }
+      ],
+      "Playbook Library": [
+        {
+          "playbooks": {
+            "motor_vehicle_damage_v1": {
+              "required_facts": [
+                "incident_description",
+                "incident_datetime",
+                "incident_location",
+                "owner_present",
+                "driver_identity",
+                "own_vehicle_registration",
+                "damage_description"
+              ],
+              "optional_facts": [
+                "other_party_name",
+                "other_party_contact",
+                "other_party_registration",
+                "other_party_insurer",
+                "police_report_number",
+                "witness_details",
+                "insurer_name",
+                "policy_number",
+                "repair_quote_amount",
+                "prior_communications"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  },
+  "expect": {
+    "plan_stamp_pattern": "^P[0-9A-Z]{6,}$",
+    "action_id_pattern": "^ACT-QA-000001-P[0-9A-Z]+-00[12]$",
+    "idempotency_key_pattern": "^MAT-QA-000001\\|P[0-9A-Z]+\\|00[12]$",
+    "depends_on_remapped_to": "the stamped id of action 1 from THIS plan"
+  },
+  "assertions": [
+    "The plan stamp is 'P' plus base36 epoch seconds upper-cased, which sorts correctly when parsed back with parseInt(s, 36) - that is how readers rank plans.",
+    "Every action id in a plan shares one stamp, and no two plans on the same matter can share a stamp.",
+    "depends_on_json entries are rewritten through the same id map in the same pass, so a dependency can never resolve against an action belonging to a different plan.",
+    "idempotency_key is matter_id | plan_stamp | positional sequence, so an append is idempotent within a plan but never collides across plans.",
+    "Nothing is overwritten or deleted - readers pick the newest stamp per matter and history stays intact."
+  ],
+  "target": {
+    "workflow": "wf2",
+    "unit_file": "harness/units/wf2/finalise-plan.js"
+  },
+  "harness": {
+    "adapter": "finalise-plan"
+  }
+}

@@ -1,0 +1,129 @@
+{
+  "id": "wf5-ingress-thread-tag-mismatch",
+  "workflow": "wf5",
+  "unit": "Build Reply Context (resolveReply) - thread vs tag agreement",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "XevQwFviJHUobw0U",
+    "name": "QA - Ingress Round Trip"
+  },
+  "description": "When the thread resolves to one matter but the subject or body carries a [MAT-...] tag naming a different matter, the reply is BLOCKED on THREAD_MISMATCH.",
+  "why_it_exists": "Derived variant of the round-trip fixture. The resolver extracts every [MAT-...] tag from subject plus body and refuses when thread and tag disagree, rather than trusting either. Recorded so the branch is exercised by the harness.",
+  "input": {
+    "event": {
+      "provider_message_id": "MSG-RT-1",
+      "thread_id": "THREAD-AAA",
+      "from": "Claims Team <claims@examplecarpark.test>",
+      "subject": "Re: [MAT-QA-999] round trip",
+      "body": "First delivery body.",
+      "received_at": "2026-08-21T02:00:00.000Z"
+    },
+    "communications_register": [
+      {
+        "communication_id": "COM-OUT-1",
+        "matter_id": "MAT-QA-001",
+        "action_id": "ACT-QA-001",
+        "direction": "OUTBOUND",
+        "channel": "GMAIL",
+        "provider_message_id": "MSG-OUT-1",
+        "thread_id": "THREAD-AAA",
+        "recipient": "claims@examplecarpark.test",
+        "subject": "Preserve footage request",
+        "summary": "seed outbound",
+        "classification": "",
+        "received_at": "2026-08-20T00:00:00.000Z",
+        "response_due": "",
+        "next_action": "",
+        "draft_id": "",
+        "approval_id": "",
+        "idempotency_key": "ACT-QA-001|seed",
+        "ingress_fingerprint": ""
+      }
+    ],
+    "now": "2026-08-23T06:00:00.000Z",
+    "items": [
+      {
+        "communication_id": "COM-OUT-1",
+        "matter_id": "MAT-QA-001",
+        "action_id": "ACT-QA-001",
+        "direction": "OUTBOUND",
+        "channel": "GMAIL",
+        "provider_message_id": "MSG-OUT-1",
+        "thread_id": "THREAD-AAA",
+        "recipient": "claims@examplecarpark.test",
+        "subject": "Preserve footage request",
+        "summary": "seed outbound",
+        "classification": "",
+        "received_at": "2026-08-20T00:00:00.000Z",
+        "response_due": "",
+        "next_action": "",
+        "draft_id": "",
+        "approval_id": "",
+        "idempotency_key": "ACT-QA-001|seed",
+        "ingress_fingerprint": ""
+      }
+    ],
+    "nodeOutputs": {
+      "Match Reply to Matter": [
+        {
+          "provider_message_id": "MSG-RT-1",
+          "thread_id": "THREAD-AAA",
+          "from_address": "Claims Team <claims@examplecarpark.test>",
+          "subject": "Re: [MAT-QA-999] round trip",
+          "body_text": "First delivery body.",
+          "received_at": "2026-08-21T02:00:00.000Z"
+        }
+      ],
+      "Load Matters (Reply)": [
+        {
+          "matter_id": "MAT-QA-001"
+        }
+      ],
+      "Load Actions (Reply)": [],
+      "Load Comms (Reply)": [
+        {
+          "communication_id": "COM-OUT-1",
+          "matter_id": "MAT-QA-001",
+          "action_id": "ACT-QA-001",
+          "direction": "OUTBOUND",
+          "channel": "GMAIL",
+          "provider_message_id": "MSG-OUT-1",
+          "thread_id": "THREAD-AAA",
+          "recipient": "claims@examplecarpark.test",
+          "subject": "Preserve footage request",
+          "summary": "seed outbound",
+          "classification": "",
+          "received_at": "2026-08-20T00:00:00.000Z",
+          "response_due": "",
+          "next_action": "",
+          "draft_id": "",
+          "approval_id": "",
+          "idempotency_key": "ACT-QA-001|seed",
+          "ingress_fingerprint": ""
+        }
+      ]
+    }
+  },
+  "expect": {
+    "decision": "BLOCKED",
+    "basis": "THREAD_MISMATCH",
+    "matter_id": "MAT-QA-001",
+    "event_type": "INBOUND_REPLY_THREAD_MISMATCH",
+    "severity": "WARNING",
+    "reason_shape": "Thread and tag disagree.",
+    "_correction_2026-08-25": "expect.reason was the paraphrase \"Thread and tag disagree.\"; the node emits \"The thread belongs to <matter> but the message tags <tags>.\" Demoted to reason_shape (informational); basis THREAD_MISMATCH and the rest are unchanged and still asserted."
+  },
+  "assertions": [
+    "Tags are matched case-insensitively by /\\[(MAT-[A-Za-z0-9-]+)\\]/g over subject + '\\n' + body and upper-cased before comparison.",
+    "A tag list that is empty does not trigger a mismatch; only a non-empty tag list that omits the thread's matter does.",
+    "Duplicate occurrences of the same tag count once."
+  ],
+  "derived": true,
+  "target": {
+    "workflow": "wf5",
+    "unit_file": "harness/units/wf5/build-reply-context.js"
+  },
+  "harness": {
+    "adapter": "reply-policy"
+  }
+}

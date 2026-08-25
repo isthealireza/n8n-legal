@@ -1,0 +1,115 @@
+{
+  "id": "wf2-b1-planner-contradiction-recorded-value-wins",
+  "workflow": "wf2",
+  "unit": "Finalise Plan contradiction control",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "olEuL3AIVr4ER0bT",
+    "name": "QA - WF2 B1 Boundary Harness"
+  },
+  "description": "A fact listed as missing while a real value for that exact key sits in facts is removed from the missing list; the recorded value wins and the contradiction is flagged.",
+  "why_it_exists": "Validate Plan JSON seeds its missing list from the model's own raw.missing_facts and never prunes a key that IS present in facts, so a fact could be reported known and missing at the same time - blocking a matter over a fact it already holds.",
+  "input": {
+    "plan_valid": true,
+    "playbook_id": "motor_vehicle_damage_v1",
+    "force_proceed": false,
+    "required_facts": [
+      "incident_description",
+      "incident_datetime",
+      "incident_location",
+      "owner_present",
+      "driver_identity",
+      "own_vehicle_registration",
+      "damage_description"
+    ],
+    "optional_facts": [
+      "other_party_name",
+      "other_party_contact",
+      "other_party_registration",
+      "other_party_insurer",
+      "police_report_number",
+      "witness_details",
+      "insurer_name",
+      "policy_number",
+      "repair_quote_amount",
+      "prior_communications"
+    ],
+    "facts_json": "{\"incident_description\": \"Rear quarter panel struck while the vehicle was parked and unattended.\", \"incident_datetime\": \"UNVERIFIED: unknown; discovered 2026-08-14 about 18:00 AWST; occurred while parked\", \"incident_location\": \"Level 2, Hay Street car park, Perth WA\", \"owner_present\": \"no\", \"driver_identity\": \"vehicle was unattended\", \"own_vehicle_registration\": \"9XYZ876\", \"damage_description\": \"Dent and paint transfer to the rear quarter panel.\"}",
+    "missing_facts_json": "[\"own_vehicle_registration\"]",
+    "risk_flags_json": "[]",
+    "questions": [],
+    "now": "2026-08-23T06:00:00.000Z",
+    "items": [
+      {
+        "plan_valid": true,
+        "matter_id": "MAT-QA-000001",
+        "playbook_id": "motor_vehicle_damage_v1",
+        "facts_json": "{\"incident_description\": \"Rear quarter panel struck while the vehicle was parked and unattended.\", \"incident_datetime\": \"UNVERIFIED: unknown; discovered 2026-08-14 about 18:00 AWST; occurred while parked\", \"incident_location\": \"Level 2, Hay Street car park, Perth WA\", \"owner_present\": \"no\", \"driver_identity\": \"vehicle was unattended\", \"own_vehicle_registration\": \"9XYZ876\", \"damage_description\": \"Dent and paint transfer to the rear quarter panel.\"}",
+        "missing_facts_json": "[\"own_vehicle_registration\"]",
+        "risk_flags_json": "[]",
+        "questions": [],
+        "actions": [],
+        "owner_summary": ""
+      }
+    ],
+    "nodeOutputs": {
+      "Resolve Matter": [
+        {
+          "force_proceed": false
+        }
+      ],
+      "Playbook Library": [
+        {
+          "playbooks": {
+            "motor_vehicle_damage_v1": {
+              "required_facts": [
+                "incident_description",
+                "incident_datetime",
+                "incident_location",
+                "owner_present",
+                "driver_identity",
+                "own_vehicle_registration",
+                "damage_description"
+              ],
+              "optional_facts": [
+                "other_party_name",
+                "other_party_contact",
+                "other_party_registration",
+                "other_party_insurer",
+                "police_report_number",
+                "witness_details",
+                "insurer_name",
+                "policy_number",
+                "repair_quote_amount",
+                "prior_communications"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  },
+  "expect": {
+    "planner_contradictions_json": "[\"own_vehicle_registration\"]",
+    "missing_facts_json": "[]",
+    "requires_information": false,
+    "matter_status": "CLASSIFIED",
+    "risk_flags_contains": [
+      "PLANNER_CONTRADICTION"
+    ],
+    "requires_human_review": true
+  },
+  "assertions": [
+    "A key is a contradiction only when it looks like a fact key (/^[a-z][a-z0-9_]*$/) and facts holds a real, non-placeholder value for it.",
+    "Recorded facts win: the key is dropped from missing, and the matter proceeds.",
+    "PLANNER_CONTRADICTION is raised and requires_human_review is set - the contradiction is resolved in favour of proceeding but is never silent.",
+    "The owner summary names the contradicting keys and states that the recorded values were kept."
+  ],
+  "target": {
+    "workflow": "wf2",
+    "unit_file": "harness/units/wf2/finalise-plan.js"
+  },
+  "harness": {
+    "adapter": "finalise-plan"
+  }
+}

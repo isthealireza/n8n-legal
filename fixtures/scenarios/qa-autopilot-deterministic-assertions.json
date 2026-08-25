@@ -1,0 +1,56 @@
+{
+  "id": "qa-autopilot-deterministic-assertions",
+  "workflow": "qa-autopilot",
+  "unit": "Deterministic Assertions",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "9vnlGSbNFSkg0qnc",
+    "name": "QA Autopilot — Legal AI"
+  },
+  "description": "Eighteen scenarios are run through the QA WF2 clone and checked by hard deterministic assertions before any model judgment is consulted.",
+  "why_it_exists": "Semantic judgment by a model cannot be the only gate on a legal pipeline. The deterministic layer encodes the behaviours that had already regressed once each: matter isolation, continuation fact loading, and question deduplication.",
+  "input": {
+    "scenario_count": 18,
+    "severities": [
+      "CRITICAL",
+      "MAJOR",
+      "MINOR"
+    ],
+    "named_regressions": [
+      "D8_new_matter_isolation",
+      "D9_continuation_loads_facts",
+      "D10_question_deduplication",
+      "net_pay_risk_flag",
+      "no_draft_without_facts",
+      "MAT006_vehicle_clarification",
+      "contractor_not_employee",
+      "empty_input_graceful_handling",
+      "evidence_note_continuation",
+      "general_fallback",
+      "super_and_award_coverage",
+      "debt_recovery_fields"
+    ]
+  },
+  "expect": {
+    "A01_wf2_returned": "qa_mode === true",
+    "A02_plan_valid_is_bool": "typeof plan_valid === 'boolean'",
+    "A03_matter_id_present": "matter_id truthy",
+    "A05_playbook_match": "playbook_id === expected_playbook",
+    "A06_requires_info_match": "requires_information === expect_requires_information",
+    "A07_is_new_matter_match": "is_new_matter === expect_is_new_matter",
+    "A08_D8_known_facts_empty": "NEW_MATTER known_facts is empty",
+    "A09_D9_known_facts_loaded": "CONTINUE_MATTER known_facts is non-empty",
+    "A10_D10_no_duplicates": "case-insensitive trimmed questions are all unique",
+    "A11_min_questions": "questions_count >= expect_min_questions"
+  },
+  "assertions": [
+    "D8: a NEW_MATTER must never inherit facts from an existing matter - known_facts must be empty.",
+    "D9: a CONTINUE_MATTER must load the existing matter's facts - known_facts must be non-empty.",
+    "D10: the question list must contain no case-insensitive trimmed duplicates.",
+    "Every assertion carries a severity, and the deterministic layer runs before the semantic judge so a hard failure is never argued away by a model.",
+    "Assertions are skipped rather than failed when the scenario declares no expectation for that field, so an under-specified scenario cannot produce a false pass on a field it never claimed.",
+    "The suite writes nothing to production - the WF2 under test is the QA clone whose Sheets writes are all replaced by pass-through no-ops."
+  ],
+  "target": null,
+  "target_unresolved_reason": "Administrative / QA-infrastructure workflow. No WF1-WF5/WF9 Code node implements it."
+}

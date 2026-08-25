@@ -1,0 +1,187 @@
+{
+  "id": "wf5-reply-resolver-is-deterministic",
+  "workflow": "wf5",
+  "unit": "WF5 Build Reply Context resolveReply policy",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "BAKIml11QKedtH9d",
+    "name": "QA - WF5 Reply Policy v2"
+  },
+  "description": "Two invocations of resolveReply with identical inputs produce byte-identical output.",
+  "why_it_exists": "The resolver used to read a wall clock when a message carried no date header, which made its output non-deterministic and turned retries into conflicts. This asserts the whole resolver, not just the fingerprint, is a pure function of its inputs. Suite case D1.",
+  "input": {
+    "case_id": "D1",
+    "register": {
+      "matters": [
+        {
+          "matter_id": "MAT-20260101-011",
+          "title": "Parked vehicle damage"
+        },
+        {
+          "matter_id": "MAT-20260101-012",
+          "title": "Employment contract review"
+        },
+        {
+          "matter_id": "MAT-20260101-013",
+          "title": "Second car park matter, same insurer"
+        }
+      ],
+      "comms": [
+        {
+          "communication_id": "COM-OUT-1",
+          "matter_id": "MAT-20260101-011",
+          "direction": "OUTBOUND",
+          "recipient": "claims@examplecarpark.test",
+          "thread_id": "THREAD-AAA",
+          "provider_message_id": "MSG-OUT-1"
+        },
+        {
+          "communication_id": "COM-OUT-2",
+          "matter_id": "MAT-20260101-012",
+          "direction": "OUTBOUND_DRY_RUN",
+          "recipient": "hr@exampleco.test",
+          "thread_id": "THREAD-BBB",
+          "provider_message_id": "DRY_RUN"
+        },
+        {
+          "communication_id": "COM-OUT-3",
+          "matter_id": "MAT-20260101-013",
+          "direction": "OUTBOUND",
+          "recipient": "claims@examplecarpark.test",
+          "thread_id": "THREAD-CCC",
+          "provider_message_id": "MSG-OUT-3"
+        },
+        {
+          "communication_id": "COM-LEGACY",
+          "matter_id": "MAT-20260101-011",
+          "direction": "INBOUND",
+          "recipient": "me@example.test",
+          "thread_id": "THREAD-AAA",
+          "provider_message_id": "MSG-LEGACY-1",
+          "ingress_fingerprint": ""
+        }
+      ]
+    },
+    "event": {
+      "provider_message_id": "MSG-IN-1",
+      "thread_id": "THREAD-AAA",
+      "from": "Claims Team <claims@examplecarpark.test>",
+      "subject": "Re: [MAT-20260101-011] parked vehicle damage",
+      "body": "We have received your letter.",
+      "received_at": "2026-08-20T05:00:00.000Z"
+    },
+    "note": "run twice against the BASE register, not the accumulated one",
+    "now": "2026-08-23T06:00:00.000Z",
+    "items": [
+      {
+        "communication_id": "COM-OUT-1",
+        "matter_id": "MAT-20260101-011",
+        "direction": "OUTBOUND",
+        "recipient": "claims@examplecarpark.test",
+        "thread_id": "THREAD-AAA",
+        "provider_message_id": "MSG-OUT-1"
+      },
+      {
+        "communication_id": "COM-OUT-2",
+        "matter_id": "MAT-20260101-012",
+        "direction": "OUTBOUND_DRY_RUN",
+        "recipient": "hr@exampleco.test",
+        "thread_id": "THREAD-BBB",
+        "provider_message_id": "DRY_RUN"
+      },
+      {
+        "communication_id": "COM-OUT-3",
+        "matter_id": "MAT-20260101-013",
+        "direction": "OUTBOUND",
+        "recipient": "claims@examplecarpark.test",
+        "thread_id": "THREAD-CCC",
+        "provider_message_id": "MSG-OUT-3"
+      },
+      {
+        "communication_id": "COM-LEGACY",
+        "matter_id": "MAT-20260101-011",
+        "direction": "INBOUND",
+        "recipient": "me@example.test",
+        "thread_id": "THREAD-AAA",
+        "provider_message_id": "MSG-LEGACY-1",
+        "ingress_fingerprint": ""
+      }
+    ],
+    "nodeOutputs": {
+      "Match Reply to Matter": [
+        {
+          "provider_message_id": "MSG-IN-1",
+          "thread_id": "THREAD-AAA",
+          "from_address": "Claims Team <claims@examplecarpark.test>",
+          "subject": "Re: [MAT-20260101-011] parked vehicle damage",
+          "body_text": "We have received your letter.",
+          "received_at": "2026-08-20T05:00:00.000Z"
+        }
+      ],
+      "Load Matters (Reply)": [
+        {
+          "matter_id": "MAT-20260101-011",
+          "title": "Parked vehicle damage"
+        },
+        {
+          "matter_id": "MAT-20260101-012",
+          "title": "Employment contract review"
+        },
+        {
+          "matter_id": "MAT-20260101-013",
+          "title": "Second car park matter, same insurer"
+        }
+      ],
+      "Load Actions (Reply)": [],
+      "Load Comms (Reply)": [
+        {
+          "communication_id": "COM-OUT-1",
+          "matter_id": "MAT-20260101-011",
+          "direction": "OUTBOUND",
+          "recipient": "claims@examplecarpark.test",
+          "thread_id": "THREAD-AAA",
+          "provider_message_id": "MSG-OUT-1"
+        },
+        {
+          "communication_id": "COM-OUT-2",
+          "matter_id": "MAT-20260101-012",
+          "direction": "OUTBOUND_DRY_RUN",
+          "recipient": "hr@exampleco.test",
+          "thread_id": "THREAD-BBB",
+          "provider_message_id": "DRY_RUN"
+        },
+        {
+          "communication_id": "COM-OUT-3",
+          "matter_id": "MAT-20260101-013",
+          "direction": "OUTBOUND",
+          "recipient": "claims@examplecarpark.test",
+          "thread_id": "THREAD-CCC",
+          "provider_message_id": "MSG-OUT-3"
+        },
+        {
+          "communication_id": "COM-LEGACY",
+          "matter_id": "MAT-20260101-011",
+          "direction": "INBOUND",
+          "recipient": "me@example.test",
+          "thread_id": "THREAD-AAA",
+          "provider_message_id": "MSG-LEGACY-1",
+          "ingress_fingerprint": ""
+        }
+      ]
+    }
+  },
+  "expect": {
+    "first_run_json": "EQUALS second_run_json"
+  },
+  "assertions": [
+    "JSON.stringify(resolveReply(event, base)) is identical across two consecutive calls",
+    "no Date, $now or random source appears anywhere in the resolver"
+  ],
+  "target": {
+    "workflow": "wf5",
+    "unit_file": "harness/units/wf5/build-reply-context.js"
+  },
+  "harness": {
+    "adapter": "reply-determinism"
+  }
+}

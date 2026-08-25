@@ -1,0 +1,126 @@
+{
+  "workflow": "wf4",
+  "unit": "WF4 Integrity Guard and Verify Selected Row fail-closed gates",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "hTz7VbLHENx8ZB1N",
+    "name": "QA - WF4 Integrity Guard Runtime"
+  },
+  "id": "wf4-guard-unique-action-approval-route-passes",
+  "description": "Positive control: a clean single-row action on the APPROVAL route passes both the guard and Verify Selected Row.",
+  "why_it_exists": "Proves the full happy path through both fail-closed gates, so that the negative C5 cases below are known to be failing for the injected reason and not because the path never opens.",
+  "input": {
+    "case_id": "C4",
+    "config": {
+      "matter_id": "MAT-QA-CLEAN",
+      "route_group": "APPROVAL",
+      "approval_id": "APR-QACLEAN"
+    },
+    "actions": [
+      {
+        "action_id": "ACT-QA-CLEAN-001",
+        "matter_id": "MAT-QA-CLEAN",
+        "action_type": "CONTACT_INSURER",
+        "status": "AWAITING_APPROVAL",
+        "priority": "HIGH",
+        "depends_on_json": "[]",
+        "recipient": "claims@insurer.example",
+        "channel": "GMAIL",
+        "requires_approval": "TRUE",
+        "draft_id": "DRF-QA-CLEAN-001-v1",
+        "approval_id": "APR-QACLEAN",
+        "due_at": "",
+        "deadline_basis": "",
+        "blocked_reason": "",
+        "idempotency_key": "MAT-QA-CLEAN|PQA|001",
+        "created_at": "2026-08-21T00:00:00Z",
+        "updated_at": "2026-08-21T00:00:00Z"
+      }
+    ],
+    "approvals": [
+      {
+        "approval_id": "APR-A1B2C3D4E5F60718",
+        "matter_id": "MAT-20260101-002",
+        "action_id": "ACT-20260101-002-003",
+        "draft_id": "DRF-20260101-002-003-v1",
+        "status": "PENDING"
+      },
+      {
+        "approval_id": "APR-QACLEAN",
+        "matter_id": "MAT-QA-CLEAN",
+        "action_id": "ACT-QA-CLEAN-001",
+        "draft_id": "DRF-QA-CLEAN-001-v1",
+        "status": "PENDING"
+      }
+    ],
+    "now": "2026-08-23T06:00:00.000Z",
+    "items": [
+      {}
+    ],
+    "nodeOutputs": {
+      "Config": [
+        {
+          "matter_id": "MAT-QA-CLEAN",
+          "route_group": "APPROVAL",
+          "approval_id": "APR-QACLEAN"
+        }
+      ],
+      "Load Actions": [
+        {
+          "action_id": "ACT-QA-CLEAN-001",
+          "matter_id": "MAT-QA-CLEAN",
+          "action_type": "CONTACT_INSURER",
+          "status": "AWAITING_APPROVAL",
+          "priority": "HIGH",
+          "depends_on_json": "[]",
+          "recipient": "claims@insurer.example",
+          "channel": "GMAIL",
+          "requires_approval": "TRUE",
+          "draft_id": "DRF-QA-CLEAN-001-v1",
+          "approval_id": "APR-QACLEAN",
+          "due_at": "",
+          "deadline_basis": "",
+          "blocked_reason": "",
+          "idempotency_key": "MAT-QA-CLEAN|PQA|001",
+          "created_at": "2026-08-21T00:00:00Z",
+          "updated_at": "2026-08-21T00:00:00Z"
+        }
+      ],
+      "Load Approvals": [
+        {
+          "approval_id": "APR-A1B2C3D4E5F60718",
+          "matter_id": "MAT-20260101-002",
+          "action_id": "ACT-20260101-002-003",
+          "draft_id": "DRF-20260101-002-003-v1",
+          "status": "PENDING"
+        },
+        {
+          "approval_id": "APR-QACLEAN",
+          "matter_id": "MAT-QA-CLEAN",
+          "action_id": "ACT-QA-CLEAN-001",
+          "draft_id": "DRF-QA-CLEAN-001-v1",
+          "status": "PENDING"
+        }
+      ]
+    }
+  },
+  "expect": {
+    "integrity_ok": true,
+    "verify_integrity_ok": true,
+    "reaches": "Gate Result (SINK)",
+    "integrity_verified_action_id": "ACT-QA-CLEAN-001"
+  },
+  "assertions": [
+    "the guard passes with a single selected row",
+    "Verify Selected Row re-derives the same fingerprint from the same Load Actions snapshot and passes",
+    "integrity_verified_fingerprint equals the fingerprint the guard carried",
+    "the writer sink is reached, meaning a real run would have written state or sent"
+  ],
+  "target": {
+    "workflow": "wf4",
+    "unit_file": "harness/units/wf4/integrity-guard.js"
+  },
+  "harness": {
+    "adapter": "integrity-guard"
+  }
+}

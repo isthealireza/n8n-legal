@@ -1,0 +1,91 @@
+{
+  "id": "wf5-guarded-replay-same-key-identical-content",
+  "workflow": "wf5",
+  "unit": "read-before-mutate replay gate (Decide / Allow Mutations)",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "c6YPmuWf3cevjZ3r",
+    "name": "QA - Guarded Replay Test"
+  },
+  "description": "A replay of the same idempotency key carrying identical content yields ALREADY_RECORDED, no mutation, and no human review.",
+  "why_it_exists": "Derived variant: the QA workflow drove only the conflicting branch, but the gate distinguishes three outcomes and an ordinary duplicate delivery must be quiet, not an alert. Without this case a harness could pass while collapsing ALREADY_RECORDED into IDEMPOTENCY_CONFLICT and paging a human for every Gmail redelivery.",
+  "input": {
+    "payload": {
+      "matter_id": "MAT-QA-001",
+      "action_id": "ACT-QA-001",
+      "provider_message_id": "MSG-QA-1",
+      "thread_id": "THREAD-QA-A",
+      "idempotency_key": "MAT-QA-001|MSG-QA-1",
+      "communication_id": "COM-FIRSTRUN",
+      "subject": "Re: QA replay test",
+      "summary": "first delivery",
+      "classification": "ACKNOWLEDGEMENT",
+      "received_at": "2026-08-20T05:00:00.000Z"
+    },
+    "register": [
+      {
+        "communication_id": "COM-SEED-0",
+        "matter_id": "MAT-QA-001",
+        "action_id": "ACT-QA-001",
+        "direction": "OUTBOUND",
+        "channel": "GMAIL",
+        "provider_message_id": "MSG-SEED-0",
+        "thread_id": "THREAD-QA-A",
+        "recipient": "claims@examplecarpark.test",
+        "subject": "Seed row",
+        "summary": "synthetic seed",
+        "classification": "SEED",
+        "received_at": "2026-08-19T00:00:00.000Z",
+        "response_due": "",
+        "next_action": "",
+        "draft_id": "",
+        "approval_id": "",
+        "idempotency_key": "MAT-QA-001|MSG-SEED-0"
+      },
+      {
+        "communication_id": "COM-FIRSTRUN",
+        "matter_id": "MAT-QA-001",
+        "action_id": "ACT-QA-001",
+        "direction": "INBOUND",
+        "channel": "GMAIL",
+        "provider_message_id": "MSG-QA-1",
+        "thread_id": "THREAD-QA-A",
+        "recipient": "claims@examplecarpark.test",
+        "subject": "Re: QA replay test",
+        "summary": "first delivery",
+        "classification": "ACKNOWLEDGEMENT",
+        "received_at": "2026-08-20T05:00:00.000Z",
+        "response_due": "",
+        "next_action": "",
+        "draft_id": "",
+        "approval_id": "",
+        "idempotency_key": "MAT-QA-001|MSG-QA-1"
+      }
+    ],
+    "compare_fields": [
+      "communication_id",
+      "subject",
+      "summary",
+      "classification",
+      "received_at"
+    ]
+  },
+  "expect": {
+    "decision": "ALREADY_RECORDED",
+    "allow_mutations": false,
+    "requires_human_review": false,
+    "event_id": "EVT-REPLAY-MSG-QA-1",
+    "event_type": "INBOUND_REPLAY_IGNORED",
+    "severity": "INFO",
+    "conflict_fields": "",
+    "reason": "Key MAT-QA-001|MSG-QA-1 already recorded identically. Ignored."
+  },
+  "assertions": [
+    "All five compare fields matching produces ALREADY_RECORDED at severity INFO with no human review.",
+    "allow_mutations is false, so no write node runs.",
+    "The event_id is the same as the conflicting-replay event_id (EVT-REPLAY-<pmid>); only event_type and severity distinguish them."
+  ],
+  "derived": true,
+  "target": null,
+  "target_unresolved_reason": "As above (QA-only ancestor logic)."
+}

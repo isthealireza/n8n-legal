@@ -1,0 +1,38 @@
+{
+  "id": "wf4-live-fetch-negative-bare-landing-page",
+  "workflow": "wf4",
+  "unit": "Live retrieval and verification of the real playbook source policies (GET only)",
+  "kind": "integration",
+  "source_qa_workflow": {
+    "id": "oClbmnidX0swK0oP",
+    "name": "QA - Source Retrieval Fix"
+  },
+  "description": "Live GET of insurance commission homepage must grade LANDING_PAGE_NOT_AUTHORITY.",
+  "why_it_exists": "WF4 was drafting with no sources at all because Build Draft Context yielded urls: [] (the URL constructor does not exist in the n8n Code sandbox), and separately because the old verification graded navigation chrome and app shells as RETRIEVED. This harness runs the proposed regex host filter and the hardened verification against the REAL playbook source URLs over live GET requests, so the grading is checked against the pages as they actually serve rather than against a fixture.",
+  "input": {
+    "policy": "NEGATIVE_CONTROL",
+    "url": "https://www.icwa.wa.gov.au/",
+    "http": {
+      "method": "GET",
+      "responseFormat": "text",
+      "neverError": true,
+      "timeout": 30000,
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1000
+    }
+  },
+  "expect": {
+    "verification_status": "LANDING_PAGE_NOT_AUTHORITY",
+    "source_type": "GOVERNMENT_GUIDANCE"
+  },
+  "assertions": [
+    "classifySource(url) returns GOVERNMENT_GUIDANCE",
+    "verify(url, rawBody, strippedText, type) returns LANDING_PAGE_NOT_AUTHORITY",
+    "GET only; nothing is written to any sheet and no message is sent",
+    "INTEGRATION: this depends on a live third-party government site. A change to that site can flip the result without any code change, so a failure here is a signal to re-inspect the page, not automatically a code regression.",
+    "the rejection is decidable from the URL path alone once the body clears the 400 character floor"
+  ],
+  "target": null,
+  "target_unresolved_reason": "kind is \"integration\": not executed by harness/run.js."
+}

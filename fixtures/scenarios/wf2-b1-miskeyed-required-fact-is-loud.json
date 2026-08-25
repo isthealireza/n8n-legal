@@ -1,0 +1,128 @@
+{
+  "id": "wf2-b1-miskeyed-required-fact-is-loud",
+  "workflow": "wf2",
+  "unit": "Finalise Plan fact-key vocabulary (B1)",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "olEuL3AIVr4ER0bT",
+    "name": "QA - WF2 B1 Boundary Harness"
+  },
+  "description": "Case C2: the planner records the same facts under off-vocabulary key names, so the required facts read as missing; the harness must flag it loudly, preserve the keys unchanged, and never guess a mapping.",
+  "why_it_exists": "Observed on MAT-20260102-006: own_vehicle_registration was reported missing while registration = \"9XYZ876\" sat in the same facts object, plus incident_datetime missing beside incident_date + incident_time, and damage_description missing beside damage. Validate Plan JSON marks a required fact missing with hasOwnProperty(facts, rf), and the planner had written the value under a key of its own choosing. The prompt's rule 11 forbade inventing key names, but rule 11 lived only in the prompt.",
+  "input": {
+    "case_id": "C2",
+    "matter_id": "MAT-QA-000002",
+    "playbook_id": "motor_vehicle_damage_v1",
+    "plan_valid": true,
+    "force_proceed": false,
+    "required_facts": [
+      "incident_description",
+      "incident_datetime",
+      "incident_location",
+      "owner_present",
+      "driver_identity",
+      "own_vehicle_registration",
+      "damage_description"
+    ],
+    "optional_facts": [
+      "other_party_name",
+      "other_party_contact",
+      "other_party_registration",
+      "other_party_insurer",
+      "police_report_number",
+      "witness_details",
+      "insurer_name",
+      "policy_number",
+      "repair_quote_amount",
+      "prior_communications"
+    ],
+    "facts_json": "{\"incident_description\": \"Rear quarter panel struck while the vehicle was parked and unattended.\", \"incident_location\": \"Level 2, Hay Street car park, Perth WA\", \"owner_present\": \"no\", \"driver_identity\": \"vehicle was unattended\", \"registration\": \"9XYZ876\", \"incident_date\": \"2026-08-14\", \"incident_time\": \"09:20\", \"damage\": \"Dent and paint transfer to the rear quarter panel.\"}",
+    "missing_facts_json": "[\"incident_datetime\", \"own_vehicle_registration\", \"damage_description\"]",
+    "risk_flags_json": "[\"LIABILITY_UNDETERMINED\"]",
+    "questions": [],
+    "now": "2026-08-23T06:00:00.000Z",
+    "items": [
+      {
+        "plan_valid": true,
+        "matter_id": "MAT-QA-000002",
+        "playbook_id": "motor_vehicle_damage_v1",
+        "facts_json": "{\"incident_description\": \"Rear quarter panel struck while the vehicle was parked and unattended.\", \"incident_location\": \"Level 2, Hay Street car park, Perth WA\", \"owner_present\": \"no\", \"driver_identity\": \"vehicle was unattended\", \"registration\": \"9XYZ876\", \"incident_date\": \"2026-08-14\", \"incident_time\": \"09:20\", \"damage\": \"Dent and paint transfer to the rear quarter panel.\"}",
+        "missing_facts_json": "[\"incident_datetime\", \"own_vehicle_registration\", \"damage_description\"]",
+        "risk_flags_json": "[\"LIABILITY_UNDETERMINED\"]",
+        "questions": [],
+        "actions": [],
+        "owner_summary": ""
+      }
+    ],
+    "nodeOutputs": {
+      "Resolve Matter": [
+        {
+          "force_proceed": false
+        }
+      ],
+      "Playbook Library": [
+        {
+          "playbooks": {
+            "motor_vehicle_damage_v1": {
+              "required_facts": [
+                "incident_description",
+                "incident_datetime",
+                "incident_location",
+                "owner_present",
+                "driver_identity",
+                "own_vehicle_registration",
+                "damage_description"
+              ],
+              "optional_facts": [
+                "other_party_name",
+                "other_party_contact",
+                "other_party_registration",
+                "other_party_insurer",
+                "police_report_number",
+                "witness_details",
+                "insurer_name",
+                "policy_number",
+                "repair_quote_amount",
+                "prior_communications"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  },
+  "expect": {
+    "requires_information": true,
+    "matter_status": "NEEDS_INFORMATION",
+    "missing_facts_json": "[\"incident_datetime\", \"own_vehicle_registration\", \"damage_description\"]",
+    "unmapped_fact_keys_json": "[\"registration\", \"incident_date\", \"incident_time\", \"damage\"]",
+    "unmapped_facts_json": "{\"registration\": \"9XYZ876\", \"incident_date\": \"2026-08-14\", \"incident_time\": \"09:20\", \"damage\": \"Dent and paint transfer to the rear quarter panel.\"}",
+    "risk_flags_contains": [
+      "UNKNOWN_FACT_KEYS",
+      "REQUIRED_FACT_MAY_BE_MISKEYED"
+    ],
+    "requires_human_review": true,
+    "facts_json_unchanged_keys": [
+      "registration",
+      "incident_date",
+      "incident_time",
+      "damage"
+    ]
+  },
+  "assertions": [
+    "NO MAPPING: registration is not silently bound to own_vehicle_registration - nothing in the record says whether 9XYZ876 is the owner's vehicle or another party's, and binding a guessed value to a legal fact is worse than reporting the gap.",
+    "NOTHING IS DISCARDED: every off-vocabulary key stays in facts_json under its original name; unmapped_facts_json is an audit copy, not a relocation.",
+    "Any off-vocabulary key with a real value raises UNKNOWN_FACT_KEYS and sets requires_human_review.",
+    "An off-vocabulary key coexisting with a missing REQUIRED fact additionally raises REQUIRED_FACT_MAY_BE_MISKEYED - that combination is the one that produced the false gap.",
+    "Keys the pipeline itself injects (matter_id, route, is_new_matter, dry_run, test_data_only, force_proceed, owner_chat_id, jurisdiction) are control values, not claims about the matter, and are never counted as off-vocabulary.",
+    "A key whose value is blank or a placeholder (UNKNOWN, MISSING, UNOBTAINABLE, N/A, NA, NONE, TBC, TBD, PENDING) is not counted as an unmapped fact.",
+    "The owner summary states the unmapped key names and explicitly declines to say which is which."
+  ],
+  "target": {
+    "workflow": "wf2",
+    "unit_file": "harness/units/wf2/finalise-plan.js"
+  },
+  "harness": {
+    "adapter": "finalise-plan"
+  }
+}

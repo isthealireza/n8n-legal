@@ -1,0 +1,195 @@
+{
+  "id": "wf5-ingress-replay-changed-body",
+  "workflow": "wf5",
+  "unit": "Build Reply Context (resolveReply) - replay detection",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "XevQwFviJHUobw0U",
+    "name": "QA - Ingress Round Trip"
+  },
+  "description": "The same provider_message_id redelivered with a different body is an IDEMPOTENCY_CONFLICT that requires human review and permits no mutation.",
+  "why_it_exists": "A provider message id is only as trustworthy as the provider. If the same id arrives carrying different content, one of the two is wrong and silently overwriting the stored legal communication would destroy the record. The QA fixture deliberately flips the body to a liability denial to make the stakes concrete.",
+  "input": {
+    "event": {
+      "provider_message_id": "MSG-RT-1",
+      "thread_id": "THREAD-AAA",
+      "from": "Claims Team <claims@examplecarpark.test>",
+      "subject": "Re: [MAT-QA-001] round trip",
+      "body": "DIFFERENT BODY. We now deny liability entirely.",
+      "received_at": "2026-08-21T02:00:00.000Z"
+    },
+    "communications_register": [
+      {
+        "communication_id": "COM-OUT-1",
+        "matter_id": "MAT-QA-001",
+        "action_id": "ACT-QA-001",
+        "direction": "OUTBOUND",
+        "channel": "GMAIL",
+        "provider_message_id": "MSG-OUT-1",
+        "thread_id": "THREAD-AAA",
+        "recipient": "claims@examplecarpark.test",
+        "subject": "Preserve footage request",
+        "summary": "seed outbound",
+        "classification": "",
+        "received_at": "2026-08-20T00:00:00.000Z",
+        "response_due": "",
+        "next_action": "",
+        "draft_id": "",
+        "approval_id": "",
+        "idempotency_key": "ACT-QA-001|seed",
+        "ingress_fingerprint": ""
+      },
+      {
+        "communication_id": "COM-MSG-RT-1",
+        "matter_id": "MAT-QA-001",
+        "action_id": "ACT-QA-001",
+        "direction": "INBOUND",
+        "channel": "GMAIL",
+        "provider_message_id": "MSG-RT-1",
+        "thread_id": "THREAD-AAA",
+        "recipient": "me@example.test",
+        "subject": "Re: [MAT-QA-001] round trip",
+        "summary": "classifier output for first delivery",
+        "classification": "ACKNOWLEDGEMENT",
+        "received_at": "2026-08-21T02:00:00.000Z",
+        "response_due": "",
+        "next_action": "",
+        "draft_id": "",
+        "approval_id": "",
+        "idempotency_key": "MAT-QA-001|MSG-RT-1",
+        "ingress_fingerprint": "<computed by ingressFingerprint(EV_FIRST); recompute, do not hard-code>"
+      }
+    ],
+    "now": "2026-08-23T06:00:00.000Z",
+    "items": [
+      {
+        "communication_id": "COM-OUT-1",
+        "matter_id": "MAT-QA-001",
+        "action_id": "ACT-QA-001",
+        "direction": "OUTBOUND",
+        "channel": "GMAIL",
+        "provider_message_id": "MSG-OUT-1",
+        "thread_id": "THREAD-AAA",
+        "recipient": "claims@examplecarpark.test",
+        "subject": "Preserve footage request",
+        "summary": "seed outbound",
+        "classification": "",
+        "received_at": "2026-08-20T00:00:00.000Z",
+        "response_due": "",
+        "next_action": "",
+        "draft_id": "",
+        "approval_id": "",
+        "idempotency_key": "ACT-QA-001|seed",
+        "ingress_fingerprint": ""
+      },
+      {
+        "communication_id": "COM-MSG-RT-1",
+        "matter_id": "MAT-QA-001",
+        "action_id": "ACT-QA-001",
+        "direction": "INBOUND",
+        "channel": "GMAIL",
+        "provider_message_id": "MSG-RT-1",
+        "thread_id": "THREAD-AAA",
+        "recipient": "me@example.test",
+        "subject": "Re: [MAT-QA-001] round trip",
+        "summary": "classifier output for first delivery",
+        "classification": "ACKNOWLEDGEMENT",
+        "received_at": "2026-08-21T02:00:00.000Z",
+        "response_due": "",
+        "next_action": "",
+        "draft_id": "",
+        "approval_id": "",
+        "idempotency_key": "MAT-QA-001|MSG-RT-1",
+        "ingress_fingerprint": "ING-a7728903-20"
+      }
+    ],
+    "nodeOutputs": {
+      "Match Reply to Matter": [
+        {
+          "provider_message_id": "MSG-RT-1",
+          "thread_id": "THREAD-AAA",
+          "from_address": "Claims Team <claims@examplecarpark.test>",
+          "subject": "Re: [MAT-QA-001] round trip",
+          "body_text": "DIFFERENT BODY. We now deny liability entirely.",
+          "received_at": "2026-08-21T02:00:00.000Z"
+        }
+      ],
+      "Load Matters (Reply)": [
+        {
+          "matter_id": "MAT-QA-001"
+        }
+      ],
+      "Load Actions (Reply)": [],
+      "Load Comms (Reply)": [
+        {
+          "communication_id": "COM-OUT-1",
+          "matter_id": "MAT-QA-001",
+          "action_id": "ACT-QA-001",
+          "direction": "OUTBOUND",
+          "channel": "GMAIL",
+          "provider_message_id": "MSG-OUT-1",
+          "thread_id": "THREAD-AAA",
+          "recipient": "claims@examplecarpark.test",
+          "subject": "Preserve footage request",
+          "summary": "seed outbound",
+          "classification": "",
+          "received_at": "2026-08-20T00:00:00.000Z",
+          "response_due": "",
+          "next_action": "",
+          "draft_id": "",
+          "approval_id": "",
+          "idempotency_key": "ACT-QA-001|seed",
+          "ingress_fingerprint": ""
+        },
+        {
+          "communication_id": "COM-MSG-RT-1",
+          "matter_id": "MAT-QA-001",
+          "action_id": "ACT-QA-001",
+          "direction": "INBOUND",
+          "channel": "GMAIL",
+          "provider_message_id": "MSG-RT-1",
+          "thread_id": "THREAD-AAA",
+          "recipient": "me@example.test",
+          "subject": "Re: [MAT-QA-001] round trip",
+          "summary": "classifier output for first delivery",
+          "classification": "ACKNOWLEDGEMENT",
+          "received_at": "2026-08-21T02:00:00.000Z",
+          "response_due": "",
+          "next_action": "",
+          "draft_id": "",
+          "approval_id": "",
+          "idempotency_key": "MAT-QA-001|MSG-RT-1",
+          "ingress_fingerprint": "ING-a7728903-20"
+        }
+      ]
+    }
+  },
+  "expect": {
+    "decision": "IDEMPOTENCY_CONFLICT",
+    "basis": "IDEMPOTENCY_CONFLICT",
+    "matter_id": "MAT-QA-001",
+    "communication_id": "COM-MSG-RT-1",
+    "requires_human_review": true,
+    "event_id": "EVT-REPLAY-CONFLICT-MSG-RT-1",
+    "event_type": "INBOUND_REPLAY_IGNORED_CONFLICT",
+    "severity": "WARNING",
+    "reason_shape": "Already recorded but the raw message differs (stored <storedFp>, now <newFp>).",
+    "needs_hash_regen": true,
+    "ingress_fingerprint_spec": "ingressFingerprint(e) = 'ING-' + fnv1a32(parts) + '-' + canon(e.body).length, where parts = ['pmid=' + trim(pmid), 'thread=' + trim(thread_id), 'from=' + emailOf(from), 'subject=' + canon(subject), 'body=' + canon(body), 'ts=' + trim(received_at)].join(' '); canon collapses all whitespace runs to a single space and trims; emailOf extracts the address inside angle brackets and lowercases it; fnv1a32 is a single 32-bit FNV-1a pass (offset basis 0x811c9dc5) rendered as 8 lowercase hex characters.",
+    "note": "Both fingerprints must be recomputed. The two must differ: the bodies differ in both content and canonicalised length (20 vs 47)."
+  },
+  "assertions": [
+    "A stored fingerprint that differs from the recomputed one yields IDEMPOTENCY_CONFLICT, never ACCEPT and never ALREADY_RECORDED.",
+    "requires_human_review is true and severity is WARNING.",
+    "The conflict reason names both the stored and the incoming fingerprint so a human can see which is which.",
+    "communication_id is still the stored deterministic value, so the conflict event points at the row it is about.",
+    "No Communications, Actions or Matters mutation is proposed."
+  ],
+  "target": {
+    "workflow": "wf5",
+    "unit_file": "harness/units/wf5/build-reply-context.js"
+  },
+  "harness": {
+    "adapter": "reply-policy"
+  }
+}

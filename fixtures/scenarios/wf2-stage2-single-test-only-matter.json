@@ -1,0 +1,80 @@
+{
+  "id": "wf2-stage2-single-test-only-matter",
+  "workflow": "wf2",
+  "unit": "QA WF2 matter classification, end to end, one bounded case",
+  "kind": "integration",
+  "source_qa_workflow": {
+    "id": "TryzWP4S2VpL8OU0",
+    "name": "QA - Stage 2 Single TEST ONLY Matter"
+  },
+  "description": "One synthetic TEST ONLY matter is run through the isolated QA WF2 classification path with dry_run true, and eighteen assertions are checked over the returned plan.",
+  "why_it_exists": "Stage 2 of the QA programme deliberately shrank to the smallest bounded case - exactly one scenario, no recipient, no channel, no external destination, dry_run true - after larger autopilot loops made failures hard to attribute. It mirrors the item shape that QA Autopilot's Loop Scenarios hands to QA WF2. Created 2026-08-23 with saveDataSuccessExecution 'all' and a 180-second timeout so the whole plan is inspectable afterwards.",
+  "input": {
+    "scenario": {
+      "scenario_id": "STAGE2-TESTONLY-01",
+      "severity": "CRITICAL",
+      "description": "Stage 2 bounded single case - clean TEST ONLY matter",
+      "payload_text": "TEST ONLY - DO NOT USE. Synthetic QA matter, not a real legal matter. My parked car was damaged in a car park in Perth on 17 August 2026 while I was not present. The other driver did not stop. I have photographs on my phone.",
+      "route": "NEW_MATTER",
+      "session_matter_id": "",
+      "session_awaiting": "",
+      "session_awaiting_ref": "",
+      "matter_ref": "",
+      "matters_json": "[]",
+      "expected_playbook": "motor_vehicle_damage_v1",
+      "expect_requires_information": true,
+      "expect_is_new_matter": true,
+      "expect_min_questions": 1,
+      "expect_risk_flags_contain": [],
+      "preserved_behaviour": "stage2_single_test_only_matter",
+      "qa_run_id": "STAGE2-BOUNDED-01",
+      "chat_id": "OWNER_CHAT_ID",
+      "qa_mode": true,
+      "qa_scenario_id": "STAGE2-TESTONLY-01",
+      "dry_run": true
+    },
+    "called_workflow": "QA WF2 (sub-workflow id T6jGZRxNd9pVOfHi), mode 'each', waitForSubWorkflow true"
+  },
+  "expect": {
+    "VERDICT": "PASS",
+    "assertions_total": 18,
+    "assertions_failed": 0,
+    "matter_id": "non-empty",
+    "is_new_matter": true,
+    "plan_valid": true,
+    "playbook_id": "motor_vehicle_damage_v1",
+    "requires_information": true,
+    "matter_status": "NEEDS_INFORMATION",
+    "missing_facts_count": "> 0",
+    "questions_count": "> 0",
+    "duplicate_questions": 0,
+    "actions_count": "> 0",
+    "duplicate_action_ids": 0,
+    "duplicate_idempotency_keys": 0,
+    "every_action_matter_id": "equals the returned matter_id",
+    "approval_id_on_any_action": "empty",
+    "channel_on_every_action": "NONE or empty",
+    "recipient_on_every_action": "empty",
+    "status_on_every_action": "never SENT, COMPLETED or FAILED",
+    "detected_as_test_matter": true,
+    "not_exercised": [
+      "WF4 Integrity Guard - not reachable from WF2 classification; no draft or approval stage was run",
+      "ConflictNotices write path - no writer exists yet; register untouched",
+      "Daily Digest reporting of this matter - QA WF2 writes nothing, so the matter never reaches the register"
+    ]
+  },
+  "assertions": [
+    "A new matter is created and flagged is_new_matter, with a valid plan.",
+    "The motor_vehicle_damage_v1 playbook is selected from a car-park damage narrative.",
+    "Incomplete facts set requires_information true and matter_status NEEDS_INFORMATION, with at least one recorded missing fact and at least one question.",
+    "No two questions are duplicates after lower-casing, stripping non-alphanumerics and collapsing whitespace.",
+    "At least one action is created; no action_id repeats and no idempotency_key repeats within the plan.",
+    "Every action carries the same matter_id as the matter just created.",
+    "Classification alone decides no approval: no action carries an approval_id.",
+    "Classification alone sets no external destination: every action has channel NONE or blank and an empty recipient.",
+    "No action is emitted already in a terminal state (SENT, COMPLETED, FAILED).",
+    "The report must state what was NOT exercised rather than implying full coverage - absence of evidence is not a verdict."
+  ],
+  "target": null,
+  "target_unresolved_reason": "kind is \"integration\": not executed by harness/run.js."
+}

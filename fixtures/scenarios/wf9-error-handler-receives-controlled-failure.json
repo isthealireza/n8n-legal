@@ -1,0 +1,35 @@
+{
+  "id": "wf9-error-handler-receives-controlled-failure",
+  "workflow": "wf9",
+  "unit": "Error workflow wiring",
+  "kind": "integration",
+  "source_qa_workflow": {
+    "id": "aSygXnnfLDXRR3fK",
+    "name": "QA - WF9 Error Handler Test"
+  },
+  "description": "A throwaway webhook-triggered workflow whose only real node throws deliberately, wired to WF9 as its errorWorkflow, proving the error handler actually fires.",
+  "why_it_exists": "An error handler that is configured but never fires is worse than none, because it creates the belief that failures are being reported. This is the live proof that a thrown error in a workflow with settings.errorWorkflow set reaches WF9.",
+  "input": {
+    "trigger": {
+      "type": "webhook",
+      "method": "GET",
+      "path": "qa-wf9-proof3-v9n4h2k8",
+      "responseMode": "onReceived"
+    },
+    "error_workflow_id": "JfaCOxRq0FjZ5JWb"
+  },
+  "expect": {
+    "throws": true,
+    "error_message": "QA Error Handler Test — deliberate controlled failure — safe to ignore. This is a controlled test of WF9 error handling.",
+    "wf9_invoked": true,
+    "events_row_written": true
+  },
+  "assertions": [
+    "The failing workflow declares settings.errorWorkflow = JfaCOxRq0FjZ5JWb; without that setting the throw is invisible to WF9.",
+    "The error message identifies itself as a deliberate test in its own text, so an owner who receives the alert is not misled into investigating a real fault.",
+    "The webhook responds immediately (onReceived) and the failure happens after the response, so the caller sees success while the error path still runs.",
+    "This workflow's webhook path is a live unauthenticated GET endpoint on the n8n host; anyone who has the path can fire a synthetic error alert at the owner."
+  ],
+  "target": null,
+  "target_unresolved_reason": "kind is \"integration\": not executed by harness/run.js."
+}

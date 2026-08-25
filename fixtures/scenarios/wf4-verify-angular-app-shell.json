@@ -1,0 +1,73 @@
+{
+  "id": "wf4-verify-angular-app-shell",
+  "workflow": "wf4",
+  "unit": "WF4 Distil Sources verification grading (pre-alignment version)",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "rMxfriXtRP8nQGAb",
+    "name": "QA - Source Verification Regression"
+  },
+  "description": "An Angular app shell (ng-version= in the raw HTML) is rejected before any text-based grading.",
+  "why_it_exists": "Three verification defects were found in live WF4 runs. (1) source_type was HARDCODED to OFFICIAL for every fetched page, so a landing page, a block page or a blog was all stamped official. (2) verification_status was decided by text.length > 400 alone, so navigation chrome on a bare homepage passed as RETRIEVED and was then cited by id in a legal draft - fabricated authority, and the most dangerous defect in the build. (3) execution 300: a federal legislation page returned 1.23 MB of text with no section heading marker and was still graded RETRIEVED, because a table of contents is full of structural words. A heading-marker check now separates a real section body from an index.",
+  "input": {
+    "ctx": {
+      "matter_id": "MAT-TEST-000",
+      "jurisdiction": "WA, Australia",
+      "playbook_name": "regression fixture",
+      "urls": [
+        "https://www.legislation.gov.au/C2009A00028/latest/text/original/epub/OEBPS/document_2/document_2.html"
+      ]
+    },
+    "items": [
+      {
+        "json": {
+          "data": "<html ng-version=\"17.0.0\"><title>Federal Register</title><body>section 61 Part 2 Division 3 subsection the following words are padding only and carry no heading marker and no digits repeated so that the stripped text passes the four hundred character floor easily the following words are padding only and carry no heading marker and no digits repeated so that the stripped text passes the four hundred character floor easily the following words are padding only and carry no heading marker and no digits repeated so that the stripped text passes the four hundred character floor easily the following words are padding only and carry no heading marker and no digits repeated so that the stripped text passes the four hundred character floor easily the following words are padding only and carry no heading marker and no digits repeated so that the stripped text passes the four hundred character floor easily the following words are padding only and carry no heading marker and no digits repeated so that the stripped text passes the four hundred character floor easily</body></html>"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "now": "2026-08-23T06:00:00.000Z",
+    "nodeOutputs": {
+      "Collect Evidence Text": [
+        {
+          "matter_id": "MAT-TEST-000",
+          "jurisdiction": "WA, Australia",
+          "playbook_name": "regression fixture",
+          "urls": [
+            "https://www.legislation.gov.au/C2009A00028/latest/text/original/epub/OEBPS/document_2/document_2.html"
+          ]
+        }
+      ],
+      "Source Registry": [
+        {
+          "json": {
+            "url": "https://www.legislation.gov.au/C2009A00028/latest/text/original/epub/OEBPS/document_2/document_2.html",
+            "want": [],
+            "cite": ""
+          }
+        }
+      ]
+    }
+  },
+  "expect": {
+    "verification_status": [
+      "SPA_SHELL_NOT_TEXT"
+    ],
+    "research_status": "UNVERIFIED"
+  },
+  "assertions": [
+    "the per-source verification_status list is exactly [\"SPA_SHELL_NOT_TEXT\"]",
+    "research_status is UNVERIFIED",
+    "SPA_SHELL is matched against the RAW body, first 20000 characters, not against the stripped text",
+    "the shell here contains section 61, Part 2, Division 3 and subsection, so it would otherwise pass LEGAL_STRUCTURE"
+  ],
+  "target": {
+    "workflow": "wf4",
+    "unit_file": "harness/units/wf4/distil-sources.js"
+  },
+  "harness": {
+    "adapter": "distil-grading"
+  }
+}

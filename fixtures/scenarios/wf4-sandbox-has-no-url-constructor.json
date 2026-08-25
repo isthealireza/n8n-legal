@@ -1,0 +1,32 @@
+{
+  "id": "wf4-sandbox-has-no-url-constructor",
+  "workflow": "wf4",
+  "unit": "n8n Code sandbox global environment probe",
+  "kind": "integration",
+  "source_qa_workflow": {
+    "id": "nRcZrgLMDuBPjmEm",
+    "name": "QA - URL Filter Probe"
+  },
+  "description": "Probes whether the global URL constructor exists inside the n8n Code node sandbox.",
+  "why_it_exists": "Build Draft Context filtered its source policy with new URL(u).host inside a try/catch that swallowed the throw, so every candidate was silently discarded and urls arrived empty. Execution 297 had already recorded \"URL is not defined\". This probe records the environment fact that the whole fix rests on.",
+  "input": {
+    "probe": [
+      "typeof URL",
+      "typeof URL === \"function\"",
+      "new URL(\"https://example.com/a\").host"
+    ]
+  },
+  "expect": {
+    "typeof_URL": "undefined",
+    "URL_is_function": false,
+    "URL_ctor_error": "a ReferenceError message such as \"URL is not defined\"",
+    "note": "This is a property of the n8n Code sandbox, not of the application code, so it must be re-probed rather than assumed on any other runtime. On plain Node.js the URL constructor DOES exist and this scenario will not reproduce."
+  },
+  "assertions": [
+    "typeof URL is \"undefined\" inside the n8n Code node sandbox",
+    "constructing new URL(...) throws, and the throw is what the production try/catch was swallowing",
+    "host and path parsing in this codebase must therefore stay regex-based"
+  ],
+  "target": null,
+  "target_unresolved_reason": "kind is \"integration\": not executed by harness/run.js."
+}

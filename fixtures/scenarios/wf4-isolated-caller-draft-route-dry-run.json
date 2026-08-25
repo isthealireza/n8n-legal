@@ -1,0 +1,74 @@
+{
+  "id": "wf4-isolated-caller-draft-route-dry-run",
+  "workflow": "wf4",
+  "unit": "WF4 end-to-end DRAFT route invoked as a sub-workflow from an isolated QA caller",
+  "kind": "integration",
+  "source_qa_workflow": {
+    "id": "glrx1XJl0cXbmMKu",
+    "name": "QA - WF4 Isolated Caller"
+  },
+  "description": "Seeds one DRAFT_DOCUMENT action on a matter that has no actions, then invokes WF4 as a sub-workflow on the DRAFT route with dry_run left at true, and identifies which version of WF4 actually ran.",
+  "why_it_exists": "Two synthetic nodes (QA Manual Start and QA Router Payload) had been wired into WF4 own Config node, putting a manual trigger directly on the production send path. They were removed and replaced by this external caller, so that everything synthetic about the test lives in a QA workflow and never inside WF4. The seeded matter existed on the register but had NO actions at all, so Build Draft Context returned \"no open drafting action\" and the run stopped before source retrieval - one DRAFT_DOCUMENT action is the minimum needed to reach the retrieval path.",
+  "input": {
+    "seed_action_row": {
+      "action_id": "ACT-20260101-003-QA-001",
+      "matter_id": "MAT-20260101-003",
+      "action_type": "DRAFT_DOCUMENT",
+      "description": "QA source retrieval check. Prepare a research summary of the applicable Western Australian law for a parked vehicle damage matter. Not for delivery to any outside party.",
+      "status": "READY",
+      "priority": "LOW",
+      "depends_on_json": "[]",
+      "recipient": "",
+      "channel": "NONE",
+      "requires_approval": "TRUE",
+      "draft_id": "",
+      "approval_id": "",
+      "due_at": "",
+      "deadline_basis": "",
+      "blocked_reason": "",
+      "idempotency_key": "MAT-20260101-003|QA|001",
+      "created_at": "2026-08-21T00:00:00.000Z",
+      "updated_at": "2026-08-21T00:00:00.000Z"
+    },
+    "router_payload": {
+      "route_group": "DRAFT",
+      "command": "/draft",
+      "matter_ref": "MAT-20260101-003",
+      "session_matter_id": "MAT-20260101-003",
+      "target_action_id": "ACT-20260101-003-QA-001",
+      "chat_id": "OWNER_CHAT_ID",
+      "payload_text": "QA source retrieval check",
+      "text": "QA source retrieval check"
+    },
+    "sheets_target": {
+      "documentId": "SHEET_ID_PLACEHOLDER",
+      "sheetName": "Actions",
+      "operation": "appendOrUpdate",
+      "matchingColumns": [
+        "action_id"
+      ]
+    },
+    "sub_workflow": {
+      "id": "zKr24IThF30e6jXw",
+      "mode": "once",
+      "waitForSubWorkflow": true
+    }
+  },
+  "expect": {
+    "ran_draft_version": true,
+    "draft_marker_heading_marker": true,
+    "draft_marker_text_chars": true,
+    "draft_marker_rejection_reason": true,
+    "dry_run_seen": "true",
+    "research_status": "one of COMPLETE, PARTIAL or UNVERIFIED depending on what the live sites returned",
+    "note": "This scenario cannot be made pure. It writes a seed row to a real Google Sheet, invokes a real sub-workflow, and that sub-workflow performs live HTTP fetches. The only deterministic part is the version discriminator."
+  },
+  "assertions": [
+    "the fixed created_at/updated_at mean re-running the test updates one Actions row rather than appending a new one each time",
+    "channel NONE and an empty recipient are deliberate: nothing about the seeded action is addressable, so even an accidental approval has nowhere to send",
+    "dry_run must still read true in the sub-workflow output",
+    "VERSION DISCRIMINATOR: the returned items must contain heading_marker, text_chars and rejection_reason. The published WF4 emits none of them, so a green result without these keys proves nothing about the changes under test."
+  ],
+  "target": null,
+  "target_unresolved_reason": "kind is \"integration\": not executed by harness/run.js."
+}

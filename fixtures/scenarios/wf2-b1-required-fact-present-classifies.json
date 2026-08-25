@@ -1,0 +1,123 @@
+{
+  "id": "wf2-b1-required-fact-present-classifies",
+  "workflow": "wf2",
+  "unit": "Finalise Plan required-fact gating",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "olEuL3AIVr4ER0bT",
+    "name": "QA - WF2 B1 Boundary Harness"
+  },
+  "description": "Case C1: every required fact for motor_vehicle_damage_v1 is present under its canonical key, so the matter reaches CLASSIFIED with no questions.",
+  "why_it_exists": "Validate Plan JSON gated on 'requires_information || missing.length > 0' with no distinction between a required fact and an optional one. Observed live: a matter reached CLASSIFIED and then dropped back to NEEDS_INFORMATION over repair_quote_amount and prior_communications, both of which are optional_facts. Only missing REQUIRED facts gate now.",
+  "input": {
+    "case_id": "C1",
+    "matter_id": "MAT-QA-000001",
+    "playbook_id": "motor_vehicle_damage_v1",
+    "plan_valid": true,
+    "force_proceed": false,
+    "required_facts": [
+      "incident_description",
+      "incident_datetime",
+      "incident_location",
+      "owner_present",
+      "driver_identity",
+      "own_vehicle_registration",
+      "damage_description"
+    ],
+    "optional_facts": [
+      "other_party_name",
+      "other_party_contact",
+      "other_party_registration",
+      "other_party_insurer",
+      "police_report_number",
+      "witness_details",
+      "insurer_name",
+      "policy_number",
+      "repair_quote_amount",
+      "prior_communications"
+    ],
+    "facts_json": "{\"incident_description\": \"Rear quarter panel struck while the vehicle was parked and unattended.\", \"incident_datetime\": \"UNVERIFIED: unknown; discovered 2026-08-14 about 18:00 AWST; occurred while parked\", \"incident_location\": \"Level 2, Hay Street car park, Perth WA\", \"owner_present\": \"no\", \"driver_identity\": \"vehicle was unattended\", \"own_vehicle_registration\": \"9XYZ876\", \"damage_description\": \"Dent and paint transfer to the rear quarter panel.\"}",
+    "missing_facts_json": "[\"repair_quote_amount\", \"prior_communications\"]",
+    "risk_flags_json": "[\"LIABILITY_UNDETERMINED\", \"MATERIAL_FACTS_MISSING\"]",
+    "questions": [],
+    "now": "2026-08-23T06:00:00.000Z",
+    "items": [
+      {
+        "plan_valid": true,
+        "matter_id": "MAT-QA-000001",
+        "playbook_id": "motor_vehicle_damage_v1",
+        "facts_json": "{\"incident_description\": \"Rear quarter panel struck while the vehicle was parked and unattended.\", \"incident_datetime\": \"UNVERIFIED: unknown; discovered 2026-08-14 about 18:00 AWST; occurred while parked\", \"incident_location\": \"Level 2, Hay Street car park, Perth WA\", \"owner_present\": \"no\", \"driver_identity\": \"vehicle was unattended\", \"own_vehicle_registration\": \"9XYZ876\", \"damage_description\": \"Dent and paint transfer to the rear quarter panel.\"}",
+        "missing_facts_json": "[\"repair_quote_amount\", \"prior_communications\"]",
+        "risk_flags_json": "[\"LIABILITY_UNDETERMINED\", \"MATERIAL_FACTS_MISSING\"]",
+        "questions": [],
+        "actions": [],
+        "owner_summary": ""
+      }
+    ],
+    "nodeOutputs": {
+      "Resolve Matter": [
+        {
+          "force_proceed": false
+        }
+      ],
+      "Playbook Library": [
+        {
+          "playbooks": {
+            "motor_vehicle_damage_v1": {
+              "required_facts": [
+                "incident_description",
+                "incident_datetime",
+                "incident_location",
+                "owner_present",
+                "driver_identity",
+                "own_vehicle_registration",
+                "damage_description"
+              ],
+              "optional_facts": [
+                "other_party_name",
+                "other_party_contact",
+                "other_party_registration",
+                "other_party_insurer",
+                "police_report_number",
+                "witness_details",
+                "insurer_name",
+                "policy_number",
+                "repair_quote_amount",
+                "prior_communications"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  },
+  "expect": {
+    "requires_information": false,
+    "matter_status": "CLASSIFIED",
+    "missing_facts_json": "[]",
+    "optional_missing_facts_json": "[\"repair_quote_amount\", \"prior_communications\"]",
+    "risk_flags_contains": [
+      "LIABILITY_UNDETERMINED",
+      "OPTIONAL_FACTS_OUTSTANDING"
+    ],
+    "risk_flags_excludes": [
+      "MATERIAL_FACTS_MISSING"
+    ],
+    "questions": [],
+    "proceed_hint": ""
+  },
+  "assertions": [
+    "A missing OPTIONAL fact never sets requires_information and never moves the matter to NEEDS_INFORMATION.",
+    "missing_facts_json is narrowed to required facts only; optional gaps move to optional_missing_facts_json.",
+    "MATERIAL_FACTS_MISSING is actively removed from risk_flags when no required fact is missing.",
+    "OPTIONAL_FACTS_OUTSTANDING is raised instead, so the gap is on the record without blocking the matter.",
+    "No question is asked and no proceed_hint is offered when nothing required is missing."
+  ],
+  "target": {
+    "workflow": "wf2",
+    "unit_file": "harness/units/wf2/finalise-plan.js"
+  },
+  "harness": {
+    "adapter": "finalise-plan"
+  }
+}

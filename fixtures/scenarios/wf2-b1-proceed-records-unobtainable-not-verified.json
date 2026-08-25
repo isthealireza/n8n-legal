@@ -1,0 +1,126 @@
+{
+  "id": "wf2-b1-proceed-records-unobtainable-not-verified",
+  "workflow": "wf2",
+  "unit": "Finalise Plan forced proceed",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "olEuL3AIVr4ER0bT",
+    "name": "QA - WF2 B1 Boundary Harness"
+  },
+  "description": "With force_proceed set, missing required facts are written as UNOBTAINABLE_OWNER_CONFIRMED, the matter classifies, and the gap stays loudly on the record.",
+  "why_it_exists": "A required fact can be genuinely unobtainable, and without an escape hatch the matter deadlocks. The escape hatch records an owner declaration, never a verified finding.",
+  "input": {
+    "plan_valid": true,
+    "matter_id": "MAT-QA-000001",
+    "playbook_id": "motor_vehicle_damage_v1",
+    "force_proceed": true,
+    "required_facts": [
+      "incident_description",
+      "incident_datetime",
+      "incident_location",
+      "owner_present",
+      "driver_identity",
+      "own_vehicle_registration",
+      "damage_description"
+    ],
+    "optional_facts": [
+      "other_party_name",
+      "other_party_contact",
+      "other_party_registration",
+      "other_party_insurer",
+      "police_report_number",
+      "witness_details",
+      "insurer_name",
+      "policy_number",
+      "repair_quote_amount",
+      "prior_communications"
+    ],
+    "facts_json": "{\"incident_description\": \"Rear quarter panel struck while the vehicle was parked and unattended.\", \"incident_location\": \"Level 2, Hay Street car park, Perth WA\", \"owner_present\": \"no\", \"driver_identity\": \"vehicle was unattended\", \"registration\": \"9XYZ876\", \"incident_date\": \"2026-08-14\", \"incident_time\": \"09:20\", \"damage\": \"Dent and paint transfer to the rear quarter panel.\"}",
+    "missing_facts_json": "[\"incident_datetime\", \"own_vehicle_registration\", \"damage_description\"]",
+    "risk_flags_json": "[\"MATERIAL_FACTS_MISSING\"]",
+    "questions": [],
+    "now": "2026-08-23T06:00:00.000Z",
+    "items": [
+      {
+        "plan_valid": true,
+        "matter_id": "MAT-QA-000001",
+        "playbook_id": "motor_vehicle_damage_v1",
+        "facts_json": "{\"incident_description\": \"Rear quarter panel struck while the vehicle was parked and unattended.\", \"incident_location\": \"Level 2, Hay Street car park, Perth WA\", \"owner_present\": \"no\", \"driver_identity\": \"vehicle was unattended\", \"registration\": \"9XYZ876\", \"incident_date\": \"2026-08-14\", \"incident_time\": \"09:20\", \"damage\": \"Dent and paint transfer to the rear quarter panel.\"}",
+        "missing_facts_json": "[\"incident_datetime\", \"own_vehicle_registration\", \"damage_description\"]",
+        "risk_flags_json": "[\"MATERIAL_FACTS_MISSING\"]",
+        "questions": [],
+        "actions": [],
+        "owner_summary": ""
+      }
+    ],
+    "nodeOutputs": {
+      "Resolve Matter": [
+        {
+          "force_proceed": true
+        }
+      ],
+      "Playbook Library": [
+        {
+          "playbooks": {
+            "motor_vehicle_damage_v1": {
+              "required_facts": [
+                "incident_description",
+                "incident_datetime",
+                "incident_location",
+                "owner_present",
+                "driver_identity",
+                "own_vehicle_registration",
+                "damage_description"
+              ],
+              "optional_facts": [
+                "other_party_name",
+                "other_party_contact",
+                "other_party_registration",
+                "other_party_insurer",
+                "police_report_number",
+                "witness_details",
+                "insurer_name",
+                "policy_number",
+                "repair_quote_amount",
+                "prior_communications"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  },
+  "expect": {
+    "forced_proceed": true,
+    "matter_status": "CLASSIFIED",
+    "requires_information": false,
+    "requires_human_review": true,
+    "missing_facts_json": "[]",
+    "unobtainable_facts_json": "[\"incident_datetime\", \"own_vehicle_registration\", \"damage_description\"]",
+    "facts_values_for_unobtainable": "UNOBTAINABLE_OWNER_CONFIRMED",
+    "risk_flags_contains": [
+      "REQUIRED_FACTS_UNOBTAINABLE",
+      "REQUIRES_HUMAN_REVIEW",
+      "REQUIRED_FACT_MAY_BE_MISKEYED"
+    ],
+    "risk_flags_excludes": [
+      "MATERIAL_FACTS_MISSING"
+    ]
+  },
+  "assertions": [
+    "force_proceed is accepted as the boolean true or as the case-insensitive string 'true'.",
+    "A required fact that already has a real value is never overwritten with the unobtainable marker.",
+    "UNOBTAINABLE_OWNER_CONFIRMED is itself in the placeholder set, so it can never later be mistaken for a real value.",
+    "requires_human_review is forced true and REQUIRES_HUMAN_REVIEW is always added on the forced path.",
+    "The owner summary states in plain words that the facts are the owner's declaration, are not verified findings, and that every document shows the gap.",
+    "Forcing with nothing actually missing produces a summary saying so and marks nothing as unobtainable.",
+    "When the record also holds off-vocabulary facts, one of them may be the very fact just declared unobtainable, so REQUIRED_FACT_MAY_BE_MISKEYED is raised again on the forced path."
+  ],
+  "target": {
+    "workflow": "wf2",
+    "unit_file": "harness/units/wf2/finalise-plan.js"
+  },
+  "harness": {
+    "adapter": "finalise-plan"
+  }
+}
