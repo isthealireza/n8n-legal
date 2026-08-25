@@ -55,13 +55,13 @@
       "active": {
         "kind": "active",
         "path": "exports/active/WF4.json",
-        "sha256_body": "355b2c9d94d8f1d6301cd1e6cecf7fa6c5ca21df833a5b2f7f8dc6ceb39af8d5",
-        "sha256_canonical": "599914dc160ba4480638f7af1d3ccdeea0f04ea5b84bb7fdaf518fb7e879a2a3"
+        "sha256_body": "488f5068ed2b0a13417cc70ca7df16c38187f3ef4f4afc9e0e5fb8f0a17ca240",
+        "sha256_canonical": "9b9c4b637877fbfddcadff2efced4f8c8385b4d37f79be232a9eca95a13f4db1"
       },
-      "active_version_id": "8f6b3704-7a7d-47e2-be9f-d40e7311855e",
+      "active_version_id": "902130f4-58d0-4189-bf80-273c753c9c34",
       "determination": "from_active_version_object",
       "draft": null,
-      "draft_version_id": "8f6b3704-7a7d-47e2-be9f-d40e7311855e",
+      "draft_version_id": "902130f4-58d0-4189-bf80-273c753c9c34",
       "id": "zKr24IThF30e6jXw",
       "name": "4 - Research Drafting Approval and Dispatch"
     },
