@@ -76,6 +76,27 @@ REPO = (os.environ.get("N8N_LEAKCHECK_ROOT", "").strip()
 
 SKIP_DIRS = {".git", "__pycache__", "node_modules", ".venv", "venv", ".mypy_cache",
              ".pytest_cache", ".ruff_cache"}
+
+# The unscrubbed staging directory. `scripts/capture_mcp.py` reads raw n8n
+# bodies out of `.raw/`, and raw bodies are exactly what this gate is built to
+# find — so with a capture staged locally the gate fires on every run and stops
+# being usable, which is how a real gate ends up being ignored.
+#
+# It is skipped, but ONLY while `.gitignore` actually excludes it, and the skip
+# is PRINTED rather than silent. The guarantee this gate exists to make is about
+# what gets committed; a directory git refuses to commit cannot break it. If
+# someone ever removes the `.raw/` line from `.gitignore`, the directory becomes
+# committable and this scanner starts reading it again, in the same commit.
+RAW_STAGING_DIR = ".raw"
+
+
+def _raw_staging_is_gitignored() -> bool:
+    try:
+        with open(os.path.join(REPO, ".gitignore"), "r", encoding="utf-8") as fh:
+            lines = [ln.strip() for ln in fh]
+    except OSError:
+        return False
+    return any(ln in (RAW_STAGING_DIR, RAW_STAGING_DIR + "/") for ln in lines)
 SKIP_EXT = {".png", ".jpg", ".jpeg", ".gif", ".pdf", ".zip", ".gz", ".tgz", ".ico",
             ".woff", ".woff2", ".ttf", ".mp4", ".so", ".pyc"}
 
@@ -101,6 +122,11 @@ CHECKS = (
      r"(?i:\bauthorization\s*[\"']?\s*[:=]\s*[\"']?)(?!\s*$)[A-Za-z0-9._~+/=-]{12,}"),
     ("telegram-bot-token", r"\b\d{8,12}:[A-Za-z0-9_-]{30,}"),
     ("google-file-id", r"\b[A-Za-z0-9_-]{28,64}\b"),
+    # An identifier with its middle elided — `0Aa0a0...0000` — found verbatim in
+    # a real sticky note. Both ends of a live Drive file id, and every length
+    # floor above is far too high to see it. `_benign` applies the same guard
+    # `scrub.py` does so prose and code ellipses do not fire.
+    ("elided-identifier", r"\b[A-Za-z0-9_-]{4,}(?:\.\.\.|…)[A-Za-z0-9_-]{3,}\b"),
     # `%40` is `@` once a URL has been encoded; both spellings are an address.
     ("email-address", r"\b[A-Za-z0-9._%+-]+(?:@|%40)[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b"),
     # A `.` before the run is not a reason to skip it: `chat.9000000001` is a
@@ -144,12 +170,24 @@ ALLOWLIST = (
     ("scripts/leak_check.py", "*", r"sk-abcdefghijklmnopqrstuvwxyz0123"),
     ("scripts/leak_check.py", "*", r"abcdefghijklmnopqrstuvwx(?:yzab)?"),
     ("scripts/leak_check.py", "*", r"0123456789"),
+    # the synthetic elided-identifier canary. All-zero suffix, not a real id.
+    ("scripts/leak_check.py", "*", r"0Aa0a0\.\.\.0000"),
     ("scripts/leak_check.py", "*", r"dBjftJeZ4CVPmB92K27uhbUJU1p1r"),
     ("scripts/leak_check.py", "*", r"Bearer abcdefghijklmnop0123"),
     ("scripts/leak_check.py", "*", r"1234567890:A+"),
     ("scripts/leak_check.py", "*", r"A{20,64}"),
     ("scripts/leak_check.py", "*", r"n8n-sync@users\.noreply\.github\.com"),
     ("scripts/scrub.py", "*", r".*(?:lawfirm|example)\.example.*"),
+    # scrub.py's self-test plants a split-digit canary to prove the >= 10 digit
+    # guard still lets a genuine long id through. Visibly synthetic.
+    ("scripts/scrub.py", "*", r"900-000-0001-22"),
+    ("scripts/scrub.py", "*", r"0Aa0a0\.\.\.0000"),
+    # README.md explains the elided-identifier defect and has to show the shape.
+    # Same synthetic value as the canary, not the real id it stands in for.
+    ("README.md", "elided-identifier", r"0Aa0a0(?:\.\.\.|…)0000"),
+    # capture_mcp.py's self-test proves a diff value is scrubbed before it is
+    # written to the drift report, so it has to contain an address to scrub.
+    ("scripts/capture_mcp.py", "*", r".*lawfirm\.example.*"),
     ("scripts/scrub.py", "*", r".*hooks\.slack\.com.*"),
     ("scripts/scrub.py", "*", r"9000000001"),
     ("scripts/scrub.py", "*", r"(?i:.*(?:BEGIN|END)[A-Z ]*(?:PRIVATE KEY|CERTIFICATE).*)"),
@@ -209,11 +247,22 @@ def _enough_digits(value: str) -> bool:
     return sum(c.isdigit() for c in value) >= 10
 
 
+def _looks_elided_id(value: str) -> bool:
+    """Mirrors `scrub._looks_elided_id`: the fragment before the ellipsis must
+    be >= 5 characters and carry both a letter and a digit."""
+    left = re.split(r"\.\.\.|…", value, 1)[0]
+    return (len(left) >= 5
+            and any(c.isdigit() for c in left)
+            and any(c.isalpha() for c in left))
+
+
 def _benign(name: str, value: str, digest_ok: bool) -> bool:
     if PLACEHOLDER.fullmatch(value):
         return True
     if name == "split-digit-run" and not _enough_digits(value):
         return True   # an ISO date, a version triple: too few digits to be an id
+    if name == "elided-identifier" and not _looks_elided_id(value):
+        return True   # `wait...then`, `ACT-...-003`, `1...5`: prose, not an id
     if name == "google-file-id":
         if UUID.fullmatch(value):
             return True
@@ -252,7 +301,13 @@ def iter_files(roots):
         if os.path.isfile(root):
             yield root
             continue
+        skip_raw = _raw_staging_is_gitignored()
         for dirpath, dirnames, filenames in os.walk(root):
+            if skip_raw and RAW_STAGING_DIR in dirnames:
+                dirnames.remove(RAW_STAGING_DIR)
+                print("leak-check: skipping %s/ — unscrubbed capture staging, "
+                      "excluded by .gitignore so it cannot be committed."
+                      % os.path.relpath(os.path.join(dirpath, RAW_STAGING_DIR), REPO))
             dirnames[:] = [d for d in dirnames if d not in SKIP_DIRS]
             for fn in sorted(filenames):
                 if os.path.splitext(fn)[1].lower() in SKIP_EXT:
@@ -302,6 +357,8 @@ CANARIES = {
     "lowercase-case-marker": "reference evd-2026-0042 attached",
     "slash-case-marker": "matter 2026/0042 filed",
     "lowercase-alpha-fileid": "fileId: abcdefghijklmnopqrstuvwxyzab",
+    # the shape a real sticky note used to hide a live Drive id in plain sight
+    "elided-identifier": "sheet `0Aa0a0...0000` is hardcoded",
 }
 
 # Must NOT fire. These are the shapes the repo legitimately contains.
@@ -312,6 +369,8 @@ NEGATIVE = {
     "snake-case-identifier": "determination: unavailable_via_public_api",
     "iso-date": "captured on 2026-08-25 at 12:00Z",
     "version-triple": "python 3.11.9 and node 22.22.2",
+    "prose-ellipsis": "wait...then retry, ACT-...-003, range 1...5",
+    "js-spread": "const merged = [...items];",
 }
 
 # Must fire even though the text tries to talk its way out of being scanned:
@@ -357,6 +416,14 @@ def self_test() -> int:
                 passed.append("untrusted-marker-ignored:%d" % i)
             else:
                 failures.append("content marker %r silenced the scanner" % marker)
+
+        # The raw-staging skip must be conditional on .gitignore, never a
+        # blanket exemption for a directory name.
+        if _raw_staging_is_gitignored():
+            passed.append("raw-staging-skip-is-gitignore-gated")
+        else:
+            failures.append("`.raw/` is not in .gitignore, so unscrubbed capture "
+                            "staging is committable; refusing to call this clean")
 
         # The allowlist must be inert for files outside the repo.
         p = os.path.join(tmp, "outside.yml")

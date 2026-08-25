@@ -1,17 +1,15 @@
 # exports/draft/
 
-**This directory ships empty on purpose.**
-
-A `<KEY>.json` file appears here on a sync **only when both** of the following
-hold:
-
-1. the n8n public REST API genuinely exposed a published-version object
-   (`activeVersion`) alongside the workflow's current `versionId`, **and**
-2. those two version identifiers differed — i.e. an unpublished draft is
-   genuinely ahead of what production is running.
-
-If the API on the connected instance does not expose that distinction, no file
-is written here at all and every export in `exports/active/` is marked
-`unavailable_via_public_api`. See `docs/API_CAPABILITIES.md`.
+A `<KEY>.json` file appears here **only** where a workflow's draft version id
+differs from its published (active) version id — that is, where an unpublished
+draft is genuinely ahead of what production is running.
 
 **The absence of a draft file is itself a statement: draft == published.**
+
+As at the 2026-08-25 MCP capture that is two of the six: `WF1.json` and
+`WF5.json`. What differs between each draft and its published counterpart, node
+by node, is in `docs/drift-report.md` and `docs/DRAFT_VS_ACTIVE_KNOWN.md`.
+
+Like everything under `exports/`, these bodies are scrubbed and MCP-sourced —
+each carries `"source": "mcp-session"` in its `_capture` block. The public REST
+API was unreachable from the capture environment; see `docs/API_CAPABILITIES.md`.

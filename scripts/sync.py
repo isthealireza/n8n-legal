@@ -203,18 +203,39 @@ def _get(base_url: str, api_key: str, path: str, params: dict | None = None):
 
 
 # --------------------------------------------------------------------------
-# hashing
+# hashing and serialisation
 # --------------------------------------------------------------------------
-def _sha(text: str) -> str:
+# These three are the repository's ONLY definition of "the canonical form of a
+# captured body" and "the hash of one". They are public (no leading underscore)
+# so that a second capture path — scripts/capture_mcp.py, which takes bodies
+# from the authenticated MCP server rather than the REST API — can import them
+# instead of restating them. Two copies of a canonicaliser is two hashes that
+# silently disagree the first time one of them is edited; there is one copy.
+#
+# Nothing about the network behaviour of this module lives here, and importing
+# it opens no socket: `_get()` is the entire network surface and it is only
+# reached from run().
+def sha256_text(text: str) -> str:
+    """SHA-256, hex, of `text` encoded UTF-8."""
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
-def _canonical(obj) -> str:
+def canonical_json(obj) -> str:
+    """The canonical serialisation a capture is hashed over: keys sorted, no
+    insignificant whitespace, non-ASCII left as-is."""
     return json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
 
 
-def _pretty(obj) -> str:
+def pretty_json(obj) -> str:
+    """The on-disk serialisation: sorted keys, 2-space indent, trailing newline."""
     return json.dumps(obj, indent=2, sort_keys=True, ensure_ascii=False) + "\n"
+
+
+# Historical private spellings, kept so the rest of this module (and anything
+# that already imported them) is untouched by the rename.
+_sha = sha256_text
+_canonical = canonical_json
+_pretty = pretty_json
 
 
 # --------------------------------------------------------------------------

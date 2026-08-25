@@ -59,6 +59,47 @@ identity either, which is also deliberate.
 Placeholders look like ``<REDACTED_EMAIL_1>``. `leak_check.py` allowlists that
 shape.
 
+Two rules that are not pure shape-matching, and why
+---------------------------------------------------
+Both were added after this scrubber was first run over **real** captured n8n
+bodies rather than over the synthetic fixtures in the self-test. Each fixes a
+defect real data exposed and synthetic data could not.
+
+* **Credential ids are collected structurally (`CREDID`).** An n8n node carries
+  ``"credentials": {"<type>": {"id": "...", "name": "..."}}``, and that id is
+  a live handle to a stored credential on the instance. The ids observed are
+  ~16 mixed-case alphanumeric characters — comfortably *below* the 28-character
+  floor the Drive/Sheets ``FILEID`` branch needs, and there is no safe shape
+  rule that catches a bare 16-character alphanumeric run without also eating
+  ordinary identifiers, hashes and words out of every sticky note in the
+  document. So the ids are found by **structure** (walk to the ``credentials``
+  block, take each entry's ``id``) and then removed by **literal** substitution
+  everywhere in the document, prose included. The module still contains no real
+  value: it learns the literals from the document it is handed, per document,
+  and forgets them.
+
+  The consequence for `scrub_text`, which is handed a bare string and has no
+  structure to walk: it cannot do this. That is stated on the function.
+
+* **An elided identifier is redacted (`ELIDEDID`).** A sticky note in a real
+  workflow reads ``sheet `0Aa0a0...0000` ``. Six characters of prefix and four
+  of suffix are below every length floor in the table, so no shape rule saw it,
+  and yet it discloses both ends of a live Google Sheets file id. It is the
+  same family as the split-across-string-literals case the README calls out as
+  undetected — except this one has a distinctive shape and so can be caught. A
+  guard keeps it off ordinary prose: the fragment before the ellipsis must be at
+  least five characters and carry both a letter and a digit.
+
+* **A hyphen/space-split digit run needs ten digits, like `leak_check.py`.**
+  The ``CHATID`` split branch matched ``2026-08-18`` — three groups, and the
+  lookarounds are satisfied — so every ISO date in every capture came out as
+  ``<REDACTED_CHATID_1>T07:10:55.430Z``. That is not a leak, it is the opposite:
+  a false positive that deletes real, harmless information and makes an export
+  look redacted where nothing needed redacting. `leak_check.py` had guarded the
+  identical pattern with ``_enough_digits`` (>= 10 digits) from the start and
+  this module had not, so the gate and the scrubber disagreed about the same
+  regex. They now share the rule.
+
 Self-test:  ``python3 scripts/scrub.py --self-test``
 """
 
@@ -103,6 +144,12 @@ PATTERNS: Tuple[Tuple[str, str], ...] = (
     # Client / matter markers, in any case and with either separator.
     ("CASEREF", r"(?i:\b(?:MAT|ACT|APR|DRF|EVD|COM)[-/][A-Za-z0-9][A-Za-z0-9_/-]{3,})"),
     ("CASEREF", r"\b(?:19|20)\d{2}/\d{3,6}\b"),
+    # An identifier written with its middle elided: `0Aa0a0...0000`. Found in a
+    # real sticky note. Six characters of prefix and four of suffix are far below
+    # every length floor here, so nothing else in this table sees it — and it is
+    # a partial disclosure of a live Drive file id all the same. Guarded (see
+    # `_looks_elided_id`) so ordinary prose ellipses are untouched.
+    ("ELIDEDID", r"\b[A-Za-z0-9_-]{4,}(?:\.\.\.|…)[A-Za-z0-9_-]{3,}\b"),
     # UUIDs are n8n node ids. Preserve them, and shadow the broad file-id branch.
     (_IDENTITY, r"\b[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}\b"),
     # Google Sheets / Drive file ids: long opaque base64url-ish run.
@@ -113,17 +160,55 @@ PATTERNS: Tuple[Tuple[str, str], ...] = (
     ("CHATID", r"(?<![\d.-])\d{3,}(?:[ -]\d{2,}){2,}(?![\d.-])"),
 )
 
+def _enough_digits(value: str) -> bool:
+    """>= 10 digits. The same test `leak_check.py` applies to the same pattern:
+    an ISO date or a version triple is three groups of digits and is not an id."""
+    return sum(c.isdigit() for c in value) >= 10
+
+
+# Per-branch guards, keyed by the branch's own regex source so that reordering
+# PATTERNS cannot silently detach a guard from the pattern it belongs to. A
+# branch whose guard returns False is treated as if it had not matched.
+def _looks_elided_id(value: str) -> bool:
+    """True for `0Aa0a0...0000`, false for prose and for code.
+
+    The left-hand fragment must look like an opaque identifier — at least five
+    characters carrying BOTH a letter and a digit — which is what separates a
+    truncated Drive id from `wait...then`, `TEST...ONLY`, or a numeric range
+    like `1...5`. The cost of the guard is that an all-alphabetic elided token
+    is not caught; the cost of dropping it would be redacting ordinary prose,
+    and this repo's exports are mostly prose.
+    """
+    left = re.split(r"\.\.\.|…", value, 1)[0]
+    return (len(left) >= 5
+            and any(c.isdigit() for c in left)
+            and any(c.isalpha() for c in left))
+
+
+_GUARDS = {
+    r"(?<![\d.-])\d{3,}(?:[ -]\d{2,}){2,}(?![\d.-])": _enough_digits,
+    r"\b[A-Za-z0-9_-]{4,}(?:\.\.\.|…)[A-Za-z0-9_-]{3,}\b": _looks_elided_id,
+}
+
 _COMBINED = re.compile(
     "|".join("(?P<G%d>%s)" % (i, pat) for i, (_, pat) in enumerate(PATTERNS))
 )
 _LABELS = [label for label, _ in PATTERNS]
+_BRANCH_GUARDS = [_GUARDS.get(pat) for _, pat in PATTERNS]
 
 
 def _matched(m: "re.Match[str]") -> Tuple[str, str]:
-    """(label, raw) for whichever alternation branch fired."""
+    """(label, raw) for whichever alternation branch fired.
+
+    A branch with a guard that rejects the value reports `_IDENTITY`, i.e. the
+    text is left exactly as it was.
+    """
     for i, label in enumerate(_LABELS):
         raw = m.group("G%d" % i)
         if raw is not None:
+            guard = _BRANCH_GUARDS[i]
+            if guard is not None and not guard(raw):
+                return _IDENTITY, raw
             return label, raw
     return _IDENTITY, m.group(0)  # pragma: no cover - defensive
 
@@ -154,9 +239,65 @@ def _apply(text: str, table: Dict[str, Dict[str, str]]) -> str:
 
 
 def scrub_text(text: str) -> Tuple[str, Dict[str, int]]:
-    """Return (scrubbed_text, {category: count_of_distinct_values})."""
+    """Return (scrubbed_text, {category: count_of_distinct_values}).
+
+    Shape rules only. A bare string carries no structure, so the ``CREDID``
+    rule — which finds credential ids by walking to a node's ``credentials``
+    block — cannot apply here. Use `scrub_obj` for anything that is a workflow
+    body; this is for fragments (a diff value, a log line).
+    """
     table = _collect([text])
     return _apply(text, table), {k: len(v) for k, v in sorted(table.items())}
+
+
+# --- structural rule: credential ids -----------------------------------------
+# See the module docstring. This is the one thing here that is not a shape: an
+# n8n credential id is a ~16-character alphanumeric run with no distinguishing
+# form, so it is located by where it sits rather than by what it looks like.
+CREDID_LABEL = "CREDID"
+
+
+def _credential_ids(node, out: set) -> None:
+    """Collect every ``credentials.<type>.id`` string in the document.
+
+    Also picks up a bare ``credentialId``/``credential_id`` value, which some
+    node parameter shapes use instead of the nested block.
+    """
+    if isinstance(node, dict):
+        creds = node.get("credentials")
+        if isinstance(creds, dict):
+            for entry in creds.values():
+                if isinstance(entry, dict) and isinstance(entry.get("id"), str) \
+                        and entry["id"].strip():
+                    out.add(entry["id"])
+        for key, value in node.items():
+            if key in ("credentialId", "credential_id") and isinstance(value, str) \
+                    and value.strip():
+                out.add(value)
+            _credential_ids(value, out)
+    elif isinstance(node, list):
+        for value in node:
+            _credential_ids(value, out)
+
+
+def _literal_table(values) -> Dict[str, str]:
+    """Ordinals over the sorted distinct values, exactly as `_collect` does."""
+    return {raw: "<REDACTED_%s_%d>" % (CREDID_LABEL, n)
+            for n, raw in enumerate(sorted(values), 1)}
+
+
+def _literal_re(table: Dict[str, str]):
+    if not table:
+        return None
+    # Longest first, so one id that is a prefix of another cannot shadow it.
+    return re.compile("|".join(re.escape(v) for v in
+                               sorted(table, key=len, reverse=True)))
+
+
+def _apply_literals(text: str, rx, table: Dict[str, str]) -> str:
+    if rx is None:
+        return text
+    return rx.sub(lambda m: table[m.group(0)], text)
 
 
 def _strings(node) -> Iterable[str]:
@@ -192,24 +333,41 @@ def scrub_obj(obj):
 
     Returns (scrubbed_obj, {category: distinct_values_seen}).
     """
-    table = _collect(_strings(obj))
+    # Structural pass first: learn this document's credential ids, then remove
+    # them by literal substitution BEFORE the shape rules run, so an id that
+    # also happens to satisfy a broader shape cannot be labelled twice.
+    cred_values: set = set()
+    _credential_ids(obj, cred_values)
+    creds = _literal_table(cred_values)
+    cred_rx = _literal_re(creds)
+
+    def pre(text: str) -> str:
+        return _apply_literals(text, cred_rx, creds)
+
+    table = _collect(pre(s) for s in _strings(obj))
+
+    def sub(text: str) -> str:
+        return _apply(pre(text), table)
 
     def walk(node):
         if isinstance(node, dict):
-            return {_apply(str(k), table): walk(v) for k, v in node.items()}
+            return {sub(str(k)): walk(v) for k, v in node.items()}
         if isinstance(node, list):
             return [walk(v) for v in node]
         if isinstance(node, str):
-            return _apply(node, table)
+            return sub(node)
         if isinstance(node, bool):
             return node
         if isinstance(node, int):
             as_text = str(node)
-            scrubbed = _apply(as_text, table)
+            scrubbed = sub(as_text)
             return node if scrubbed == as_text else scrubbed
         return node
 
-    return walk(obj), {k: len(v) for k, v in sorted(table.items())}
+    counts = {k: len(v) for k, v in sorted(table.items())}
+    if creds:
+        counts[CREDID_LABEL] = len(creds)
+    return walk(obj), dict(sorted(counts.items()))
 
 
 # --- self test ---------------------------------------------------------------
@@ -263,6 +421,62 @@ def self_test() -> int:
     ok = isinstance(out["chatId"], str) and out["chatId"].startswith("<REDACTED_CHATID_")
     (passed if ok else failures).append(
         "int-chatid-redacted" if ok else "int-chatid-redacted: got %r" % out["chatId"])
+
+    # 7. An ISO date is NOT a chat id. This fired on real data: every
+    #    createdAt/updatedAt came back as <REDACTED_CHATID_n>T07:10:55.430Z.
+    out, _ = scrub_obj({"createdAt": "2026-08-18T07:10:55.430Z"})
+    ok = out["createdAt"] == "2026-08-18T07:10:55.430Z"
+    (passed if ok else failures).append(
+        "iso-date-survives" if ok else "iso-date-survives: got %r" % out["createdAt"])
+
+    # 8. ...but a genuinely split long id still goes. Same rule as leak_check.
+    out, _ = scrub_obj({"x": "id 900-000-0001-22"})
+    ok = "<REDACTED_CHATID_" in out["x"]
+    (passed if ok else failures).append(
+        "split-long-id-still-redacted" if ok else
+        "split-long-id-still-redacted: got %r" % out["x"])
+
+    # 8b. An elided identifier. A real sticky note carried exactly this shape:
+    #     a Sheets file id with its middle replaced by an ellipsis. The value
+    #     here is synthetic, like every other value in this file.
+    out, _ = scrub_obj({"note": "sheet `0Aa0a0...0000` is hardcoded"})
+    ok = "0Aa0a0" not in out["note"] and "<REDACTED_ELIDEDID_1>" in out["note"]
+    (passed if ok else failures).append(
+        "elided-id-redacted" if ok else "elided-id-redacted: got %r" % out["note"])
+
+    # 8c. ...but prose and code ellipses are not identifiers.
+    keep = {"a": "ACT-...-003", "b": "wait...then", "c": "1...5",
+            "d": "const x = [...items];"}
+    out, _ = scrub_obj(keep)
+    ok = all(out[k] == v for k, v in keep.items())
+    (passed if ok else failures).append(
+        "prose-ellipsis-survives" if ok else "prose-ellipsis-survives: got %r" % out)
+
+    # 9. A credential id is structural, not shape-matched: too short for the
+    #    file-id branch, and it survived verbatim until this rule existed.
+    doc = {"nodes": [
+        {"name": "A", "credentials": {"googleSheetsOAuth2Api":
+                                      {"id": "AbCdEfGhIjKlMnOp", "name": "acct"}}},
+        {"name": "B", "notes": "see credential AbCdEfGhIjKlMnOp"}]}
+    out, counts = scrub_obj(doc)
+    text = json.dumps(out)
+    ok = ("AbCdEfGhIjKlMnOp" not in text
+          and "<REDACTED_CREDID_1>" in text
+          and counts.get("CREDID") == 1)
+    (passed if ok else failures).append(
+        "credential-id-redacted" if ok else
+        "credential-id-redacted: got %s" % text)
+
+    # 10. Credential-id ordinals are sorted too, and the same id in prose gets
+    #     the same label as the one in the credentials block.
+    out, _ = scrub_obj({"nodes": [
+        {"credentials": {"t": {"id": "zzzzzzzzzzzzzzzz"}}},
+        {"credentials": {"t": {"id": "aaaaaaaaaaaaaaaa"}}}]})
+    ok = (out["nodes"][0]["credentials"]["t"]["id"] == "<REDACTED_CREDID_2>"
+          and out["nodes"][1]["credentials"]["t"]["id"] == "<REDACTED_CREDID_1>")
+    (passed if ok else failures).append(
+        "credid-ordinals-are-sorted" if ok else
+        "credid-ordinals-are-sorted: got %r" % out)
 
     for name in passed:
         print("  ok    %s" % name)

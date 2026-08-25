@@ -5,6 +5,52 @@ question had to be settled before `scripts/sync.py` was written, because the
 owner asked for "active and draft versions captured separately" and a sync that
 *pretends* to that distinction is worse than one that admits it cannot.
 
+> ## Status, 2026-08-25: none of this has been exercised against a live instance
+>
+> **The n8n public REST API is unreachable from the environment this repository
+> was populated in.** The egress proxy refuses `CONNECT` to the instance host
+> (HTTP 403), and no n8n API key exists here. `scripts/sync.py` therefore cannot
+> run: not "was not run", *cannot*. Every claim in this document below this box
+> is read off the OpenAPI specification, and it stays a claim about the
+> specification until somebody runs a sync with a key from a network that can
+> reach the instance.
+>
+> What was available instead is the authenticated, **read-only n8n MCP server**,
+> and that is where the six bodies now in `exports/` came from. They were
+> captured by `scripts/capture_mcp.py` — a separate tool, which shares this
+> repository's scrubber and hashing with `sync.py` but reads local files rather
+> than the network — and every record it writes is stamped
+> `"source": "mcp-session"` with the capture date. **`exports/` currently holds
+> MCP-sourced data.** `exports/manifest.json`, `config/workflows.json` and
+> `docs/drift-report.md` all say so on their face.
+>
+> ### What MCP told us that this document could only infer
+>
+> `get_workflow_details` returns `versionId` and `activeVersionId` as two
+> distinct top-level fields, plus an `activeVersion` object carrying
+> `sameAsDraft` and — when the two differ — the published `nodes`,
+> `connections` and `nodeGroups`. On WF5 that embedded published graph was
+> confirmed byte-identical to what `get_workflow_version(activeVersionId)`
+> returned independently. So on the MCP surface the draft/published distinction
+> is explicit rather than inferred, and it was populated on all six workflows.
+>
+> That does **not** transfer to the REST surface. The REST schema is a different
+> shape (no `activeVersionId` at the top level; the published version id lives
+> inside `activeVersion`), and whether this instance's REST endpoint populates
+> `activeVersion` at all is still unknown. `sync.py`'s `classify()` still detects
+> it per-run and still records `unavailable_via_public_api` when it cannot, which
+> is the correct behaviour and is now the *only* untested part of the pipeline
+> that matters.
+>
+> ### What is consequently untested
+>
+> - Every line of `_get()`: the HTTPS handling, the redirect refusal, the
+>   responding-host check, the size cap. Unit-reasoned, never exercised.
+> - `classify()` against a real REST payload.
+> - `_body_from_active_version()` against a real REST `activeVersion` — though
+>   `capture_mcp.py` imports and uses that same function, so it has now been
+>   exercised on real n8n graphs, just not ones delivered by REST.
+
 ## Verdict
 
 **The public REST API does express the distinction — on a current n8n — and it
@@ -97,16 +143,29 @@ One inference is worth flagging as an inference. The spec does not state in
 prose *which* graph the top-level `nodes` array holds when a draft is ahead of
 published. The structure only makes sense one way — the published graph is the
 one carried separately under `activeVersion`, so the top level is the draft —
-and this matches what the authenticated MCP server was directly observed doing
-in-session on 2026-08-25 (`get_workflow_details` hands back the draft, with the
-published body nested alongside it; see `docs/DRAFT_VS_ACTIVE_KNOWN.md`). It is
-nonetheless an inference until the first authenticated sync confirms it, and
-`sync.py` records `draft_active_determination` in every capture so a wrong
-inference is visible rather than silent.
+and this is confirmed on the MCP surface: `get_workflow_details` returned the
+draft graph at the top level and the published graph under `activeVersion` on
+both diverged workflows, and the published graph matched
+`get_workflow_version(activeVersionId)` byte for byte on WF5. See
+`docs/DRAFT_VS_ACTIVE_KNOWN.md`.
+
+That is a confirmation about MCP, not about REST. It remains an inference on the
+REST side until the first authenticated sync exercises it, and `sync.py` records
+`draft_active_determination` in every capture so a wrong inference is visible
+rather than silent.
 
 There is also one field the MCP surface has that the public schema does not: a
 `sameAsDraft` convenience boolean. Its absence costs nothing — comparing the two
-`versionId` values gives the same answer.
+`versionId` values gives the same answer, and on the 2026-08-25 capture the two
+methods agreed on all six workflows.
+
+MCP additionally exposes `get_workflow_versions_diff`, which the REST surface
+has no equivalent of. It is read-only and it is what `docs/drift-report.md`'s
+node-level section is rendered from. Worth knowing before trusting it: on WF1 it
+reported two changed fields and did **not** report that two nodes had moved on
+the canvas. `capture_mcp.py` therefore also compares the two captured bodies
+directly and prints both results, so a difference the endpoint omits is still
+visible.
 
 ## The honest fallback
 

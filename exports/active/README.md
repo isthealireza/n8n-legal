@@ -1,16 +1,20 @@
 # exports/active/
 
-**This directory ships empty on purpose.**
+One `<KEY>.json` per workflow (`WF1` … `WF9`, keys as defined in
+`config/workflows.json`), holding the **scrubbed published body** — the version
+n8n is actually running — plus a `_capture` block recording where the bytes came
+from, when, and how the published-vs-draft call was made.
 
-It fills on the **first authenticated sync** — that is, the first run of
-`scripts/sync.py` with a real `N8N_BASE_URL` and `N8N_API_KEY` present, either
-locally or via the `n8n-sync` GitHub Action.
+**These were captured through the authenticated read-only n8n MCP server on
+2026-08-25, not through the public REST API**, which is unreachable from the
+environment this repository was populated in. Every file here says so in its own
+`_capture.source` (`"mcp-session"`). See `README.md` and
+`docs/API_CAPABILITIES.md`.
 
-Each file will be `<KEY>.json` (`WF1.json` … `WF9.json`, keys as defined in
-`config/workflows.json`), holding the **scrubbed** body that the n8n public REST
-API returned for that workflow's *published / active* version, plus a `_capture`
-block recording where it came from, when, and how confident the active-vs-draft
-determination is.
+Where a workflow's draft and published version ids agreed, the single graph
+`get_workflow_details` returned *is* the published one. Where they differed, the
+published graph came from `get_workflow_version(activeVersionId)` and was swapped
+into the workflow envelope by the same function `scripts/sync.py` uses.
 
 Nothing here is hand-written, and no placeholder or example export is committed:
-an export file in this repo is always a real capture or it does not exist.
+an export file in this repository is always a real capture or it does not exist.
