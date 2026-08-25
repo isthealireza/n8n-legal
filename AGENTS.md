@@ -83,13 +83,14 @@ The runner is offline, deterministic, and takes seconds. **This is the whole poi
 repo.** Before it existed, testing a change meant hand-building a throwaway workflow in the
 n8n UI against live credentials — a twenty-minute human loop, thirty times over five days.
 
-Baseline as of 2026-08-25: **74 passed, 3 failed, 60 skipped.** The three failures are real
+Baseline as of 2026-08-26: **81 passed, 3 failed, 60 skipped.** The three failures are real
 (`harness/FINDINGS.md` §1 and §3), not flakes. **Do not make them pass by weakening the
 assertion.** A weakened assertion is a lie the next agent will trust.
 
-It was 75/2/60 until the units were re-extracted from the *published* version rather than
-the draft. The extra red is the point: one assertion had been green only because it was
-being run against code nobody has published. See `docs/draft-vs-active.md` §4.
+It was 74/3/60 before the D-TESTFLAG-01 scenarios were added (WF2 test-data stamp guard,
+7 new cases). Before that it was 75/2/60 until the units were re-extracted from the
+*published* version rather than the draft — one assertion had been green only because it
+was being run against code nobody has published. See `docs/draft-vs-active.md` §4.
 
 ### Changing production logic
 
