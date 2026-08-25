@@ -126,9 +126,14 @@ is a weaker statement, and it is the true one.
 ## The one-way guarantee, mechanically
 
 `scripts/sync.py` contains exactly one function that opens a network
-connection, `_get()`. It asserts its method before it opens anything, and the
-constant it asserts against is the only HTTP method named in the file. Every
-state-changing endpoint the n8n API offers is unreachable from this codebase:
-there is no code path to one, no disabled code path to one, and no worked
-example of one. A read of the whole tree confirms no mutating HTTP verb appears
-beside an n8n URL anywhere.
+connection, `_get()`. It **raises** if its method is anything but `GET` — an
+`assert` was used here once, and `python3 -O` deletes asserts, so the guarantee
+evaporated under a flag anyone could pass. The constant it checks against is the
+only HTTP method named in the file. Every state-changing endpoint the n8n API
+offers is unreachable from this codebase: there is no code path to one, no
+disabled code path to one, and no worked example of one.
+
+That last claim is no longer a claim about a careful read. `scripts/no_mutating_verbs.sh`
+greps the whole tree for a mutating verb on the same line as an n8n API path and
+exits non-zero if it finds one, and the Action runs it on every sync before the
+key is used. Run it yourself with `bash scripts/no_mutating_verbs.sh`.

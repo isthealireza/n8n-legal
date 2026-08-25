@@ -11,7 +11,8 @@ Copy it once — n8n will not show it again.
 **3. Add `N8N_BASE_URL` as a repository *variable*.**
 GitHub → this repo → Settings → Secrets and variables → Actions → *Variables*
 tab → New repository variable. Name it `N8N_BASE_URL`; the value is your
-instance's root URL, with no `/api/v1` on the end.
+instance's root URL, with no `/api/v1` on the end. It must start with
+`https://`; the sync refuses a plaintext URL.
 
 **4. Add `N8N_API_KEY` as a repository *secret*.**
 Same page, *Secrets* tab → New repository secret. Name it `N8N_API_KEY` and
@@ -24,14 +25,12 @@ schedule every 15 minutes once configured.
 
 **6. Review the generated draft-vs-active report and the pull request.**
 The run pushes to the `n8n-sync` branch and opens (or updates) one PR into
-`main`. Read `docs/drift-report.md` on that branch, then merge if it looks
-right.
+`main`. Read `docs/drift-report.md` on that branch, then **read the diff itself
+before merging** — the automated gate matches secret *shapes*, not meaning, so
+it cannot see a client name or a case summary written into a sticky note, a
+`jsCode` comment, or an LLM prompt. See the warning in `README.md`.
 
 ---
 
-**The first authenticated sync is read-only against n8n.** It issues `GET`
-requests and nothing else; it changes no workflow, publishes nothing,
-activates nothing, and deletes nothing.
-
-**GitHub never updates n8n.** Sync is one-way, n8n → GitHub. Merging the PR
-changes this repository and has no effect whatsoever on your running workflows.
+Sync is one-way and read-only: it issues `GET` requests to n8n and nothing
+else, and merging the PR changes this repository only.

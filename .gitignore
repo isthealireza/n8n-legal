@@ -29,6 +29,11 @@ node_modules/
 *.unscrubbed.json
 *.raw.json
 
+# Run timestamps. Deliberately untracked: writing the wall clock into a tracked
+# file makes every scheduled run look like a content change, which force-pushes
+# the sync branch ~96x/day and keeps a pull request open that says nothing.
+exports/last-run.json
+
 # Logs and transient output
 *.log
 logs/

@@ -3,8 +3,8 @@
     "schema_version": 1,
     "ids_verified": {
       "on": "2026-08-25",
-      "how": "observed via the authenticated n8n MCP server in-session",
-      "note": "The six workflow ids below are observed values, not guesses."
+      "how": "reported by the authenticated n8n MCP server during the 2026-08-25 build session and passed to the builder; NOT captured first-hand by scripts/sync.py, which has never run against the instance",
+      "note": "The six ids below are reported values, not guesses, but they are unconfirmed through the public REST API this repo actually uses; the first authenticated sync is what confirms them. The same ids and workflow names also appear in a separate local repository the owner already holds, so this file is not their only record."
     },
     "versions_known": false,
     "versions_note": "Every version-id and hash field is null and MUST stay null until the first authenticated sync populates it. Nothing in this repo may invent an n8n version id, hash, or export body.",
