@@ -56,3 +56,7 @@ venv/
 # Test output
 coverage/
 .nyc_output/
+
+# Orca / local dev — never commit these
+*.bundle
+.mcp.json
