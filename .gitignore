@@ -1,0 +1,42 @@
+# Virtualenvs and Python noise
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# Node
+node_modules/
+
+# Environment files — never commit one, not even an example with a real value
+.env
+.env.*
+!.env.example
+
+# Anything self-declaring as a secret
+*.secret
+*.secret.*
+*secret*.json
+*.key
+*.pem
+
+# Staging area for an unscrubbed export. Never commit one of these.
+.raw/
+*.unscrubbed.json
+*.raw.json
+
+# Logs and transient output
+*.log
+logs/
+scratch/
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp

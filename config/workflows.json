@@ -1,0 +1,75 @@
+{
+  "_meta": {
+    "schema_version": 1,
+    "ids_verified": {
+      "on": "2026-08-25",
+      "how": "observed via the authenticated n8n MCP server in-session",
+      "note": "The six workflow ids below are observed values, not guesses."
+    },
+    "versions_known": false,
+    "versions_note": "Every version-id and hash field is null and MUST stay null until the first authenticated sync populates it. Nothing in this repo may invent an n8n version id, hash, or export body.",
+    "sync_direction": "n8n -> GitHub only. GitHub never writes to n8n.",
+    "api": {
+      "style": "n8n public REST API",
+      "base_path": "/api/v1",
+      "auth_header": "X-N8N-API-KEY",
+      "methods_allowed": ["GET"]
+    }
+  },
+  "workflows": {
+    "WF1": {
+      "id": "xUcAXTgocHPsHy5Y",
+      "name": "1 - Telegram Intake and Command Router",
+      "active_version_id": null,
+      "draft_version_id": null,
+      "active_sha256": null,
+      "draft_sha256": null,
+      "last_synced_at": null
+    },
+    "WF2": {
+      "id": "OaVCEsrt2qpo28rB",
+      "name": "2 - Matter Classification and Planning",
+      "active_version_id": null,
+      "draft_version_id": null,
+      "active_sha256": null,
+      "draft_sha256": null,
+      "last_synced_at": null
+    },
+    "WF3": {
+      "id": "1rhaSTTviUBanJIy",
+      "name": "3 - Evidence Intake and Storage",
+      "active_version_id": null,
+      "draft_version_id": null,
+      "active_sha256": null,
+      "draft_sha256": null,
+      "last_synced_at": null
+    },
+    "WF4": {
+      "id": "zKr24IThF30e6jXw",
+      "name": "4 - Research Drafting Approval and Dispatch",
+      "active_version_id": null,
+      "draft_version_id": null,
+      "active_sha256": null,
+      "draft_sha256": null,
+      "last_synced_at": null
+    },
+    "WF5": {
+      "id": "zDLoMgW42jUm25Q4",
+      "name": "5 - Inbound Replies and Daily Supervisor",
+      "active_version_id": null,
+      "draft_version_id": null,
+      "active_sha256": null,
+      "draft_sha256": null,
+      "last_synced_at": null
+    },
+    "WF9": {
+      "id": "JfaCOxRq0FjZ5JWb",
+      "name": "9 - Error Handler",
+      "active_version_id": null,
+      "draft_version_id": null,
+      "active_sha256": null,
+      "draft_sha256": null,
+      "last_synced_at": null
+    }
+  }
+}
