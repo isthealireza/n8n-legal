@@ -1,0 +1,102 @@
+{
+  "_meta": {
+    "schema_version": 1,
+    "ids_verified": {
+      "on": "2026-08-25",
+      "how": "read first-hand from the authenticated n8n MCP server on 2026-08-25 with get_workflow_details; the six ids below are what that server returned for these workflows",
+      "note": "NOT captured by scripts/sync.py. The n8n public REST API was unreachable from the capture environment — the egress proxy refused CONNECT to the instance host and no API key existed — so sync.py has still never run against a live instance and the ids remain unconfirmed through that interface."
+    },
+    "versions_known": true,
+    "versions_note": "Populated on 2026-08-25 by scripts/capture_mcp.py from real MCP responses. Nothing here is invented: every version id was returned by get_workflow_details (or, for a published body, get_workflow_version), and every hash is sha256 over sync.canonical_json() of the scrubbed body that sits in exports/. A workflow's draft/published state is live, so these are the values as at 2026-08-25 and they age.",
+    "sync_direction": "n8n -> GitHub only. GitHub never writes to n8n.",
+    "api": {
+      "style": "n8n public REST API",
+      "base_path": "/api/v1",
+      "auth_header": "X-N8N-API-KEY",
+      "methods_allowed": [
+        "GET"
+      ]
+    },
+    "capture": {
+      "source": "mcp-session",
+      "captured_on": "2026-08-25",
+      "captured_by": "scripts/capture_mcp.py",
+      "rest_api_status": "unreachable from the capture environment; untested against a live instance",
+      "exports_hold": "MCP-sourced data, scrubbed by scripts/scrub.py"
+    }
+  },
+  "workflows": {
+    "WF1": {
+      "id": "xUcAXTgocHPsHy5Y",
+      "name": "1 - Telegram Intake and Command Router",
+      "active_version_id": "b1c425bf-5830-4e3c-a6f7-bcf2c02ef593",
+      "draft_version_id": "9cc644ec-595d-4084-b64d-cfbe265b0712",
+      "active_sha256": "d92d2aceee6fb4e0597c4c033d01a0f657052aaae88572e181ab7bc769fea7bb",
+      "draft_sha256": "0b0a333007dc1d733bade586021336cb44f2955d5024a0b45726f456656d1bc5",
+      "draft_diverged_from_published": true,
+      "last_synced_at": null,
+      "last_captured_at": "2026-08-25 (via MCP, not via the REST API)",
+      "source": "mcp-session"
+    },
+    "WF2": {
+      "id": "OaVCEsrt2qpo28rB",
+      "name": "2 - Matter Classification and Planning",
+      "active_version_id": "61e6ffee-6708-453e-ab64-8a93dfcbaa9d",
+      "draft_version_id": "61e6ffee-6708-453e-ab64-8a93dfcbaa9d",
+      "active_sha256": "33017c41261bc5bc2f29d91caf6445645b5192c709a2cfe7aeb0b1bd8c0fdf9f",
+      "draft_sha256": null,
+      "draft_diverged_from_published": false,
+      "last_synced_at": null,
+      "last_captured_at": "2026-08-25 (via MCP, not via the REST API)",
+      "source": "mcp-session"
+    },
+    "WF3": {
+      "id": "1rhaSTTviUBanJIy",
+      "name": "3 - Evidence Intake and Storage",
+      "active_version_id": "644bbdb3-6e78-42c1-a250-3cf9ba05fadc",
+      "draft_version_id": "644bbdb3-6e78-42c1-a250-3cf9ba05fadc",
+      "active_sha256": "f4184707ec2f24288e236d631f581b2629cc46b9b35840c62b54ee2b43ab5fa6",
+      "draft_sha256": null,
+      "draft_diverged_from_published": false,
+      "last_synced_at": null,
+      "last_captured_at": "2026-08-25 (via MCP, not via the REST API)",
+      "source": "mcp-session"
+    },
+    "WF4": {
+      "id": "zKr24IThF30e6jXw",
+      "name": "4 - Research Drafting Approval and Dispatch",
+      "active_version_id": "8f6b3704-7a7d-47e2-be9f-d40e7311855e",
+      "draft_version_id": "8f6b3704-7a7d-47e2-be9f-d40e7311855e",
+      "active_sha256": "ae1c31a4a71539d03e55c6fa7a0fa4d7d3d2e68fe2103a08ba19f62472858d45",
+      "draft_sha256": null,
+      "draft_diverged_from_published": false,
+      "last_synced_at": null,
+      "last_captured_at": "2026-08-25 (via MCP, not via the REST API)",
+      "source": "mcp-session"
+    },
+    "WF5": {
+      "id": "zDLoMgW42jUm25Q4",
+      "name": "5 - Inbound Replies and Daily Supervisor",
+      "active_version_id": "983da561-5c19-42db-a2b4-1e2e7ac67e0f",
+      "draft_version_id": "811b746c-869c-4fc3-94dc-123f60cb7067",
+      "active_sha256": "661cedbc4c8de451e2c0094394d79ca1a2c1fd3e1ae2d604e1fc50ea29c22b79",
+      "draft_sha256": "257249c38cfab43df28aff989660ee7b567277faafc3b8dc17bc0e4b457788db",
+      "draft_diverged_from_published": true,
+      "last_synced_at": null,
+      "last_captured_at": "2026-08-25 (via MCP, not via the REST API)",
+      "source": "mcp-session"
+    },
+    "WF9": {
+      "id": "JfaCOxRq0FjZ5JWb",
+      "name": "9 - Error Handler",
+      "active_version_id": "a5b10619-31e4-4246-8988-90a08bd45ab1",
+      "draft_version_id": "a5b10619-31e4-4246-8988-90a08bd45ab1",
+      "active_sha256": "5cad47fd66f6fe888693008673368e2a63d05e7764ad96b42ec0dd53e10b7997",
+      "draft_sha256": null,
+      "draft_diverged_from_published": false,
+      "last_synced_at": null,
+      "last_captured_at": "2026-08-25 (via MCP, not via the REST API)",
+      "source": "mcp-session"
+    }
+  }
+}

@@ -1,0 +1,579 @@
+{
+  "_capture": {
+    "active_version_id": "a5b10619-31e4-4246-8988-90a08bd45ab1",
+    "captured_by": "scripts/capture_mcp.py",
+    "captured_on": "2026-08-25",
+    "draft_active_determination": "from_mcp_active_version_id",
+    "draft_diverged_from_published": false,
+    "draft_version_id": "a5b10619-31e4-4246-8988-90a08bd45ab1",
+    "key": "WF9",
+    "kind": "active",
+    "mcp_only_keys_dropped": [
+      "scopes",
+      "canExecute",
+      "availableInMCP",
+      "nodeCount"
+    ],
+    "not_captured_by": "scripts/sync.py — the n8n public REST API was unreachable from the capture environment (proxy refused CONNECT) and no API key was available. The REST path remains untested against a live instance.",
+    "published_body_from": "get_workflow_details: versionId == activeVersionId, so the single graph returned IS the published one",
+    "scrub_counts": {
+      "CHATID": 2,
+      "CREDID": 2,
+      "FILEID": 1
+    },
+    "scrubbed": true,
+    "source": "mcp-session",
+    "source_detail": "authenticated n8n MCP server, read-only tools only (get_workflow_details / get_workflow_version / get_workflow_versions_diff). NOT the public REST API — see docs/API_CAPABILITIES.md.",
+    "workflow_id": "JfaCOxRq0FjZ5JWb",
+    "workflow_name": "9 - Error Handler"
+  },
+  "workflow": {
+    "active": true,
+    "activeVersionId": "a5b10619-31e4-4246-8988-90a08bd45ab1",
+    "connections": {
+      "Action Known?": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Mark Action Failed",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "Telegram - Error",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Append Error Event": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Action Known?",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Build Error Record": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Append Error Event",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Error Trigger": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Build Error Record",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Mark Action Failed": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Telegram - Error",
+              "type": "main"
+            }
+          ]
+        ]
+      }
+    },
+    "createdAt": "2026-08-18T07:10:55.430Z",
+    "id": "JfaCOxRq0FjZ5JWb",
+    "isArchived": false,
+    "meta": {
+      "aiBuilderAssisted": true,
+      "builderVariant": "mcp"
+    },
+    "name": "9 - Error Handler",
+    "nodeGroups": [],
+    "nodes": [
+      {
+        "id": "aa41eac1-cdf7-4c6c-9d00-b9dbd5a4a98d",
+        "name": "Error Trigger",
+        "parameters": {},
+        "position": [
+          -600,
+          0
+        ],
+        "type": "n8n-nodes-base.errorTrigger",
+        "typeVersion": 1
+      },
+      {
+        "id": "6e707592-124b-4c7e-93fe-bd0ed77644af",
+        "name": "Build Error Record",
+        "parameters": {
+          "jsCode": "// Build a safe error record. Credentials and payload bodies are never copied out.\n//\n// v2 adds ONE thing: a pre-escaped `telegram_text` field, so the Telegram node\n// can send with an explicit parse_mode of HTML instead of relying on whatever\n// mode applies when parse_mode is absent.\n//\n// WHY. Execution 263 proved a parse mode IS applied today: a message containing\n// six backticks came back from Telegram with the backticks stripped and three\n// `code` entities at the matching offsets. Execution 233 proved the same mode\n// silently ate a \"[line 1]\" - it was delivered as \"line 1\". That is legacy\n// Markdown. It means a single unpaired _ * or ` in an n8n error message returns\n// HTTP 400 \"can't parse entities\", and this node is the last line of defence.\n//\n// It also means the \"[redacted]\" marker this very node inserts is being eaten\n// before the owner sees it, so a redacted credential currently reads as though\n// nothing was redacted.\n//\n// HTML needs only three characters escaped and has no balance requirement, so\n// every error string survives verbatim. That is also the house convention: all\n// eleven Telegram nodes in workflow 4 set parse_mode HTML explicitly.\n//\n// EVERY EXISTING FIELD IS UNCHANGED. The Events register mapping reads\n// event_id, event_type, severity, matter_id, action_id, workflow_name,\n// workflow_id, node, message, execution_id, execution_url and created_at. All\n// twelve are produced exactly as before, from the same inputs, unescaped. Only\n// the new telegram_text field is escaped, and only the Telegram node reads it.\nconst j = $input.first().json || {};\nconst ex = j.execution || {};\nconst wfd = j.workflow || {};\nconst tr = j.trigger || {};\n\n// ---------------------------------------------------------------------------\n// REDACTION v3. Redacts secret VALUES; it no longer deletes whole lines.\n//\n// THE DEFECT THIS REPLACES. v2 dropped any line matching the word token,\n// secret, password, authorization, bearer, cookie or api key. That is a\n// keyword test, not a secret test, so it deleted ordinary technical errors:\n// \"Unexpected token '<' ... is not valid JSON\" - one of the most common\n// JavaScript errors there is - was blanked entirely, and the owner received\n// \"Error:\" with nothing after it. A one-line message mentioning any of those\n// words vanished completely.\n//\n// It also protected less than it appeared to. The line drop only fires when a\n// LABEL is present; a bare secret with no label was never covered by it, and\n// was only ever caught by the 32-character run rule.\n//\n// THE REPLACEMENT. Five value-shaped rules, then the original run rule, in\n// this order. Header values are redacted to end of line because the whole\n// value of an Authorization or Cookie header is sensitive. Assignment values\n// are redacted one token at a time so the surrounding sentence survives.\n// Nothing is deleted by line any more.\nconst BOT_TOKEN   = /\\b\\d{5,16}:[A-Za-z0-9_-]{20,}/g;\nconst BOT_IN_URL  = /\\/bot[A-Za-z0-9_:-]{20,}/gi;\nconst HEADER_LABEL = /\\b(authorization|proxy-authorization|www-authenticate|set-cookie|cookie|x-api-key)(\\s*[:=]\\s*)[^\\n]+/gi;\nconst SCHEME_VALUE = /\\b(bearer|basic|digest)\\s+[A-Za-z0-9._~+/=-]{8,}/gi;\nconst ASSIGN_LABEL = /\\b(api[-_ ]?keys?|apikeys?|access[-_ ]?tokens?|refresh[-_ ]?tokens?|auth[-_ ]?tokens?|bot[-_ ]?tokens?|id[-_ ]?tokens?|client[-_ ]?secrets?|private[-_ ]?keys?|secrets?|passwords?|passwd|pwd|passphrase|session[-_ ]?ids?|credentials?|bearer|tokens?)(\\s*[:=]+\\s*)(\"[^\"]*\"|'[^']*'|[^\\s,;)\\]}]+)/gi;\n\n// ---------------------------------------------------------------------------\n// toText v5 — FU-3, allowlist extraction. NOT a serialiser.\n//\n// THE DEFECT. safe() began with String(s), so a non-string message became\n// \"[object Object]\" in the Events register and the daily digest showed the owner\n// \"workflow / node: [object Object]\". Every fact was lost.\n//\n// WHY NOT FLATTEN. The obvious fix - walk the object and print every leaf - was\n// built, tested and REJECTED. An n8n error payload can carry a whole node\n// definition, and that object contains `credentials: {id, name}`, request and\n// response bodies, headers and internal configuration. Flattening turns a field\n// that leaked nothing into one that writes all of it to a spreadsheet. Redaction\n// would have caught the obvious secrets, but \"the redactor will probably catch\n// it\" is not a boundary.\n//\n// WHAT THIS DOES INSTEAD. It never traverses. It looks for a human-readable\n// error string in an explicit allowlist of fields, and if it does not find one\n// it says so and stops. Unknown keys are not read. Denied containers are not\n// read at any depth. Arrays are not flattened. Nothing is inferred.\n//\n//   ALLOWED:   message, description, name, code, status, statusCode,\n//              httpCode, type          (scalars only - never objects)\n//   CONTAINERS: error, cause, details  (descended into, allowlist only)\n//   EVERYTHING ELSE: not read. node, credentials, context, headers, request,\n//              response, config, body, data, token, secret, password,\n//              authorization, cookies and every unknown key are unreachable\n//              because they are not on the allowlist, not because they are on\n//              a denylist. A denylist would need to predict the next key name;\n//              this cannot be widened by a payload it has not seen.\n//\n// Whatever single string comes out then passes through the six redaction rules\n// exactly as a string message does.\nconst SAFE_FIELDS = ['message', 'description', 'name', 'code', 'status',\n                     'statusCode', 'httpCode', 'type'];\nconst ERROR_CONTAINERS = ['error', 'cause', 'details'];\nconst TOTEXT_MAX_DEPTH = 3;\nconst TOTEXT_MAX_ARRAY_SCAN = 5;\n\n// Realm-safe: a Code node runs inside a vm, so instanceof fails on anything\n// built in another realm. The internal tag does not.\nfunction typeTag(v) {\n  const t = Object.prototype.toString.call(v);\n  return t.slice(8, -1);\n}\n\n// A getter can throw. Reading a key must never take the workflow down.\nfunction readKey(o, k) { try { return o[k]; } catch (e) { return undefined; } }\n\n// Scalars only. An allowlisted field holding an OBJECT is ignored, not\n// stringified and not descended into - that is how a `name` or `type` key\n// nested inside a credentials blob stays unreachable.\nfunction scalarText(v) {\n  if (v === null || v === undefined) return null;\n  const k = typeof v;\n  if (k === 'string') return v.trim() === '' ? null : v;\n  if (k === 'number') return Number.isFinite(v) ? String(v) : null;\n  if (k === 'bigint' || k === 'boolean') return String(v);\n  return null;\n}\n\nfunction extractSafe(v, depth, seen) {\n  if (v === null || typeof v !== 'object') return null;\n  if (depth > TOTEXT_MAX_DEPTH) return null;\n  if (seen.indexOf(v) !== -1) return null;          // cycle: stop, do not throw\n  seen.push(v);\n  try {\n    if (typeTag(v) === 'Array') {\n      // Arrays are never flattened. Only a directly allowlisted error OBJECT\n      // inside one may contribute; loose strings and numbers do not.\n      let len = 0;\n      try { len = v.length >>> 0; } catch (e) { len = 0; }\n      const scan = len < TOTEXT_MAX_ARRAY_SCAN ? len : TOTEXT_MAX_ARRAY_SCAN;\n      for (let i = 0; i < scan; i++) {\n        const el = readKey(v, i);\n        if (el && typeof el === 'object' && typeTag(el) !== 'Array') {\n          const got = extractSafe(el, depth + 1, seen);\n          if (got) return got;\n        }\n      }\n      return null;\n    }\n    for (let i = 0; i < SAFE_FIELDS.length; i++) {\n      const s = scalarText(readKey(v, SAFE_FIELDS[i]));\n      if (s) return s;\n    }\n    for (let j = 0; j < ERROR_CONTAINERS.length; j++) {\n      const c = readKey(v, ERROR_CONTAINERS[j]);\n      // A container that is a STRING is not read. In execution 244 `cause` held\n      // a raw n8n expression full of markup; that is not an error message.\n      if (c && typeof c === 'object') {\n        const got = extractSafe(c, depth + 1, seen);\n        if (got) return got;\n      }\n    }\n    return null;\n  } catch (e) {\n    return null;\n  } finally {\n    seen.pop();\n  }\n}\n\nfunction omitted(tag, extra) {\n  return '[non-string error payload omitted; type=' + tag + (extra || '') + ']';\n}\n\nfunction toText(input) {\n  // A string is returned untouched, so string messages stay byte-identical.\n  if (typeof input === 'string') return input;\n  if (input === null || input === undefined) return '';\n\n  const prim = typeof input;\n  if (prim === 'number' || prim === 'boolean' || prim === 'bigint') return String(input);\n  if (prim === 'symbol') return omitted('Symbol');\n  if (prim === 'function') return omitted('Function');\n\n  let tag;\n  try { tag = typeTag(input); } catch (e) { tag = 'Object'; }\n\n  if (tag === 'Date') {\n    try { return isNaN(input.getTime()) ? omitted('Date', ', invalid') : input.toISOString(); }\n    catch (e) { return omitted('Date', ', unreadable'); }\n  }\n  if (tag === 'Error') {\n    let nm = '', ms = '';\n    try { nm = scalarText(input.name) || ''; } catch (e) { nm = ''; }\n    try { ms = scalarText(input.message) || ''; } catch (e) { ms = ''; }\n    if (nm || ms) return (nm ? nm + (ms ? ': ' : '') : '') + ms;\n    return omitted('Error');\n  }\n\n  let found = null;\n  try { found = extractSafe(input, 0, []); } catch (e) { found = null; }\n  if (found) return found;\n\n  if (tag === 'Array') {\n    let len = 0;\n    try { len = input.length >>> 0; } catch (e) { len = 0; }\n    return omitted('Array', ', length=' + len);\n  }\n  return omitted(tag);\n}\n\nfunction safe(s, max) {\n  let t = toText(s);\n\n  // 1. Telegram bot token, digits colon opaque run.\n  t = t.replace(BOT_TOKEN, '[redacted]');\n  // 2. The same token embedded in an api.telegram.org path.\n  t = t.replace(BOT_IN_URL, '/bot[redacted]');\n  // 3. Header-style: the entire value is the secret.\n  t = t.replace(HEADER_LABEL, function (m, label, sep) { return label + sep + '[redacted]'; });\n  // 4. Bare scheme plus credential, with no label in front of it.\n  t = t.replace(SCHEME_VALUE, function (m, scheme) { return scheme + ' [redacted]'; });\n  // 5. Assignment-style: redact the value, keep the sentence. A value shorter\n  //    than three characters is left alone so that prose like \"token = in\"\n  //    is not mangled; anything that short is not a credential worth hiding\n  //    behind a label, and rule 6 still covers long opaque runs.\n  //    Bare \"token\" and \"bearer\" ARE in the label list, but only ever fire\n  //    with a colon or equals after them, so \"Unexpected token '<'\" and\n  //    \"missing token in expression\" are untouched while \"token=abc123\" is not.\n  t = t.replace(ASSIGN_LABEL, function (m, label, sep, value) {\n    const bare = value.replace(/^[\"']|[\"']$/g, '');\n    return bare.length < 3 ? m : label + sep + '[redacted]';\n  });\n  // 6. UNCHANGED from v1 and v2: any long opaque run, labelled or not.\n  t = t.replace(/[A-Za-z0-9_\\-]{32,}/g, '[redacted]');\n\n  return t.slice(0, max || 600);\n}\n\n// Telegram HTML mode. Ampersand first, or the escapes escape each other.\nfunction esc(s) {\n  return String(s === undefined || s === null ? '' : s)\n    .replace(/&/g, '&amp;')\n    .replace(/</g, '&lt;')\n    .replace(/>/g, '&gt;');\n}\n\nconst lastNode = String(ex.lastNodeExecuted || tr.error && tr.error.node || 'unknown');\nconst message = safe((ex.error && (ex.error.message || ex.error.description)) || (tr.error && tr.error.message) || 'No message', 500);\n\n// Pull matter and action ids out of the failing item if they are present.\nlet matterId = '', actionId = '';\ntry {\n  const blob = JSON.stringify(ex.error || {}) + ' ' + JSON.stringify(j.data || {});\n  const m = blob.match(/\\b(MAT-[A-Za-z0-9-]+)\\b/);\n  const a = blob.match(/\\b(ACT-[A-Za-z0-9-]+)\\b/);\n  if (m) matterId = m[1];\n  if (a) actionId = a[1];\n} catch (e) {}\n\nconst workflowName = String(wfd.name || 'unknown');\nconst executionId = String(ex.id || '');\nconst hasAction = !!actionId;\n\n// The FAILED claim is now conditional. Mark Action Failed only runs when\n// has_action is true, and in all seven recorded WF9 executions it never ran -\n// yet every delivered message still claimed the action had been set to FAILED.\nconst closing = hasAction\n  ? 'I set the action to FAILED. A retry will not duplicate a send.'\n  : 'No action id was identified, so no action status was changed.';\n\nconst telegram_text = [\n  'A workflow run failed.',\n  '',\n  'Workflow: ' + esc(workflowName),\n  'Node: ' + esc(lastNode),\n  'Matter: ' + (matterId ? esc(matterId) : 'not identified'),\n  'Action: ' + (actionId ? esc(actionId) : 'not identified'),\n  'Error: ' + esc(message),\n  'Execution: ' + esc(executionId),\n  '',\n  'The failed run sent nothing outside this chat.',\n  closing,\n].join('\\n');\n\nreturn [{ json: {\n  event_id: 'EVT-' + new Date().toISOString().replace(/[^0-9]/g, '').slice(0, 14),\n  event_type: 'WORKFLOW_FAILED',\n  severity: 'ERROR',\n  matter_id: matterId,\n  action_id: actionId,\n  workflow_name: workflowName,\n  workflow_id: String(wfd.id || ''),\n  node: lastNode,\n  message,\n  execution_id: executionId,\n  execution_url: String(ex.url || ''),\n  mode: String(ex.mode || ''),\n  created_at: new Date().toISOString(),\n  has_action: hasAction,\n  telegram_text: telegram_text,\n}}];\n"
+        },
+        "position": [
+          -380,
+          0
+        ],
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2
+      },
+      {
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "<REDACTED_CREDID_2>",
+            "name": "Google Sheets account"
+          }
+        },
+        "id": "967edb41-b919-42d8-9c4c-1dc601869ccd",
+        "maxTries": 3,
+        "name": "Append Error Event",
+        "onError": "continueRegularOutput",
+        "parameters": {
+          "authentication": "oAuth2",
+          "columns": {
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": true,
+            "mappingMode": "defineBelow",
+            "matchingColumns": [],
+            "schema": [
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "event_id",
+                "id": "event_id",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "event_type",
+                "id": "event_type",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "severity",
+                "id": "severity",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "matter_id",
+                "id": "matter_id",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "action_id",
+                "id": "action_id",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "workflow",
+                "id": "workflow",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "node",
+                "id": "node",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "message",
+                "id": "message",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "chat_id",
+                "id": "chat_id",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "created_at",
+                "id": "created_at",
+                "required": false,
+                "type": "string"
+              }
+            ],
+            "value": {
+              "action_id": "={{ $json.action_id }}",
+              "chat_id": "",
+              "created_at": "={{ $json.created_at }}",
+              "event_id": "={{ $json.event_id }}",
+              "event_type": "={{ $json.event_type }}",
+              "matter_id": "={{ $json.matter_id }}",
+              "message": "={{ $json.message + ' || exec ' + $json.execution_id + ' ' + $json.execution_url }}",
+              "node": "={{ $json.node }}",
+              "severity": "={{ $json.severity }}",
+              "workflow": "={{ $json.workflow_name + ' (' + $json.workflow_id + ')' }}"
+            }
+          },
+          "documentId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "<REDACTED_FILEID_1>"
+          },
+          "operation": "append",
+          "options": {},
+          "resource": "sheet",
+          "sheetName": {
+            "__rl": true,
+            "mode": "name",
+            "value": "Events"
+          }
+        },
+        "position": [
+          -160,
+          0
+        ],
+        "retryOnFail": true,
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.5,
+        "waitBetweenTries": 2000
+      },
+      {
+        "id": "0e9f3b3d-c43d-44dc-b145-70cb67b0b287",
+        "name": "Action Known?",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "<REDACTED_CHATID_2>",
+                "leftValue": "={{ $('Build Error Record').first().json.has_action }}",
+                "operator": {
+                  "operation": "true",
+                  "type": "boolean"
+                },
+                "rightValue": "true"
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "looseTypeValidation": true,
+          "options": {}
+        },
+        "position": [
+          60,
+          0
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "<REDACTED_CREDID_2>",
+            "name": "Google Sheets account"
+          }
+        },
+        "id": "22daf37a-2f4d-4bb4-bf6e-c9e005ea10e8",
+        "maxTries": 3,
+        "name": "Mark Action Failed",
+        "onError": "continueRegularOutput",
+        "parameters": {
+          "columns": {
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": true,
+            "mappingMode": "defineBelow",
+            "matchingColumns": [
+              "action_id"
+            ],
+            "schema": [
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": true,
+                "display": true,
+                "displayName": "action_id",
+                "id": "action_id",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "matter_id",
+                "id": "matter_id",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "action_type",
+                "id": "action_type",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "description",
+                "id": "description",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "status",
+                "id": "status",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "priority",
+                "id": "priority",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "depends_on_json",
+                "id": "depends_on_json",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "recipient",
+                "id": "recipient",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "channel",
+                "id": "channel",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "requires_approval",
+                "id": "requires_approval",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "draft_id",
+                "id": "draft_id",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "approval_id",
+                "id": "approval_id",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "due_at",
+                "id": "due_at",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "deadline_basis",
+                "id": "deadline_basis",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "blocked_reason",
+                "id": "blocked_reason",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "idempotency_key",
+                "id": "idempotency_key",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "created_at",
+                "id": "created_at",
+                "required": false,
+                "type": "string"
+              },
+              {
+                "canBeUsedToMatch": true,
+                "defaultMatch": false,
+                "display": true,
+                "displayName": "updated_at",
+                "id": "updated_at",
+                "required": false,
+                "type": "string"
+              }
+            ],
+            "value": {
+              "action_id": "={{ $('Build Error Record').first().json.action_id }}",
+              "blocked_reason": "={{ 'Run failed at ' + $('Build Error Record').first().json.node }}",
+              "status": "FAILED",
+              "updated_at": "={{ $now.toISO() }}"
+            }
+          },
+          "documentId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "<REDACTED_FILEID_1>"
+          },
+          "operation": "appendOrUpdate",
+          "options": {},
+          "sheetName": {
+            "__rl": true,
+            "mode": "name",
+            "value": "Actions"
+          }
+        },
+        "position": [
+          280,
+          -140
+        ],
+        "retryOnFail": true,
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.5,
+        "waitBetweenTries": 2000
+      },
+      {
+        "credentials": {
+          "telegramApi": {
+            "id": "<REDACTED_CREDID_1>",
+            "name": "Telegram account"
+          }
+        },
+        "id": "ff3dfcc4-e48d-4d7e-8012-035e8997b8b8",
+        "name": "Telegram - Error",
+        "parameters": {
+          "additionalFields": {
+            "appendAttribution": false,
+            "parse_mode": "HTML"
+          },
+          "chatId": "<REDACTED_CHATID_1>",
+          "text": "={{ $('Build Error Record').first().json.telegram_text }}"
+        },
+        "position": [
+          500,
+          0
+        ],
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "webhookId": "7b560a9b-12ee-4b8b-a23a-b44928ff4cf2"
+      },
+      {
+        "id": "6a33cccc-067a-4823-93c7-58151cec24cc",
+        "name": "Note 33910",
+        "parameters": {
+          "color": 7,
+          "content": "## 9 - Error Handler\n\nSet this workflow as the **Error Workflow** on workflows 1 to 5 (Settings > Error Workflow inside each workflow).\n\n### How the error text is sanitised (v5)\n\nA **string** error message is preserved, then sanitised. Nothing is deleted by line — secret *values* are redacted in place, so ordinary technical errors such as `Unexpected token '<' ... is not valid JSON` survive intact and reach you in full.\n\nReplaced with `[redacted]`: Telegram bot tokens and `/bot<token>` URLs; `Bearer`, `Basic` and `Digest` credentials; labelled assignments (`api_key=`, `password:`, `token=`, `client_secret=` and similar); and any run of 32 or more identifier characters. **Header credentials** (`authorization`, `proxy-authorization`, `www-authenticate`, `cookie`, `set-cookie`, `x-api-key`) are redacted **to the end of the line**, because the whole header value is sensitive.\n\nA **non-string** payload is never traversed. Allowlist extraction reads only `message`, `description`, `name`, `code`, `status`, `statusCode`, `httpCode` and `type`, descending only into `error`, `cause` and `details`. Unknown fields — including `credentials`, `node`, `headers`, `context`, `request`, `response`, `config`, `body` and `data` — are never read and never reach the Events message. Arrays are summarised as type and length only, unless an element is directly an allowlisted error object. A payload with no safe field yields `[non-string error payload omitted; type=...]`.\n\nThe Telegram message is HTML-escaped and sent with an explicit `parse_mode: HTML`. The sanitised output stays bounded by the existing 500-character limit. **The Events field mappings are unchanged.**\n\nThe failing action is marked FAILED **when an action id was identified**, rather than left mid-flight — that is what makes a retry safe: the approval gate in workflow 4 will not send twice for the same action. When no action id is found, no action status is changed and the notice says so.\n\n> This behaviour is **unit-proven and statically verified** (1213 assertions). It is **not runtime-proven** — no real error has yet flowed through the published code.",
+          "height": 620,
+          "width": 760
+        },
+        "position": [
+          -600,
+          -700
+        ],
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1
+      }
+    ],
+    "parentFolderId": null,
+    "settings": {
+      "availableInMCP": true,
+      "binaryMode": "separate",
+      "callerPolicy": "workflowsFromSameOwner",
+      "executionOrder": "v1",
+      "saveManualExecutions": true,
+      "timeSavedMode": "fixed"
+    },
+    "tags": [],
+    "triggerCount": 0,
+    "updatedAt": "2026-08-25T00:59:40.954Z",
+    "versionId": "a5b10619-31e4-4246-8988-90a08bd45ab1"
+  }
+}

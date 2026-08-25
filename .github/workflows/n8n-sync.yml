@@ -1,0 +1,215 @@
+name: n8n sync (read-only)
+
+# Pulls workflow definitions FROM n8n INTO this repository.
+# This job never writes to n8n: scripts/sync.py has a single network helper and
+# it *raises* (not asserts, so `python3 -O` cannot strip it) on any method but
+# GET, and scripts/no_mutating_verbs.sh re-greps the whole tree here on every
+# run so the guarantee is enforced by the pipeline, not by a docstring.
+#
+# ===========================================================================
+#  ORDERING REQUIREMENT — READ BEFORE EDITING. DO NOT REORDER THESE STEPS.
+# ===========================================================================
+#  The `n8n-sync` branch is force-pushed by this bot. It is not protected, it
+#  is not merge-gated, and anyone with write access to this repository can push
+#  to it. So the branch's contents are UNTRUSTED CODE.
+#
+#  `N8N_API_KEY` is a live credential for the n8n instance. It must therefore
+#  never be placed in the environment of a step that runs code from that
+#  branch. Earlier this job checked out `n8n-sync` over the worktree and *then*
+#  ran `scripts/sync.py` with the key in env — which handed the live key to
+#  whatever anyone had last pushed to the branch.
+#
+#  The fix, and the invariant every future edit must preserve:
+#
+#    1. Check out the DEFAULT branch. That is the reviewed, merge-gated code.
+#    2. Copy scripts/ and config/ to $RUNNER_TEMP BEFORE any branch switch.
+#       This staged copy is the only code that ever sees the key.
+#    3. Only then switch the worktree to the sync branch.
+#    4. Run the STAGED scripts, writing their output into the worktree via
+#       N8N_SYNC_OUTPUT_ROOT. Never run `scripts/<anything>` from the worktree
+#       in a step that has N8N_API_KEY in its env.
+#
+#  If you move the "Stage trusted code" step after the "Prepare sync branch"
+#  step, you reintroduce the vulnerability. It is placed where it is on purpose.
+# ===========================================================================
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: n8n-sync
+  cancel-in-progress: false
+
+env:
+  SYNC_BRANCH: n8n-sync
+  BASE_BRANCH: main
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      # STEP 1 — trusted checkout. Actions are pinned to commit SHAs so a
+      # retagged v4/v5 cannot silently change what runs next to the key.
+      - name: Checkout the default branch (trusted code)
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4.4.0
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.repository.default_branch }}
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: '3.11'
+
+      # STEP 2 — MUST run before any branch switch. See the ordering note above.
+      - name: Stage trusted code out of the worktree (MUST precede any checkout of the sync branch)
+        run: |
+          TRUSTED_DIR="$RUNNER_TEMP/trusted"
+          mkdir -p "$TRUSTED_DIR"
+          cp -R scripts "$TRUSTED_DIR/scripts"
+          cp -R config  "$TRUSTED_DIR/config"
+          chmod -R a-w "$TRUSTED_DIR"
+          echo "TRUSTED_DIR=$TRUSTED_DIR" >> "$GITHUB_ENV"
+          echo "Staged the default branch's scripts/ and config/ at $TRUSTED_DIR."
+          echo "Only this copy is ever given the API key."
+
+      - name: Mask credentials in logs
+        env:
+          N8N_BASE_URL: ${{ vars.N8N_BASE_URL }}
+          N8N_API_KEY: ${{ secrets.N8N_API_KEY }}
+        run: |
+          # A repository *secret* is masked automatically; a repository
+          # *variable* is not, so mask the base URL explicitly. Neither value is
+          # ever echoed by this workflow.
+          if [ -n "$N8N_API_KEY" ]; then echo "::add-mask::$N8N_API_KEY"; fi
+          if [ -n "$N8N_BASE_URL" ]; then echo "::add-mask::$N8N_BASE_URL"; fi
+
+      - name: Check configuration is present
+        env:
+          N8N_BASE_URL: ${{ vars.N8N_BASE_URL }}
+          N8N_API_KEY: ${{ secrets.N8N_API_KEY }}
+        run: |
+          missing=""
+          [ -z "$N8N_BASE_URL" ] && missing="$missing N8N_BASE_URL(variable)"
+          [ -z "$N8N_API_KEY" ] && missing="$missing N8N_API_KEY(secret)"
+          if [ -n "$missing" ]; then
+            echo "Not configured yet. Missing:$missing"
+            echo "See docs/POST_PURCHASE.md."
+            exit 1
+          fi
+          echo "Configuration present. Values are not printed."
+
+      # STEP 3 — from here on the worktree holds UNTRUSTED sync-branch content.
+      - name: Prepare sync branch (worktree becomes untrusted from here on)
+        run: |
+          git config user.name  "n8n-sync[bot]"
+          git config user.email "n8n-sync@users.noreply.github.com"
+          if git ls-remote --exit-code --heads origin "$SYNC_BRANCH" >/dev/null 2>&1; then
+            git fetch origin "$SYNC_BRANCH"
+            git checkout -B "$SYNC_BRANCH" "origin/$SYNC_BRANCH"
+          else
+            git checkout -B "$SYNC_BRANCH"
+          fi
+
+      - name: Read-only guard — no mutating verb beside an n8n path
+        run: bash "$TRUSTED_DIR/scripts/no_mutating_verbs.sh" "$GITHUB_WORKSPACE"
+
+      # STEP 4 — the ONLY step with the key. It runs the staged copy, never the
+      # worktree copy, and writes its output into the worktree.
+      - name: Sync from n8n (GET only, staged scripts, key never touches branch code)
+        id: sync
+        env:
+          N8N_BASE_URL: ${{ vars.N8N_BASE_URL }}
+          N8N_API_KEY: ${{ secrets.N8N_API_KEY }}
+          N8N_SYNC_OUTPUT_ROOT: ${{ github.workspace }}
+        run: |
+          set +e
+          python3 "$TRUSTED_DIR/scripts/sync.py" 2> "$RUNNER_TEMP/sync-stderr.txt"
+          rc=$?
+          set -e
+          cat "$RUNNER_TEMP/sync-stderr.txt" >&2 || true
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          case "$rc" in
+            0) echo "Full capture." ;;
+            5) echo "PARTIAL capture — continuing so the good captures are still" \
+                    "committed, but this job will fail at the end." ;;
+            *) exit "$rc" ;;
+          esac
+
+      - name: Leak check (gate — must pass before anything is committed)
+        env:
+          N8N_LEAKCHECK_ROOT: ${{ github.workspace }}
+        run: python3 "$TRUSTED_DIR/scripts/leak_check.py" "$GITHUB_WORKSPACE"
+
+      - name: Commit if, and only if, something changed
+        id: commit
+        run: |
+          # Every tracked file this job writes is derived from the captured
+          # content alone — no timestamps — so an unchanged instance produces an
+          # empty diff and this step really does nothing. Run times go to
+          # exports/last-run.json, which is gitignored.
+          git add -A
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No changes. Nothing to commit."
+            exit 0
+          fi
+          git commit -m "chore(sync): n8n workflow snapshot"
+          git push --force-with-lease origin "HEAD:$SYNC_BRANCH"
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Open or update the pull request
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SYNC_RC: ${{ steps.sync.outputs.rc }}
+        run: |
+          body_file="$(mktemp)"
+          {
+            echo "Automated one-way snapshot of the configured n8n workflows."
+            echo
+            echo "- Direction: **n8n -> GitHub only.** This job never writes to n8n."
+            echo "- Captured bodies are scrubbed by \`scripts/scrub.py\` before they are written."
+            echo "- \`scripts/leak_check.py\` passed before this commit was created."
+            echo "- The leak check matches **shapes, not meaning**. It cannot recognise a"
+            echo "  client name or a case summary in a sticky note, a \`jsCode\` comment or an"
+            echo "  LLM prompt. **Read this diff before merging.**"
+            echo
+            if [ "$SYNC_RC" = "5" ]; then
+              echo "> [!WARNING]"
+              echo "> **Incomplete capture.** At least one configured workflow could not be"
+              echo "> read this run. Its previously captured body and hashes were retained;"
+              echo "> this is a transient fetch failure, **not** evidence that a workflow was"
+              echo "> removed. Details:"
+              echo
+              echo '```'
+              sed -e 's/^/  /' "$RUNNER_TEMP/sync-stderr.txt" || true
+              echo '```'
+              echo
+            fi
+            echo "See \`docs/drift-report.md\` in this branch for what changed."
+          } > "$body_file"
+
+          existing="$(gh pr list --head "$SYNC_BRANCH" --base "$BASE_BRANCH" \
+                       --state open --json number --jq '.[0].number // empty')"
+          if [ -n "$existing" ]; then
+            gh pr edit "$existing" --body-file "$body_file"
+            echo "Updated existing PR #$existing."
+          else
+            gh pr create --head "$SYNC_BRANCH" --base "$BASE_BRANCH" \
+              --title "n8n workflow sync" --body-file "$body_file"
+          fi
+          rm -f "$body_file"
+
+      - name: Fail the job if the capture was incomplete
+        if: steps.sync.outputs.rc == '5'
+        run: |
+          echo "sync.py exited 5 (partial capture). The good captures were committed," >&2
+          echo "but this run did not read every configured workflow, so the job fails." >&2
+          exit 1
