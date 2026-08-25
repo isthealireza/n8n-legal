@@ -27,13 +27,18 @@
       "active": {
         "kind": "active",
         "path": "exports/active/WF2.json",
-        "sha256_body": "4054c5abaf55921c74eddd09ec9528623d4b89f6cfff2b40b5530665daedbe74",
-        "sha256_canonical": "bd590a64c962b69a756e1601bd061d729f651b8bb202a01a441b12a5454c861a"
+        "sha256_body": "3bd3315c4d75a988f3ea6912f2d54238aa0b15a93ac26b7bb840d8a81dea0f18",
+        "sha256_canonical": "b541a9c134b408cbf7dc1bd6fc1bb2c99c939d4f356ddd5a2d7a820fb2cd083b"
       },
       "active_version_id": "61e6ffee-6708-453e-ab64-8a93dfcbaa9d",
       "determination": "from_active_version_object",
-      "draft": null,
-      "draft_version_id": "61e6ffee-6708-453e-ab64-8a93dfcbaa9d",
+      "draft": {
+        "kind": "draft",
+        "path": "exports/draft/WF2.json",
+        "sha256_body": "7e7b73ba3a2b0855282d1e7d17116270004cacfa6ddbd94834e07cd38c2641f5",
+        "sha256_canonical": "ae6b1ff95afc7c7c21975146c28e03253372675ecc8ccc0e7a3900e6ff656966"
+      },
+      "draft_version_id": "f2a5156f-7183-4117-aa98-74b07734a773",
       "id": "OaVCEsrt2qpo28rB",
       "name": "2 - Matter Classification and Planning"
     },
