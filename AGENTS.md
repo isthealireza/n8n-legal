@@ -9,25 +9,47 @@ it is correspondence that went to a real party about a real dispute.
 
 ---
 
-## 1. The three lines you do not cross
+## 1. Permission model
 
-1. **Never publish.** `mcp__n8n__publish_workflow`, `publish_agent`, `restore_workflow_version`,
-   and `update_agent_integration` are the owner's alone. You may create and mutate *drafts*.
-   You may not decide what goes live.
-2. **Never write to the production register.** Spreadsheet `SHEET_ID_PLACEHOLDER` holds
-   live matters, approvals, and correspondence. The real id — along with the real Drive
-   folder id, owner chat id, n8n credential ids and party addresses — **is** committed, as
-   the *keys* of `.tooling/scrub-map.json`, because the scrub is not reversible without
-   them. `leak-check.sh` excludes that one file by design. Treat this repo as
-   **private**: it is safe to share a diff, it is not safe to publish the tree. No agent writes to it. Ever. Not "just a
-   test row". Not "read-before-mutate so it's safe".
-3. **Never bypass the approval gate.** WF4's `Approval Gate` is the only thing between a
-   model-drafted letter and a real recipient. It is pure deterministic code with no model in
-   the loop, deliberately. Do not add a model to it. Do not add a route around it. Do not
-   "simplify" its checks.
+Claude Code / Cowork is the single Orchestrator. It has full access to the repository,
+GitHub, and the n8n MCP/API.
 
-If a task seems to require crossing one of these, stop and say so. That is the correct
-outcome, not a failure.
+### Task approval
+
+Show one short plan before starting a task. One owner approval covers the complete approved
+task, including n8n inspection, code or workflow changes, tests, export and backup, Git
+branch, commit, pull request, and publishing if publishing is part of the approved task.
+
+Do not ask for separate approval for every step.
+
+Ask again only if:
+
+- the scope changes
+- a new workflow is affected
+- a secret or credential is required
+- an unplanned production side effect is required
+
+**Approval examples:**
+
+- `APPROVE TASK: update WF4 draft, run tests, create commit and PR`
+- `APPROVE TASK: update and publish WF2 after all tests pass`
+- `APPROVE TASK: execute the controlled WF5 test and send no external messages`
+
+### Hard limits
+
+1. **Never bypass the approval gate.** WF4's `Approval Gate` is the only thing between a
+   model-drafted letter and a real recipient. Do not add a model to it, route around it, or
+   simplify its checks.
+2. **Never write to the production register** (`SHEET_ID_PLACEHOLDER`) or send Telegram,
+   Gmail, or Google Sheets writes unless the owner explicitly includes those actions in the
+   task approval.
+3. **Never expose secrets or client data.** Run `python3 .tooling/scrub.py &&
+   ./.tooling/leak-check.sh` before every commit. Both must exit 0.
+4. **Never push directly to main.** Use a branch and pull request.
+5. **GitHub → n8n is never automatic.** It is allowed only when explicitly included in the
+   owner-approved task.
+
+If a task seems to require crossing these limits, stop and say so.
 
 ## 2. What lives here
 
@@ -90,17 +112,26 @@ advice.
 
 ## 4. Roles, when several agents run at once
 
-- **Implementer** — has n8n MCP access. Writes code, mutates drafts. One at a time per
-  workflow; two agents mutating one workflow will clobber each other's `configHash`.
-- **Reviewer (adversarial)** — repo only, **no credentials**. Its job is to refute, not to
-  approve. Default to "refuted" when uncertain.
-- **Regression guard** — runs `harness/run.js`, reports PASS/FAIL, changes nothing.
-- **Domain critic** — legal only: citation integrity, approval gating, whether anything
-  could leave without a human saying yes.
+| Agent | Role | n8n access | Repo access |
+|---|---|---|---|
+| **Claude Code / Cowork** | Single Orchestrator | Full — mutations require task approval | read/write |
+| **Codex** | Adversarial reviewer | None | read-only |
+| **OpenCode** | Test scenario author | None | `fixtures/scenarios/` only |
 
-Parallelise across *independent* workflows and independent defects. Serialise anything that
-touches shared register state. Worktree isolation protects the code; it does **not**
-protect the shared n8n instance or the shared spreadsheet.
+**Orchestrator** shows a short plan, waits for owner approval, then carries out the full
+approved task. It is the only agent that may call any `mcp__n8n__*` tool. One agent per
+workflow at a time to avoid `configHash` collisions.
+
+**Codex** reviews diffs and reports APPROVE or REFUTE with reasons. Its verdict is advisory:
+it does not block the Orchestrator after owner approval, but a REFUTE must be addressed or
+explicitly overridden by the owner. Codex has no n8n credentials and must never receive them.
+
+**OpenCode** writes scenario JSON in `fixtures/scenarios/` only. It does not touch units,
+adapters, exports, or workflow code. It has no n8n credentials and must never receive them.
+Every scenario must pass `python3 .tooling/scrub.py --check` with 0 replacements.
+
+**Parallelise** across independent workflows and defects. **Serialise** anything that touches
+the same workflow's `configHash` or the shared spreadsheet.
 
 ## 5. Things that are true and will bite you
 
