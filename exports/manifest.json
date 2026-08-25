@@ -27,13 +27,13 @@
       "active": {
         "kind": "active",
         "path": "exports/active/WF2.json",
-        "sha256_body": "4054c5abaf55921c74eddd09ec9528623d4b89f6cfff2b40b5530665daedbe74",
-        "sha256_canonical": "bd590a64c962b69a756e1601bd061d729f651b8bb202a01a441b12a5454c861a"
+        "sha256_body": "0ec6616cedbe95968602093b2e5fbab2651e08b2ffe72bff58d48bfe1eaab5c1",
+        "sha256_canonical": "e10aa189ed187d8ceb22a53c490f11b802b0c296ee844246e388e00d045310ab"
       },
-      "active_version_id": "61e6ffee-6708-453e-ab64-8a93dfcbaa9d",
+      "active_version_id": "f2a5156f-7183-4117-aa98-74b07734a773",
       "determination": "from_active_version_object",
       "draft": null,
-      "draft_version_id": "61e6ffee-6708-453e-ab64-8a93dfcbaa9d",
+      "draft_version_id": "f2a5156f-7183-4117-aa98-74b07734a773",
       "id": "OaVCEsrt2qpo28rB",
       "name": "2 - Matter Classification and Planning"
     },

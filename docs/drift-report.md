@@ -14,7 +14,7 @@ in `exports/last-run.json`, which is untracked.
 | key | name | capture | active sha256 (canonical, first 12) | draft present | draft sha256 (first 12) |
 |---|---|---|---|---|---|
 | WF1 | 1 - Telegram Intake and Command Router | ok | `ca8f4a4e99ca` | yes | `140b1ce6ad85` |
-| WF2 | 2 - Matter Classification and Planning | ok | `bd590a64c962` | no | - |
+| WF2 | 2 - Matter Classification and Planning | ok | `e10aa189ed18` | no | - |
 | WF3 | 3 - Evidence Intake and Storage | ok | `2e1844d69a07` | no | - |
 | WF4 | 4 - Research Drafting Approval and Dispatch | ok | `9b9c4b637877` | no | - |
 | WF5 | 5 - Inbound Replies and Daily Supervisor | ok | `fef1afc9eecb` | yes | `553e0a6a0906` |
