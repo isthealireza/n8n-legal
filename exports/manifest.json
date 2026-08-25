@@ -1,123 +1,102 @@
 {
-  "api_capability": "not_exercised_rest_api_unreachable_from_capture_environment",
-  "captured_by": "scripts/capture_mcp.py",
-  "captured_on": "2026-08-25",
-  "hashing": "sha256 over sync.canonical_json() of the scrubbed body — the same function scripts/sync.py uses",
+  "api_capability": "from_active_version_object",
   "schema_version": 2,
-  "source": "mcp-session",
-  "source_detail": "authenticated n8n MCP server, read-only tools only (get_workflow_details / get_workflow_version / get_workflow_versions_diff). NOT the public REST API — see docs/API_CAPABILITIES.md.",
+  "source": "n8n public REST API /api/v1 (GET only)",
+  "timestamps": "not stored here on purpose — see exports/last-run.json",
   "workflows": {
     "WF1": {
       "active": {
         "kind": "active",
         "path": "exports/active/WF1.json",
-        "sha256_body": "554768dc4f3eee0a1c08cb83619f577f01f4c0e0474b57770db61fc47521b78d",
-        "sha256_canonical": "d92d2aceee6fb4e0597c4c033d01a0f657052aaae88572e181ab7bc769fea7bb"
+        "sha256_body": "2bc2fc99dfa0f730ce9b6d6676de974293222148268454e04d797b0dc54f98bf",
+        "sha256_canonical": "ca8f4a4e99ca903e50c796b4ad0c116e385d438a0a83fd1c92577800e5fc6b84"
       },
       "active_version_id": "b1c425bf-5830-4e3c-a6f7-bcf2c02ef593",
-      "captured_on": "2026-08-25",
-      "determination": "from_mcp_active_version_id",
-      "diverged": true,
+      "determination": "from_active_version_object",
       "draft": {
         "kind": "draft",
         "path": "exports/draft/WF1.json",
-        "sha256_body": "de1617e1ab037e884d8179c52c0324e29ca58d962b71a3850e7a7fee52948a85",
-        "sha256_canonical": "0b0a333007dc1d733bade586021336cb44f2955d5024a0b45726f456656d1bc5"
+        "sha256_body": "c6307f96b48416a837a6cd2824542bc7bb95cbaa7fa2d9fd8611eadfd17a24dc",
+        "sha256_canonical": "140b1ce6ad85df0b30ac422faf6d1554ce6e092eb48ad7cb84ab8b4ec32f78f3"
       },
       "draft_version_id": "9cc644ec-595d-4084-b64d-cfbe265b0712",
       "id": "xUcAXTgocHPsHy5Y",
-      "name": "1 - Telegram Intake and Command Router",
-      "source": "mcp-session"
+      "name": "1 - Telegram Intake and Command Router"
     },
     "WF2": {
       "active": {
         "kind": "active",
         "path": "exports/active/WF2.json",
-        "sha256_body": "95221e96e08d6147addf987604a69dd3e8e84fe7d667717414dc9047cc94eeac",
-        "sha256_canonical": "33017c41261bc5bc2f29d91caf6445645b5192c709a2cfe7aeb0b1bd8c0fdf9f"
+        "sha256_body": "4054c5abaf55921c74eddd09ec9528623d4b89f6cfff2b40b5530665daedbe74",
+        "sha256_canonical": "bd590a64c962b69a756e1601bd061d729f651b8bb202a01a441b12a5454c861a"
       },
       "active_version_id": "61e6ffee-6708-453e-ab64-8a93dfcbaa9d",
-      "captured_on": "2026-08-25",
-      "determination": "from_mcp_active_version_id",
-      "diverged": false,
+      "determination": "from_active_version_object",
       "draft": null,
       "draft_version_id": "61e6ffee-6708-453e-ab64-8a93dfcbaa9d",
       "id": "OaVCEsrt2qpo28rB",
-      "name": "2 - Matter Classification and Planning",
-      "source": "mcp-session"
+      "name": "2 - Matter Classification and Planning"
     },
     "WF3": {
       "active": {
         "kind": "active",
         "path": "exports/active/WF3.json",
-        "sha256_body": "19291004ac2093a51db0f327a0bfebed2cc5c7b3248954fef6e0049c33ed701a",
-        "sha256_canonical": "f4184707ec2f24288e236d631f581b2629cc46b9b35840c62b54ee2b43ab5fa6"
+        "sha256_body": "b38adc1145633acb0bca9dc718485500d60b264568a10e3a62b8d8c4018abb48",
+        "sha256_canonical": "2e1844d69a07e8c35399efcbb8df92ce0d4526d02e053d3e05c3201227a55b90"
       },
       "active_version_id": "644bbdb3-6e78-42c1-a250-3cf9ba05fadc",
-      "captured_on": "2026-08-25",
-      "determination": "from_mcp_active_version_id",
-      "diverged": false,
+      "determination": "from_active_version_object",
       "draft": null,
       "draft_version_id": "644bbdb3-6e78-42c1-a250-3cf9ba05fadc",
       "id": "1rhaSTTviUBanJIy",
-      "name": "3 - Evidence Intake and Storage",
-      "source": "mcp-session"
+      "name": "3 - Evidence Intake and Storage"
     },
     "WF4": {
       "active": {
         "kind": "active",
         "path": "exports/active/WF4.json",
-        "sha256_body": "157014ba39773c72047bcec2612dd0cc30b84748cb41d7974f389fb8a03323b7",
-        "sha256_canonical": "ae1c31a4a71539d03e55c6fa7a0fa4d7d3d2e68fe2103a08ba19f62472858d45"
+        "sha256_body": "355b2c9d94d8f1d6301cd1e6cecf7fa6c5ca21df833a5b2f7f8dc6ceb39af8d5",
+        "sha256_canonical": "599914dc160ba4480638f7af1d3ccdeea0f04ea5b84bb7fdaf518fb7e879a2a3"
       },
       "active_version_id": "8f6b3704-7a7d-47e2-be9f-d40e7311855e",
-      "captured_on": "2026-08-25",
-      "determination": "from_mcp_active_version_id",
-      "diverged": false,
+      "determination": "from_active_version_object",
       "draft": null,
       "draft_version_id": "8f6b3704-7a7d-47e2-be9f-d40e7311855e",
       "id": "zKr24IThF30e6jXw",
-      "name": "4 - Research Drafting Approval and Dispatch",
-      "source": "mcp-session"
+      "name": "4 - Research Drafting Approval and Dispatch"
     },
     "WF5": {
       "active": {
         "kind": "active",
         "path": "exports/active/WF5.json",
-        "sha256_body": "9c2875d97262602df81d958316569081713a467bcfc8098ec10fd4622ceb6450",
-        "sha256_canonical": "661cedbc4c8de451e2c0094394d79ca1a2c1fd3e1ae2d604e1fc50ea29c22b79"
+        "sha256_body": "302a7d088196286ac6437fbe16eeb68dfc6eab5fe89523dab0837701a9323df9",
+        "sha256_canonical": "fef1afc9eecbb0edc02f8ac3267f59b383ec089f4c5a106a75b1839915b98a9f"
       },
       "active_version_id": "983da561-5c19-42db-a2b4-1e2e7ac67e0f",
-      "captured_on": "2026-08-25",
-      "determination": "from_mcp_active_version_id",
-      "diverged": true,
+      "determination": "from_active_version_object",
       "draft": {
         "kind": "draft",
         "path": "exports/draft/WF5.json",
-        "sha256_body": "5293182d4c920e13642d3989a6c99392e5ac180aab85f8de24916ef5fcba364b",
-        "sha256_canonical": "257249c38cfab43df28aff989660ee7b567277faafc3b8dc17bc0e4b457788db"
+        "sha256_body": "3f2ce7312688549be7507433e367114cbe44abc1df208ce518c05c26218d1d38",
+        "sha256_canonical": "553e0a6a0906fa5bab2f67f27f30fee03ba75bb4409ced905860a26aa9515528"
       },
       "draft_version_id": "811b746c-869c-4fc3-94dc-123f60cb7067",
       "id": "zDLoMgW42jUm25Q4",
-      "name": "5 - Inbound Replies and Daily Supervisor",
-      "source": "mcp-session"
+      "name": "5 - Inbound Replies and Daily Supervisor"
     },
     "WF9": {
       "active": {
         "kind": "active",
         "path": "exports/active/WF9.json",
-        "sha256_body": "dce7f3d8742f49c326b178611c3223cfff15183c17263096623331a94a00a916",
-        "sha256_canonical": "5cad47fd66f6fe888693008673368e2a63d05e7764ad96b42ec0dd53e10b7997"
+        "sha256_body": "bcc23dc477d3460f7050652bc288f7dc4f4154bb281d8befceb5bbab1a81eac9",
+        "sha256_canonical": "44ce03650373851eb0d60f4f1d84f0b2d57b082d7e7c597636779769a5aabd75"
       },
       "active_version_id": "a5b10619-31e4-4246-8988-90a08bd45ab1",
-      "captured_on": "2026-08-25",
-      "determination": "from_mcp_active_version_id",
-      "diverged": false,
+      "determination": "from_active_version_object",
       "draft": null,
       "draft_version_id": "a5b10619-31e4-4246-8988-90a08bd45ab1",
       "id": "JfaCOxRq0FjZ5JWb",
-      "name": "9 - Error Handler",
-      "source": "mcp-session"
+      "name": "9 - Error Handler"
     }
   }
 }
