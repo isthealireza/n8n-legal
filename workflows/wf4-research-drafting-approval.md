@@ -5,7 +5,7 @@
 - **Nodes**: 102 · **triggerCount**: 0 (sub-workflow only)
 - **Created** 2026-08-18T07:31:47Z · **Updated** 2026-08-24T17:48:32Z
 - **Settings**: `executionOrder: v1`, `binaryMode: separate`, `availableInMCP: true`, `saveManualExecutions: true`, `callerPolicy: workflowsFromSameOwner`, `errorWorkflow: JfaCOxRq0FjZ5JWb`, `timezone: Australia/Perth`
-- Raw JSON: `/root/n8n-legal/exports/wf4.json`
+- Raw JSON (published; draft == active, so there is no `wf4.draft.json`): `/root/n8n-legal/exports/wf4.active.json`
 
 ---
 

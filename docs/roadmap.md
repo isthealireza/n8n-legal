@@ -9,7 +9,8 @@ Nothing below authorises crossing the three lines in [`AGENTS.md`](../AGENTS.md)
 ## Step 1 — done: the repo and the offline harness
 
 This tree. 6 scrubbed exports, 6 specs, 59 extracted units, 137 scenarios, a deterministic
-runner. Baseline 75 passed / 2 failed / 60 skipped.
+runner. Baseline 74 passed / 3 failed / 60 skipped (75/2/60 until the units were re-extracted
+from the published version rather than the draft — see `docs/draft-vs-active.md`).
 
 *Why it came first: nothing else is safe until a change can be tested without touching the
 live register.*

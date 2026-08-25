@@ -1,14 +1,27 @@
 # WF9 — 9 - Error Handler
 
 - **n8n workflow id:** `JfaCOxRq0FjZ5JWb`
-- **Raw export:** `exports/wf9.json`
+- **Raw export:** `exports/wf9.active.json` (draft == active as of 2026-08-25T02:12Z, so there is no `wf9.draft.json`)
 - **Active:** yes · **Nodes:** 7 · **Trigger count:** 0 (error trigger)
 - **Created:** 2026-08-18T07:10:55.430Z · **Updated:** 2026-08-25T00:59:40.954Z
-- **Draft versionId:** `a5b10619-31e4-4246-8988-90a08bd45ab1`
-- **Published (active) versionId:** `df3579b2-6a7a-4d9b-a1e9-632afc78b702` — **draft ≠ published**
+- **versionId = activeVersionId:** `a5b10619-31e4-4246-8988-90a08bd45ab1` — `activeVersion.sameAsDraft: true`
 - **Settings:** `executionOrder: v1`, `saveManualExecutions: true`, `callerPolicy: workflowsFromSameOwner`, `binaryMode: separate`, `timeSavedMode: fixed`, `availableInMCP: true`. No `errorWorkflow` of its own, no timezone set.
 
-> **Version drift (important).** The published version still runs **redaction v2** and the old sticky note ("any line mentioning a key, token, secret, password, authorization header, or cookie is dropped"). The draft carries **redaction v3 + toText v5 allowlist extraction + `telegram_text` HTML pre-escape + the conditional FAILED claim**. Everything described below as "v3/v5" is in the draft only until republished. The sticky itself states the new behaviour is *"unit-proven and statically verified (1213 assertions)"* but **not runtime-proven — no real error has yet flowed through the published code."*
+> **Version drift — CLOSED, and the previous note here was wrong.** Two corrections.
+>
+> 1. **The drift is gone.** `a5b10619` was **published** by someone between 2026-08-25T01:0xZ
+>    and 02:12Z. Publishing writes no history entry and does not move `updatedAt`, so the
+>    only trace is `activeVersionId`. Draft and published are now the same body.
+> 2. **The published version was never running redaction v2.** The earlier note here claimed
+>    it was. The version history contradicts that: `cf78986f` (2026-08-25T00:12Z) shipped
+>    redaction v3 and `df3579b2` (00:43Z) shipped toText v5, and `df3579b2` was the active
+>    version at capture. The **entire** draft-vs-published delta was `a5b10619`, which is
+>    *sticky-note text only* — `Build Error Record`'s `jsCode` is byte-identical across the
+>    two. No unit and no harness result was ever affected.
+>
+> The sticky's own caveat still stands: the v3/v5 behaviour is *"unit-proven and statically
+> verified (1213 assertions)"* but **not runtime-proven** — no real error has yet flowed
+> through it.
 
 ## Purpose
 

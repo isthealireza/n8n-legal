@@ -57,9 +57,9 @@ node harness/run.js --verbose                # every check, and every skip with 
 Offline, deterministic (both clocks frozen), no n8n, no network, no credentials. Exit code
 is 0 only when nothing failed.
 
-**Baseline: 75 passed, 2 failed, 60 skipped — so it exits 1.** The two failures are a real
-production defect (`harness/FINDINGS.md` §1), not flakes. Do not make them pass by weakening
-the assertion. A skip is never a pass; the summary says why each one skipped.
+**Baseline: 74 passed, 3 failed, 60 skipped — so it exits 1.** The three failures are real
+(`harness/FINDINGS.md` §1 and §3), not flakes. Do not make them pass by weakening the
+assertion. A skip is never a pass; the summary says why each one skipped.
 
 Before any commit:
 
@@ -71,10 +71,11 @@ python3 .tooling/scrub.py && ./.tooling/leak-check.sh   # both must exit 0
 
 | path | what it is |
 |---|---|
-| `exports/wf{1,2,3,4,5,9}.json` | scrubbed canonical exports. Diff these to see what changed. |
+| `exports/wf{1,2,3,4,5,9}.active.json` | scrubbed canonical exports of the **published** version — what production runs. Diff these to see what changed. |
+| `exports/wf{1,5}.draft.json` | unpublished drafts that are ahead of published. Not production; not extracted into units. See `docs/draft-vs-active.md`. |
 | `workflows/*.md` | human specs: node graph, invariants, output contract, and the incident behind each guard |
 | `harness/run.js` | the runner: selects, projects, compares, reports |
-| `harness/units/` | 59 modules, one per Code node, byte-identical inside the `VERBATIM` markers. Generated — never hand-edit. |
+| `harness/units/` | 59 modules, one per Code node, extracted from `wfN.active.json`, byte-identical inside the `VERBATIM` markers. Generated — never hand-edit. |
 | `harness/n8n-shim.js` | the fake `$input` / `$()` / `$now` that lets those run offline |
 | `harness/adapters.js` | one projection per scenario family; `harness/oracles.js` re-implements the hashes independently |
 | `harness/FINDINGS.md` | production defects the suite found and nobody has fixed |
@@ -83,6 +84,7 @@ python3 .tooling/scrub.py && ./.tooling/leak-check.sh   # both must exit 0
 | `fixtures/sheet-schema.json` | the ten register tabs with exact ordered columns |
 | `.tooling/` | scrub map, scrubber, leak-check, unit extractor, scenario normaliser |
 | `docs/decisions.md` | why this is shaped the way it is |
+| `docs/draft-vs-active.md` | draft vs published: the export naming, and the current divergences |
 | `docs/roadmap.md` | what to do next, in order |
 
 Deeper detail: `harness/README.md` (how the runner works, how to add a scenario),

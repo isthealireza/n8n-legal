@@ -2,9 +2,15 @@
 """
 extract-units.py -- turn every n8n JavaScript Code node into a standalone JS module.
 
-Reads  : /root/n8n-legal/exports/wf*.json   (scrubbed exports; never modified here)
+Reads  : /root/n8n-legal/exports/wf*.active.json  (scrubbed exports; never modified here)
 Writes : /root/n8n-legal/harness/units/<wfN>/<slug>.js
          /root/n8n-legal/harness/units/index.json
+
+ACTIVE, NOT DRAFT. The units are extracted from `wfN.active.json` -- the
+PUBLISHED version, i.e. the code production is actually running. A `wfN.draft.json`
+is an unpublished draft and is deliberately NOT extracted: the harness exists to
+tell the truth about what is live, and a suite that green-lights draft code while
+production runs something else is worse than no suite. See docs/draft-vs-active.md.
 
 The original `parameters.jsCode` is embedded BYTE-IDENTICALLY between the
 BEGIN/END markers so a diff against the workflow JSON stays meaningful.
@@ -110,11 +116,11 @@ def main():
     per_wf = {}
 
     files = sorted(
-        [f for f in os.listdir(EXPORTS) if re.fullmatch(r"wf\d+\.json", f)],
+        [f for f in os.listdir(EXPORTS) if re.fullmatch(r"wf\d+\.active\.json", f)],
         key=lambda f: int(re.search(r"\d+", f).group()),
     )
     for fname in files:
-        wf = fname[:-5]  # wfN
+        wf = fname.split(".")[0]  # wfN, from wfN.active.json
         with open(os.path.join(EXPORTS, fname), "r", encoding="utf-8") as fh:
             doc = json.load(fh)
 

@@ -23,7 +23,7 @@ fingerprint it never stores is useless: every replay looks like a first delivery
 **Production node it copied code from.** WF5 → **Build Reply Context**. The comment in
 `Resolve R1` says it is "the same compacted copy as the policy harness
 (`BAKIml11QKedtH9d`), which mirrors the WF5 draft's Build Reply Context". I confirmed
-against `/root/n8n-legal/exports/wf5.json`: the production `Build Reply Context` node
+against `/root/n8n-legal/exports/wf5.active.json`: the production `Build Reply Context` node
 carries the identical `ingressFingerprint`, `canon`, `emailOf`, `tagsIn` helpers and the
 same five decision values (`ACCEPT`, `ALREADY_RECORDED`, `IDEMPOTENCY_CONFLICT` ×2 bases,
 `BLOCKED`), and feeds a `Sender Verified?` IF node with `matched = decision === 'ACCEPT'`

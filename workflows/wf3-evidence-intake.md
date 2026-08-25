@@ -5,7 +5,7 @@
 - **versionId / activeVersionId:** `644bbdb3-6e78-42c1-a250-3cf9ba05fadc` (draft == active)
 - **Nodes:** 33 (32 functional + 1 sticky note)
 - **Created:** 2026-08-18T07:31:28.390Z · **Updated:** 2026-08-20T01:57:22.629Z
-- **Raw export:** `/root/n8n-legal/exports/wf3.json`
+- **Raw export** (published; draft == active, so there is no `wf3.draft.json`): `/root/n8n-legal/exports/wf3.active.json`
 
 ## Settings
 

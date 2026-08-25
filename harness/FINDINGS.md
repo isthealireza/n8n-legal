@@ -5,7 +5,8 @@ harness binding was checked and is correct, the scenario's `expect` was checked 
 source QA workflow and is not a transcription slip, and the extracted production code
 genuinely does something else. **Neither side was changed.**
 
-Reproduce with `node harness/run.js`. Two scenarios fail; both fail on the same defect.
+Reproduce with `node harness/run.js`. Three scenarios fail: two on the same WF4 defect (§1),
+one on a WF5 scenario that was written against unpublished code (§3).
 
 ---
 
@@ -60,7 +61,7 @@ before taking the headline, with `DUPLICATE_ACTION_ID_FIELD_MISMATCH` above
 `action_id`s rather than conflict entries.
 
 **One caveat, stated because it changes who should fix it.** The QA workflow copied the
-guard from WF4 draft `5a2a208f`; the unit here is extracted from `exports/wf4.json`. If the
+guard from WF4 draft `5a2a208f`; the unit here is extracted from `exports/wf4.active.json`. If the
 node has been edited since the copy was taken, the expectation may be describing an older
 push order rather than a stated intent. Either way the behaviour *today* is push-order
 dependent, which Group A reached independently by reading the code
@@ -84,9 +85,9 @@ deliberately refuses to fire on "emissions test", "test period", "Sandbox Pty Lt
 `grep -rn 'resolveTestFlag' exports/*.json harness/units/` returns nothing. Searching for the
 field it is supposed to stamp:
 
-- `exports/wf2.json` → `Finalise Plan` mentions `test_data_only` only in a `CONTROL` set, i.e.
+- `exports/wf2.active.json` → `Finalise Plan` mentions `test_data_only` only in a `CONTROL` set, i.e.
   as a key excluded from the fact vocabulary. It never computes or writes it.
-- `exports/wf5.json` → `Build Daily Digest` **reads** `facts.test_data_only` inside
+- `exports/wf5.active.json` → `Build Daily Digest` **reads** `facts.test_data_only` inside
   `isTestMatter`, and its own comment calls it one of "the DETERMINISTIC signals stamped at
   ingress".
 
@@ -99,6 +100,62 @@ flag, and a matter titled `Parked vehicle damage - Perth car park (hit and run) 
 
 The `isTestMatter` half of these scenarios *is* covered, by
 `wf5-digest-is-test-matter-predicate` (13 cases, passing).
+
+---
+
+## 3. A WF5 digest scenario asserts a diagnostic that only the unpublished draft emits
+
+**Unit** `harness/units/wf5/build-daily-digest.js` (WF5 `Build Daily Digest`, node
+`00a4aea9-d1ea-4038-b462-e2cd037bede6`), extracted from `exports/wf5.active.json` —
+published version `983da561`.
+
+**Scenario** `wf5-digest-budget-pressure`, mined from `RtNgxMxS10ZOJPFG`
+*QA - WF5 Conflict Notice Digest Sections*.
+
+```
+FAIL  wf5-digest-budget-pressure
+        x rendered message is within the 3600-char ceiling
+            expected: true
+            actual:   undefined
+```
+
+**Why it appeared on 2026-08-25.** It did not appear because production changed. It appeared
+because the extractor stopped reading the draft. WF5's draft (`811b746c`) is one version
+ahead of published and the sole difference is this node; until now the unit was built from
+the draft, so this scenario had been asserting against code that has never executed. The
+extractor now globs `wfN.active.json` only. See `docs/draft-vs-active.md`.
+
+**What the failure is.** `budget_holds` is one of six diagnostics that only the draft emits
+(`sections_built`, `sections_kept_titles`, `sections_omitted_detail`,
+`sections_omitted_titles`, `budget_ceiling`, `budget_holds`). Against the published node it
+is `undefined`, and `undefined !== true`.
+
+**What the failure is NOT.** It is not a reproduction of the 3632-character overshoot that
+the draft's commit message describes. The overshoot is real in principle — the published
+node measures the message, stops at `CEILING`, and only then appends the omission notice —
+but at this fixture's size the published node renders **3586** characters, inside the 3600
+ceiling. This fixture never reaches the size that exposes it.
+
+**Two sibling assertions in the same scenario are now silently vacuous**, which is the more
+dangerous half of this finding:
+
+- *"nothing at priority 0 was dropped"* evaluates `(d.sections_omitted_detail || []).every(…)`.
+  Against production that field is `undefined`, so `.every()` runs over an empty array and
+  passes without testing anything. The priority-0 guarantee — the thing that stops
+  `DATA_INTEGRITY_CONFLICT` and `CONFLICT NOTICES NEVER REPORTED` falling off the end of a
+  Telegram message — is **currently unproven against production code**.
+- The scenario's `assertions` list claims the reply prints `OMITTED TO FIT ONE MESSAGE (<n>)`
+  and names each omitted section with its priority and row count. `harness/adapters.js` never
+  checks either string, and against production neither string exists — the published node
+  prints only `[N further section(s) omitted to fit one message. The full picture is on the
+  sheets.]`.
+
+**Left failing, and not retargeted.** Per AGENTS.md the assertion has not been weakened and
+the scenario has not been pointed back at the draft. Its red state is a true statement:
+this scenario tests a property production does not have. The fix is the owner publishing
+`811b746c` (after the comment problem in `docs/draft-vs-active.md` §4 is dealt with), or a
+new scenario that asserts the priority-0 guarantee in terms the published node actually
+emits. Neither is this task.
 
 ---
 

@@ -3,7 +3,7 @@
 // Node name       : Build Daily Digest
 // Node id         : 00a4aea9-d1ea-4038-b462-e2cd037bede6
 // Node mode       : runOnceForAllItems
-// sha256(jsCode)  : ad149beced78d782d90a135db8c225148c5647bdf6577fc5553d5f322da67bac
+// sha256(jsCode)  : 5f51a90787d6b427e0962bddd4a5e4739821d039f979d4f66808b1a765047918
 //
 // The code between the BEGIN/END markers below is byte-identical to the
 // node's parameters.jsCode in the workflow export. Everything outside the
@@ -35,16 +35,31 @@ async function run(__n8nCtx) {
 // ============================================================================
 // WHY THIS NODE COLLAPSES ROWS BEFORE IT COUNTS ANYTHING
 //
+// The 2026-08-22 report said "Open actions: 27" and then listed 13 rows. It put
+// one action in both ACTIONS AWAITING APPROVAL and BLOCKED, and listed another
+// twice under BLOCKED. None of that was a formatting fault.
+//
 // The Actions tab holds one row per WRITE, not one row per action. Until
 // 2026-08-19T18:25Z, WF2's Append Actions used operation=append with NO matching
 // column, so every re-plan wrote a fresh set of rows under the same positional
-// action ids. Everything written since is unique. The duplicates in the register
-// are historical residue, not a live write fault.
+// action ids. Two later fixes closed that: upsert on idempotency_key, then
+// per-plan-stamped ids. Everything written since is unique. The duplicates in the
+// register are historical residue from before those fixes, not a live write fault.
+// The old report filtered rows directly, so one action_id could still satisfy two
+// section filters at once and be counted twice.
 //
-// Where duplicate rows disagree about what the action IS (different action_type
-// under one action_id), that is an identity collision and no rule can resolve it.
-// Those are reported as DATA_INTEGRITY_CONFLICT and kept out of the operational
-// sections entirely.
+// Two dimensions were also being conflated. The Actions sheet has ONE status
+// column, so BLOCKED and AWAITING_APPROVAL are mutually exclusive AS A STATUS.
+// But "is an approval outstanding" lives in the Approvals tab and is a SEPARATE
+// dimension: an action can be blocked on a dependency while an approval sits
+// against it. This node now carries both on one record and prints them together,
+// rather than emitting the same action as two operational rows.
+//
+// WHAT IT WILL NOT DO. Where duplicate rows disagree about what the action IS
+// (different action_type under one action_id), that is an identity collision and
+// no rule can resolve it. Those are reported as DATA_INTEGRITY_CONFLICT and kept
+// out of the operational sections entirely. Guessing would be worse than saying
+// nothing: the two rows are genuinely different pieces of work.
 //
 // Nothing here writes, decides, approves, or sends. Reporting only.
 // ============================================================================
@@ -56,12 +71,14 @@ const evidence  = $('Load Evidence (Digest)').all().map(i => i.json).filter(r =>
 const events    = $('Load Events (Digest)').all().map(i => i.json).filter(r => r && r.event_id);
 const drafts    = (() => { try { return $('Load Drafts (Digest)').all().map(i => i.json).filter(r => r && r.draft_id); }
                            catch (e) { return []; } })();
+// Conflict notices. Read defensively: the register may not exist yet, and a digest
+// must never fail because of a register it only reports on.
 const notices   = (() => { try { return $('Load Conflict Notices (Digest)').all().map(i => i.json).filter(r => r && r.conflict_key); }
                            catch (e) { return []; } })();
 
 const QUIET_DAYS = 14;
-const MAX_ROWS_PER_SECTION = 12;
-const CEILING = 3600;
+const MAX_ROWS_PER_SECTION = 12;   // sections are attention-only; overflow is stated, never silent
+const CEILING = 3600;              // final message budget, measured before send
 const now = new Date();
 const today = now.toISOString().slice(0, 10);
 const dayMs = 86400000;
@@ -73,11 +90,24 @@ function dueIn(v)     { const t = Date.parse(String(v || '')); return Number.isN
 function stamp(r)     { const t = Date.parse(String(r.updated_at || r.created_at || '')); return Number.isNaN(t) ? -1 : t; }
 
 // ---- TEST / SYNTHETIC ISOLATION -------------------------------------------
-// Only fires on markers that cannot plausibly occur in a genuine matter title.
-// facts.test_data_only / matter_flagged_test_only / is_test are the DETERMINISTIC
-// signals stamped at ingress; the title and risk-flag checks are model-generated
-// fallbacks and must never be the only thing standing between a synthetic matter
-// and the live figures.
+// General predicate, not a list of ids.
+//
+// THE ASYMMETRY THAT SETS THE THRESHOLD. Mislabelling a test matter as live is
+// untidy. Mislabelling a LIVE matter as test hides real legal work from the only
+// daily report the owner reads. So this predicate only fires on markers that
+// cannot plausibly occur in a genuine matter title.
+//
+// An earlier version of this node matched bare \bTEST\b, \bQA\b, \bSANDBOX\b and
+// \bSYNTHETIC\b anywhere in the title. Checked against realistic titles, that
+// wrongly excluded 'Employment contract - QA Engineer, Perth', 'Dispute over
+// failed emissions test on purchased vehicle', 'Contract with 3 month test
+// period' and 'Claim against Sandbox Pty Ltd'. Any of those would have vanished
+// from the live figures without a trace. The markers below were checked against
+// the same set: every real test matter is still caught, and none of those four is.
+//
+// facts.dry_run is deliberately NOT a signal. dry_run is a system-wide operating
+// mode, currently true for everything, so treating it as a test marker would hide
+// every live matter the moment it appeared in recorded facts.
 function isTestMatter(m) {
   if (!m) return false;
   const id = up(m.matter_id);
@@ -93,18 +123,21 @@ function isTestMatter(m) {
   return false;
 }
 const matterById = {};
-matters.forEach(m => { matterById[m.matter_id] = m; });
+matters.forEach(m => { matterById[m.matter_id] = m; });   // last row per id wins
 const testMatterIds = {};
 Object.keys(matterById).forEach(id => { if (isTestMatter(matterById[id])) testMatterIds[id] = true; });
 const isTestId = id => !!testMatterIds[String(id)];
+const matterTitle = id => String((matterById[id] || {}).title || '');
 
 // ---- CANONICAL ACTION RECORDS ---------------------------------------------
+// One record per distinct action_id. Duplicate rows are collapsed by latest
+// updated_at, EXCEPT where they describe different work, which is unresolvable.
 const rowsById = {};
 actionRows.forEach(a => { (rowsById[a.action_id] = rowsById[a.action_id] || []).push(a); });
 
-const canonical = [];
-const identityConflicts = [];
-const collapsed = [];
+const canonical = [];        // one per action_id, conflict-free
+const identityConflicts = [];// one per action_id whose rows disagree on what it is
+const collapsed = [];        // duplicates resolved by recency, recorded for hygiene
 
 Object.keys(rowsById).forEach(id => {
   const rows = rowsById[id];
@@ -117,10 +150,10 @@ Object.keys(rowsById).forEach(id => {
       reason: types.length > 1 ? 'SAME_ACTION_ID_DIFFERENT_ACTION_TYPE' : 'SAME_ACTION_ID_DIFFERENT_MATTER',
       candidates: rows.map(r => ({
         action_type: r.action_type, status: r.status, matter_id: r.matter_id,
-        idempotency_key: r.idempotency_key, updated_at: r.updated_at
-      }))
+        idempotency_key: r.idempotency_key, updated_at: r.updated_at,
+      })),
     });
-    return;
+    return;                                  // fail closed: never guess which is current
   }
 
   const ordered = rows.slice().sort((a, b) => stamp(a) - stamp(b));
@@ -129,13 +162,17 @@ Object.keys(rowsById).forEach(id => {
     collapsed.push({
       action_id: id, rows: rows.length,
       statuses: Array.from(new Set(rows.map(r => up(r.status)))),
-      kept_status: up(winner.status), kept_updated_at: winner.updated_at
+      kept_status: up(winner.status), kept_updated_at: winner.updated_at,
     });
   }
   canonical.push(winner);
 });
 
-// ---- APPROVAL STATE, SUPERSESSION DERIVED, NEVER WRITTEN ------------------
+// ---- APPROVAL STATE, WITH SUPERSESSION DERIVED, NEVER WRITTEN --------------
+// A PENDING row is only LIVE if its draft is the newest draft for that action.
+// Approval Gate already refuses an older draft as STALE, so reporting those as
+// actionable invites the owner to approve something the gate will reject.
+// Nothing is written back: the Approvals tab keeps its full history untouched.
 const latestDraftVersion = {};
 drafts.forEach(d => {
   const v = parseInt(d.version || '0', 10) || 0;
@@ -148,7 +185,7 @@ drafts.forEach(d => { draftById[String(d.draft_id)] = d; });
 function draftVersionOf(a) {
   const d = draftById[String(a.draft_id)];
   if (d) { const v = parseInt(d.version || '0', 10); return Number.isNaN(v) ? null : v; }
-  const m = String(a.draft_id || '').match(/-v(\d+)$/);
+  const m = String(a.draft_id || '').match(/-v(\d+)$/);   // fall back to the id's own suffix
   return m ? parseInt(m[1], 10) : null;
 }
 
@@ -163,6 +200,8 @@ pendingRows.forEach(a => {
   const newest = latestDraftVersion[actionId];
 
   if (mine === null || newest === undefined) {
+    // Cannot establish which draft this approval refers to. Fail closed:
+    // neither live nor superseded, and it does not appear as actionable.
     approvalStateUnknown.push({ approval_id: a.approval_id, action_id: actionId,
       draft_id: a.draft_id, reason: mine === null ? 'DRAFT_VERSION_UNRESOLVABLE' : 'NO_DRAFT_ROW_FOR_ACTION' });
     return;
@@ -175,6 +214,7 @@ pendingRows.forEach(a => {
   liveApprovals.push(a);
 });
 
+// More than one live approval on a single action is itself a conflict.
 const liveByAction = {};
 liveApprovals.forEach(a => { (liveByAction[String(a.action_id)] = liveByAction[String(a.action_id)] || []).push(a); });
 const multiLiveApproval = Object.keys(liveByAction).filter(k => liveByAction[k].length > 1)
@@ -183,6 +223,7 @@ const multiLiveApproval = Object.keys(liveByAction).filter(k => liveByAction[k].
 const liveApprovalByAction = {};
 Object.keys(liveByAction).forEach(k => { if (liveByAction[k].length === 1) liveApprovalByAction[k] = liveByAction[k][0]; });
 
+// ---- ONE RECORD, TWO DIMENSIONS -------------------------------------------
 function decorate(a) {
   const apr = liveApprovalByAction[String(a.action_id)];
   const superseded = supersededUnrecorded.filter(s => s.action_id === String(a.action_id)).length;
@@ -197,7 +238,7 @@ function decorate(a) {
     blocked_reason: a.blocked_reason || '',
     due_at: a.due_at || '',
     deadline_basis: a.deadline_basis || '',
-    is_test: isTestId(a.matter_id)
+    is_test: isTestId(a.matter_id),
   };
 }
 const records = canonical.map(decorate);
@@ -205,6 +246,7 @@ const openRecords = records.filter(r => DONE.indexOf(r.workflow_status) === -1);
 const liveOpen = openRecords.filter(r => !r.is_test);
 const testOpen = openRecords.filter(r => r.is_test);
 
+// A single line carries both dimensions, so one action is never two rows.
 function line(r) {
   const bits = [r.action_id, r.action_type, r.workflow_status];
   if (r.approval_state === 'APPROVAL_PENDING') bits.push('approval ' + r.approval_id + ' PENDING');
@@ -213,6 +255,7 @@ function line(r) {
   return bits.join('  ');
 }
 
+// ---- MATTERS ---------------------------------------------------------------
 const openMatters = matters.filter(m => ['CLOSED', 'REJECTED'].indexOf(up(m.status)) === -1);
 const liveMatters = openMatters.filter(m => !isTestMatter(m));
 const testMatters = openMatters.filter(m => isTestMatter(m));
@@ -225,6 +268,7 @@ const missingEvidence = liveMatters.filter(m => {
 });
 const quiet = liveMatters.filter(m => { const d = daysSince(m.last_activity_at || m.updated_at); return d !== null && d >= QUIET_DAYS; });
 
+// ---- ATTENTION BUCKETS (live only) ----------------------------------------
 const dated    = liveOpen.filter(r => String(r.due_at).trim());
 const overdue  = dated.filter(r => { const d = dueIn(r.due_at); return d !== null && d < 0; });
 const dueToday = dated.filter(r => dueIn(r.due_at) === 0);
@@ -251,6 +295,9 @@ function section(title, rows) {
 }
 
 // ---- CONFLICT NOTICES ------------------------------------------------------
+// A notice is only silent when it has been reported. PENDING, FAILED and EXHAUSTED
+// all appear here, so an unresolved conflict cannot disappear just because the
+// notification path failed or was never built.
 const S2 = v => String(v === null || v === undefined ? '' : v).trim();
 const NST = r => { const v = up(r.notification_status); return v || (S2(r.notified_at) ? 'SENT' : 'PENDING'); };
 function noticeLine(r) {
@@ -264,6 +311,7 @@ function noticeLine(r) {
 const noticesPending   = notices.filter(r => NST(r) === 'PENDING');
 const noticesFailed    = notices.filter(r => NST(r) === 'FAILED');
 const noticesExhausted = notices.filter(r => NST(r) === 'EXHAUSTED');
+// Two rows sharing a conflict_key is the register's own integrity failure.
 const noticeKeyCounts = {};
 notices.forEach(r => { const k = S2(r.conflict_key); noticeKeyCounts[k] = (noticeKeyCounts[k] || 0) + 1; });
 const noticeDuplicates = Object.keys(noticeKeyCounts).filter(k => noticeKeyCounts[k] > 1);
@@ -276,6 +324,9 @@ const integrity = []
   .concat(multiLiveApproval.map(c => c.action_id + '  MULTIPLE_LIVE_APPROVALS  ' + c.approval_ids.join(', ')))
   .concat(approvalStateUnknown.map(a => a.approval_id + '  ' + a.reason + '  action ' + a.action_id));
 
+// Each section carries a drop priority. Under budget pressure the HIGHEST number
+// yields first. Priority 0 is undroppable: an integrity conflict and the test/live
+// separation must never be the thing that falls off the end of a message.
 const spec = [
   [0, 'DATA_INTEGRITY_CONFLICT - needs manual review, excluded from the counts below', integrity],
   [0, 'TEST AND QA MATTERS - not live work', testMatters.map(m =>
@@ -304,11 +355,20 @@ const spec = [
     collapsed.map(c => c.action_id + '  ' + c.rows + ' rows [' + c.statuses.join(', ') + '] kept ' + c.kept_status)],
   [4, 'MISSING EVIDENCE', missingEvidence.map(m => m.matter_id + '  ' + (m.title || ''))],
   [4, 'NO ACTIVITY FOR ' + QUIET_DAYS + '+ DAYS', quiet.map(m =>
-    m.matter_id + '  last activity ' + String(m.last_activity_at || 'unknown').slice(0, 10))]
+    m.matter_id + '  last activity ' + String(m.last_activity_at || 'unknown').slice(0, 10))],
 ];
-const built = spec.map(([p, title, rows], i) => ({ p, i, title: title, rows: rows.length, text: section(title, rows) })).filter(b => b.text);
+const built = spec.map(([p, title, rows], i) => ({ p, i, text: section(title, rows) })).filter(b => b.text);
 const blocks = built.map(b => b.text);
 
+// ---- RECONCILIATION HEADER -------------------------------------------------
+// Every distinct action id is accounted for in exactly one bucket, and the
+// buckets are printed even when zero, so nothing can appear to vanish between
+// the register and the report. 'Open actions: 27' followed by 13 rows is the
+// failure this replaces: it stated a number and then silently showed a subset.
+//
+// distinct ids = countable live open + identity conflicts + test-only + closed
+// If that identity ever fails, RECONCILIATION MISMATCH is printed rather than
+// quietly showing figures that do not add up.
 const doneRecords = records.filter(r => DONE.indexOf(r.workflow_status) !== -1);
 const distinctIds = Object.keys(rowsById).length;
 const accounted = liveOpen.length + identityConflicts.length + testOpen.length + doneRecords.length;
@@ -325,7 +385,7 @@ const head = [
   'Closed or completed actions:          ' + doneRecords.length,
   'Historical duplicate rows:            ' + duplicateRows,
   'Attention items shown below:          ' + attentionCount,
-  'Open items not shown, no flag set:    ' + notShown
+  'Open items not shown, no flag set:    ' + notShown,
 ];
 if (accounted !== distinctIds) {
   head.push('RECONCILIATION MISMATCH: ' + accounted + ' accounted for against '
@@ -347,62 +407,30 @@ const footer = [
   'Sections above are attention-only. An action with no flag is open and needs nothing from you today.',
   'Dates marked UNVERIFIED_ESTIMATE are my estimates, not legal deadlines.',
   'Dates marked NO_BASIS_RECORDED have no recorded source at all.',
-  'I do not calculate limitation periods. Confirm any date that matters with a lawyer.'
+  'I do not calculate limitation periods. Confirm any date that matters with a lawyer.',
 ];
 
-// ---- MESSAGE BUDGET, WITH OMISSIONS NAMED ---------------------------------
-// Two changes, both about not hiding what was cut.
-//
-// 1. A dropped section is now NAMED, with its priority, its row count and the
-//    reason it went. A bare '4 further section(s) omitted' told the owner that
-//    something was missing but not what, which is only marginally better than
-//    silence.
-//
-// 2. The omission block is now INCLUDED IN THE MEASUREMENT. Previously the loop
-//    measured the message, stopped at the ceiling, and only then appended the
-//    notice, so a truncated message always exceeded CEILING by the length of
-//    that notice: 3632 characters against a 3600 ceiling was observed. Naming
-//    every dropped section would have made that overshoot far worse.
-//
-// The priority 0 guarantee is unchanged: the loop still refuses to drop anything
-// at priority 0, so DATA_INTEGRITY_CONFLICT, TEST AND QA MATTERS and CONFLICT
-// NOTICES NEVER REPORTED can never be the thing that falls off the end.
-function omissionBlock(omittedList) {
-  if (!omittedList.length) return null;
-  return 'OMITTED TO FIT ONE MESSAGE (' + omittedList.length + ')\n'
-    + omittedList.map(o => '  ' + o.title + '  [priority ' + o.priority + ', ' + o.rows + ' row(s), ' + o.reason + ']').join('\n')
-    + '\n  Nothing at priority 0 is ever omitted. The full picture is on the sheets.';
-}
-function inOrder(list) { return list.slice().sort((a, b) => a.i - b.i).map(b => b.text); }
-function assemble(list) { return head.concat([''], list).concat(footer).join('\n'); }
-function render(keptList, omittedList) {
-  const parts = inOrder(keptList);
-  const note = omissionBlock(omittedList);
-  return assemble(note ? parts.concat([note]) : parts);
-}
-
+// Budget the message rather than cutting it silently at the end.
 let keptBlocks = built.slice();
-const omitted = [];
-while (render(keptBlocks, omitted).length > CEILING) {
+let droppedSections = 0;
+function assemble(list) { return head.concat([''], list).concat(footer).join('\n'); }
+function inOrder(list) { return list.slice().sort((a, b) => a.i - b.i).map(b => b.text); }
+while (assemble(inOrder(keptBlocks)).length > CEILING) {
+  // yield the highest priority number present; never priority 0
   const maxP = Math.max.apply(null, keptBlocks.map(b => b.p));
-  if (maxP === 0) break;   // priority 0 is undroppable
+  if (maxP === 0) break;
   const victim = keptBlocks.map((b, n) => ({ b, n })).filter(x => x.b.p === maxP).pop();
-  omitted.push({
-    title: victim.b.title,
-    priority: victim.b.p,
-    rows: victim.b.rows,
-    reason: 'BUDGET_EXCEEDED, lowest priority dropped first'
-  });
   keptBlocks.splice(victim.n, 1);
+  droppedSections++;
 }
-const droppedSections = omitted.length;
+let kept = inOrder(keptBlocks);
+if (droppedSections) {
+  kept = kept.concat(['[' + droppedSections + ' further section(s) omitted to fit one message. The full picture is on the sheets.]']);
+}
 
 const body = blocks.length
-  ? render(keptBlocks, omitted)
+  ? assemble(kept)
   : head.concat(['', 'Nothing needs your attention today.']).concat(footer).join('\n');
-
-const omittedTitles = omitted.map(o => o.title);
-const keptTitles = keptBlocks.slice().sort((a, b) => a.i - b.i).map(b => b.title);
 
 return [{ json: {
   reply: body,
@@ -433,14 +461,7 @@ return [{ json: {
     notices_failed: noticesFailed.length,
     notices_exhausted: noticesExhausted.length,
     notice_duplicate_keys: noticeDuplicates,
-    sections_built: built.length,
-    sections_kept_titles: keptTitles,
-    sections_omitted_count: droppedSections,
-    sections_omitted_detail: omitted,
-    sections_omitted_titles: omittedTitles,
-    budget_ceiling: CEILING,
-    budget_holds: body.length <= CEILING
-  }
+  },
 } }];
 // ---- END VERBATIM n8n jsCode ----
   }).call(__n8nCtx);
@@ -451,5 +472,5 @@ module.exports = { run, meta: {
   "nodeName": "Build Daily Digest",
   "nodeId": "00a4aea9-d1ea-4038-b462-e2cd037bede6",
   "mode": "runOnceForAllItems",
-  "sha256OfJsCode": "ad149beced78d782d90a135db8c225148c5647bdf6577fc5553d5f322da67bac"
+  "sha256OfJsCode": "5f51a90787d6b427e0962bddd4a5e4739821d039f979d4f66808b1a765047918"
 } };

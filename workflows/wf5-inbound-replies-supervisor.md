@@ -14,7 +14,8 @@
 | Meta | `aiBuilderAssisted: true`, `builderVariant: mcp` |
 | Tags / folder | none / none |
 
-Raw export: `/root/n8n-legal/exports/wf5.json`
+Raw export (published — what this document describes): `/root/n8n-legal/exports/wf5.active.json`
+Raw export (unpublished draft, ahead of published): `/root/n8n-legal/exports/wf5.draft.json`
 
 ---
 
@@ -559,5 +560,13 @@ All Telegram bodies HTML-escape `&`, `<`, `>`.
 ## 11. Draft vs active drift
 
 `activeVersion.sameAsDraft = false`. Node sets and connections are identical; exactly one node differs: **`Build Daily Digest`**. The draft (`811b746c…`, 2026-08-23, "Digest: name omitted sections, reserve budget for the notice") adds the named-omission block, includes it in the budget measurement, and adds diagnostics `sections_built`, `sections_kept_titles`, `sections_omitted_count`, `sections_omitted_detail`, `sections_omitted_titles`, `budget_ceiling`, `budget_holds`. The draft also **strips a large amount of explanatory comment** that the published version carries — the 2026-08-22 "Open actions: 27 / 13 rows" incident narrative, the adversarial test-title list, and the priority/fail-closed rationale. Those comments are quoted above from the active version so they are not lost.
+
+**Verified 2026-08-25** by `get_workflow_versions_diff` 983da561 → 811b746c. Still exactly one node, still `Build Daily Digest`, still no node or connection change. Two corrections and one addition to the paragraph above:
+
+- The diagnostic `sections_omitted_count` is present in **both** versions, not only the draft. The genuinely new draft diagnostics are `sections_built`, `sections_kept_titles`, `sections_omitted_detail`, `sections_omitted_titles`, `budget_ceiling` and `budget_holds`.
+- The comment stripping is worse than "a large amount removed". The draft also **replaces** one of the removed comments with a false one: its `isTestMatter` header calls `facts.test_data_only / matter_flagged_test_only / is_test` "the DETERMINISTIC signals stamped at ingress". Nothing stamps them — that is AGENTS.md §6.7 — and the published version makes no such claim. Publishing the draft would put a comment into production asserting a safety property the system does not have.
+- The unused helper `const matterTitle = id => ...` is also dropped by the draft.
+
+**Harness consequence.** Until 2026-08-25 `harness/units/wf5/build-daily-digest.js` was extracted from the **draft**, so every WF5 digest scenario was asserting against code that has never run. The extractor now reads `wfN.active.json` only. Re-extraction moved this unit's `sha256OfJsCode` and turned `wf5-digest-budget-pressure` red: `budget_holds` is a draft-only diagnostic and is `undefined` in production. See `harness/FINDINGS.md` §3 and `docs/draft-vs-active.md` §4.
 
 Version history author on every entry: `Owner` (most "via MCP").

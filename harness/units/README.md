@@ -1,7 +1,13 @@
 # Extracted Code-Node Units
 
-Every JavaScript Code node (`n8n-nodes-base.code`) in `exports/wf*.json` is mirrored here
-as a standalone CommonJS module that runs in plain Node — no n8n, no network, no clock.
+Every JavaScript Code node (`n8n-nodes-base.code`) in `exports/wf*.active.json` is mirrored
+here as a standalone CommonJS module that runs in plain Node — no n8n, no network, no clock.
+
+**Active, not draft.** The extractor globs `wfN.active.json` — the *published* version — and
+deliberately ignores `wfN.draft.json`. A suite extracted from drafts goes green on code
+nobody is running while the code that is running goes untested. If you need to exercise a
+draft, extract it into a scratch tree; do not point `units/` at it. Reasoning and the
+current divergences: `docs/draft-vs-active.md`.
 
 ```
 harness/
@@ -128,7 +134,7 @@ Tips:
 ## `sha256OfJsCode` — resolved 2026-08-25
 
 There was a window in which six unit files carried a digest computed *before*
-`.tooling/scrub.py` rewrote the real identifiers in `exports/wf*.json`:
+`.tooling/scrub.py` rewrote the real identifiers in the exports (then named `exports/wf*.json`):
 
 ```
 wf1/validate-intent-json.js   wf2/build-plan-message.js   wf2/finalise-plan.js

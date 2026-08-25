@@ -91,7 +91,7 @@ strictly richer: it carries both deliveries in full, with *differing* `communica
 
 The eight `wf5-testonly-*` scenarios assert a WF5 **ingress** predicate
 `resolveTestFlag(ingress) -> { test_data_only, basis }`. A grep across all six workflow
-exports (`exports/wf{1,2,3,4,5,9}.json`) and all 59 extracted units finds no such function.
+exports (`exports/wf{1,2,3,4,5,9}.active.json`) and all 59 extracted units finds no such function.
 The only test-matter predicate in the estate is `isTestMatter` in WF5 `Build Daily Digest`,
 which reads a *persisted* `facts_json.test_data_only` — nothing in the estate computes and
 stamps that value at ingress. These scenarios are therefore left with `target: null` rather

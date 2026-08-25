@@ -7,7 +7,7 @@
 - **Created:** 2026-08-18T07:31:11.186Z · **Updated:** 2026-08-24T15:13:00.574Z
 - **Settings:** `executionOrder: v1`, `binaryMode: separate`, `availableInMCP: true`, `saveManualExecutions: true`, `callerPolicy: workflowsFromSameOwner`, `errorWorkflow: JfaCOxRq0FjZ5JWb`, `timezone: Australia/Perth`, `timeSavedMode: fixed`
 - **Tags:** none · **parentFolderId:** null · **meta:** `{aiBuilderAssisted: true, builderVariant: mcp}`
-- Raw export: `/root/n8n-legal/exports/wf2.json`
+- Raw export (published; draft == active, so there is no `wf2.draft.json`): `/root/n8n-legal/exports/wf2.active.json`
 
 ---
 

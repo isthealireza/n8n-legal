@@ -8,7 +8,7 @@ the "rejected" line first: it is usually the thing you are about to propose.
 
 ## (a) Scrubbed JSON exports are the canonical form, not the workflow-as-code SDK
 
-**Decision.** `exports/wf{1,2,3,4,5,9}.json` — the n8n export, run through
+**Decision.** `exports/wf{1,2,3,4,5,9}.active.json` — the **published** n8n export, run through
 `.tooling/scrub.py` in place — is what this repo treats as the workflows. Everything else
 (`workflows/*.md`, `harness/units/`) is derived from it or describes it.
 
@@ -87,7 +87,7 @@ safe to share; the tree is not.
 
 ---
 
-## (d) The two failing scenarios were left failing
+## (d) The failing scenarios were left failing
 
 **Decision.** `wf4-guard-conflicted-action-approval-route` and
 `wf4-guard-conflicted-matter-draft-route` fail, `node harness/run.js` exits 1, and that is
@@ -108,10 +108,13 @@ into the n8n draft and come back through re-export, and it needs the owner's eye
 changes what a halt notice says. (3) Marking the two scenarios `skip` — a skip is invisible;
 a red test is a standing instruction.
 
-**Consequence.** Green is not the success condition of this repo; **75/2/60** is. Any
-change that moves those numbers has to explain itself. The cost is that a naive CI hook
-would consider the repo broken — so the baseline is written into `AGENTS.md`, `README.md`
-and here.
+A third scenario, `wf5-digest-budget-pressure`, joined them on 2026-08-25 for a different
+reason: see decision (i) and `harness/FINDINGS.md` §3.
+
+**Consequence.** Green is not the success condition of this repo; **74/3/60** is (it was
+75/2/60 until decision (i)). Any change that moves those numbers has to explain itself. The
+cost is that a naive CI hook would consider the repo broken — so the baseline is written
+into `AGENTS.md`, `README.md` and here.
 
 ---
 
@@ -179,6 +182,36 @@ matching plus an explicit alias list.
 
 ---
 
+## (i) Units are extracted from the PUBLISHED version, not the draft
+
+**Decision.** `exports/` holds `wfN.active.json` (the published body, always present) and
+`wfN.draft.json` (only where the draft is ahead). There is no bare `wfN.json` any more.
+`.tooling/extract-units.py` globs `wf*.active.json`, so `harness/units/` — and therefore
+every scenario the runner executes by default — is production code.
+
+**Why.** The repo's central claim is that `node harness/run.js` tells you the truth about
+the live system in seconds. `mcp__n8n__get_workflow_details` returns the **draft**, and the
+first reconstruction took it at face value, so WF5's `Build Daily Digest` unit was built
+from unpublished code. That is the worst possible direction for a test suite to be wrong in:
+green on code nobody is running, silent on the code that is running against a real
+practitioner's real matters. A suite can be allowed to be incomplete. It cannot be allowed
+to report on the wrong artefact.
+
+**Rejected.** (1) Extracting from the draft, on the grounds that you test the change you are
+about to ship — real, but served by extracting a draft into a scratch tree, not by making it
+the default. Testing a draft is an opt-in act; testing production is the floor. (2) Keeping
+a bare `wfN.json` for the undiverged workflows and adding suffixes only where they diverge —
+that leaves the *unsuffixed* name meaning "whichever it happens to be today", which is the
+exact ambiguity that caused this. Every file states its side. (3) Committing a
+`wfN.draft.json` for every workflow whether or not it differs — six redundant files, and the
+absence of a draft file is a more useful signal than a duplicate of the active one.
+
+**Consequence.** One unit body changed (`wf5/build-daily-digest.js`) and the baseline moved
+from 75/2/60 to **74/3/60**. The extra red is the whole point of the change. Recorded in
+`docs/draft-vs-active.md` and `harness/FINDINGS.md` §3.
+
+---
+
 ## Smaller decisions, recorded because they will look arbitrary later
 
 | decision | why | rejected | consequence |
@@ -191,11 +224,12 @@ matching plus an explicit alias list.
 
 ---
 
-## (g) All six exports are pretty-printed with two-space indent, not stored as n8n returned them
+## (g) Every export is pretty-printed with two-space indent, not stored as n8n returned them
 
-**Decision.** `exports/*.json` are serialised with `indent=2` and a trailing newline. Three
-of them (WF1, WF3, WF9) arrived minified onto a single line from a different agent and were
-reformatted on 2026-08-25.
+**Decision.** `exports/*.json` are serialised with `indent=2` and a trailing newline — the
+`wfN.active.json` files and the `wfN.draft.json` files alike. Three of them (WF1, WF3, WF9)
+arrived minified onto a single line from a different agent and were reformatted on
+2026-08-25.
 
 **Why.** "Diffable" is the whole claim this directory makes. A 46 KB single-line JSON file
 has exactly one line, so every change to it is a whole-file diff and the repo silently stops
@@ -203,7 +237,7 @@ being able to answer "what drifted". Uniformity also matters more than fidelity 
 exact bytes, because n8n's export formatting is not itself stable or meaningful.
 
 **Rejected.** Keeping the raw bytes from the API. That would be the purer position if all
-six had been raw — but three were already reformatted, so there was no raw baseline to
+of them had been raw — but three were already reformatted, so there was no raw baseline to
 preserve, only an inconsistency to pick a side of.
 
 **Consequence.** A re-export must be run through the same serialisation before it is

@@ -5781,5 +5781,11 @@
   "meta": {
     "aiBuilderAssisted": true,
     "builderVariant": "mcp"
+  },
+  "_export": {
+    "kind": "draft",
+    "note": "UNPUBLISHED draft, ahead of the active version. NOT what production runs. Active is 983da561 -> exports/wf5.active.json. Source: get_workflow_details.",
+    "aheadOfActiveVersionId": "983da561-5c19-42db-a2b4-1e2e7ac67e0f",
+    "capturedAt": "2026-08-25T02:15:00Z"
   }
 }

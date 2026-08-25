@@ -1617,5 +1617,10 @@
   "meta": {
     "aiBuilderAssisted": true,
     "builderVariant": "mcp"
+  },
+  "_export": {
+    "kind": "active",
+    "note": "PUBLISHED version. This is what production runs. Draft is AHEAD: see exports/wf1.draft.json (9cc644ec, UI autosave).",
+    "capturedAt": "2026-08-25T02:15:00Z"
   }
 }

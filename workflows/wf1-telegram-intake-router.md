@@ -1,10 +1,22 @@
 # WF1 — 1 - Telegram Intake and Command Router
 
 - **n8n workflow id:** `xUcAXTgocHPsHy5Y`
-- **Raw export:** `exports/wf1.json`
+- **Raw export (published — what this document describes):** `exports/wf1.active.json`
+- **Raw export (unpublished draft, ahead of published):** `exports/wf1.draft.json`
 - **Active:** yes · **Nodes:** 33 · **Trigger count:** 1
-- **Created:** 2026-08-18T07:30:40.630Z · **Updated:** 2026-08-24T13:21:22.552Z
-- **versionId = activeVersionId:** `b1c425bf-5830-4e3c-a6f7-bcf2c02ef593` (`activeVersion.sameAsDraft: true` — draft and published are identical)
+- **Created:** 2026-08-18T07:30:40.630Z · **Published version updated:** 2026-08-24T13:21:22.552Z · **Draft autosaved:** 2026-08-25T01:19:51.786Z
+- **activeVersionId (running):** `b1c425bf-5830-4e3c-a6f7-bcf2c02ef593`
+- **versionId (draft):** `9cc644ec-595d-4084-b64d-cfbe265b0712` — `activeVersion.sameAsDraft: false`
+
+> **Draft drift (2026-08-25).** A **UI autosave by Owner** (bare author, no `(via MCP)`) at
+> 01:19:51Z pushed the draft one version ahead of published. Two changes, nothing added or
+> removed: `DeepSeek - Router` `options.maxTokens` 64000 → 32768, and `Ack Button` lost its
+> `operation: "answerQuery"` key. Both were assessed and neither is a regression —
+> `answerQuery` is the default operation for `resource: callback` on the Telegram node at
+> typeVersion 1.2, and 32768 completion tokens is two orders of magnitude more than the
+> six-field intent schema needs. Production is unaffected while `b1c425bf` stays active, but
+> this is the body that ships the next time anyone presses Publish, and nobody reviewed it.
+> Full assessment: `docs/draft-vs-active.md` §5.
 - **Settings:** `executionOrder: v1`, `binaryMode: separate`, `availableInMCP: true`, `saveManualExecutions: true`, `callerPolicy: workflowsFromSameOwner`, **`errorWorkflow: JfaCOxRq0FjZ5JWb`** (WF9), **`timezone: Australia/Perth`**, `timeSavedMode: fixed`.
 
 ## Purpose

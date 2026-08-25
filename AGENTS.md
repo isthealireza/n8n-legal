@@ -33,9 +33,10 @@ outcome, not a failure.
 
 | path | what it is |
 |---|---|
-| `exports/wf{1,2,3,4,5,9}.json` | scrubbed canonical exports of the six production workflows. **Diffable.** This is how you see what changed. |
+| `exports/wf{1,2,3,4,5,9}.active.json` | scrubbed canonical exports of the **published** version of each of the six production workflows — what is actually running. **Diffable.** This is how you see what changed. |
+| `exports/wf{N}.draft.json` | present **only** where the n8n draft is ahead of published. Today: `wf1`, `wf5`. Not production. Not extracted into units. |
 | `workflows/*.md` | human specs: node graph, invariants, output contract, and the incident behind each guard |
-| `harness/units/` | 59 JS modules, one per n8n Code node, extracted byte-identically so the logic runs in plain Node |
+| `harness/units/` | 59 JS modules, one per n8n Code node, extracted byte-identically **from `wfN.active.json`** so the logic runs in plain Node |
 | `harness/n8n-shim.js` | the fake `$input` / `$()` / `$now` that lets those modules run offline and deterministically |
 | `harness/run.js` | the test runner |
 | `fixtures/scenarios/` | 137 scenario files, mined from ~30 retired one-shot QA workflows |
@@ -45,6 +46,7 @@ outcome, not a failure.
 | `.tooling/` | scrub map, scrubber, leak-check, unit extractor |
 | `README.md` | orientation: what the system does end to end, how to run the harness, the layout |
 | `docs/decisions.md` | why the repo is shaped this way — read before proposing to reshape it |
+| `docs/draft-vs-active.md` | the draft/active split: why exports are named the way they are, and the current divergences |
 | `docs/roadmap.md` | what to do next, in order, and what only the owner can do |
 
 ## 3. The loop
@@ -59,15 +61,21 @@ The runner is offline, deterministic, and takes seconds. **This is the whole poi
 repo.** Before it existed, testing a change meant hand-building a throwaway workflow in the
 n8n UI against live credentials — a twenty-minute human loop, thirty times over five days.
 
-Baseline as of 2026-08-25: **75 passed, 2 failed, 60 skipped.** The two failures are real
-production defects (`harness/FINDINGS.md` §1), not flakes. **Do not make them pass by
-weakening the assertion.** A weakened assertion is a lie the next agent will trust.
+Baseline as of 2026-08-25: **74 passed, 3 failed, 60 skipped.** The three failures are real
+(`harness/FINDINGS.md` §1 and §3), not flakes. **Do not make them pass by weakening the
+assertion.** A weakened assertion is a lie the next agent will trust.
+
+It was 75/2/60 until the units were re-extracted from the *published* version rather than
+the draft. The extra red is the point: one assertion had been green only because it was
+being run against code nobody has published. See `docs/draft-vs-active.md` §4.
 
 ### Changing production logic
 
 1. Edit the unit in `harness/units/`, prove it with the harness.
 2. Port the change into the n8n draft via MCP (`update_workflow`), never straight to live.
-3. Re-export and re-scrub so the repo matches:
+3. Re-export and re-scrub so the repo matches. A draft you just wrote goes to
+   `exports/wfN.draft.json`, **not** to `wfN.active.json` — `wfN.active.json` changes only
+   when the owner publishes:
    `python3 .tooling/extract-units.py && python3 .tooling/scrub.py && ./.tooling/leak-check.sh`
 4. Hand the owner the diff. They publish.
 
@@ -95,6 +103,33 @@ touches shared register state. Worktree isolation protects the code; it does **n
 protect the shared n8n instance or the shared spreadsheet.
 
 ## 5. Things that are true and will bite you
+
+### The draft is not what is running
+
+`mcp__n8n__get_workflow_details` returns the **DRAFT**. It does not return the published
+version. For a workflow whose draft is ahead, everything in that payload — code, prompts,
+parameters — is code that has never executed. Read three fields before you believe any of
+it: `versionId` (the draft you were handed), `activeVersionId` (what production runs), and
+`activeVersion.sameAsDraft`.
+
+**A UI autosave silently creates a draft ahead of published.** Nobody presses publish and
+nobody is warned. Someone opens a live workflow in the n8n editor, nudges a field, walks
+away — `versionId` moves, `activeVersionId` does not, and the next agent exports a version
+that has never run. In the history an autosave is `autosaved: true`, `name: null`, and an
+author with **no `(via MCP)` suffix**; a bare name means a human in the editor, `(via MCP)`
+means an agent or the API. The editor also prunes any parameter equal to its default, so an
+explicitly-spelled default silently disappears on first autosave and looks like an edit in
+the diff.
+
+Hence the export naming: `exports/wfN.active.json` is the published body and always exists;
+`exports/wfN.draft.json` exists only where the draft is ahead. **The absence of a draft file
+is the claim that draft == active.** `harness/units/` is extracted from active only — the
+harness's job is to tell the truth about what is running. Full account, including the two
+current divergences (`wf1`, `wf5`): `docs/draft-vs-active.md`.
+
+**Publishing leaves almost no trace.** It writes no history entry and does not move
+`updatedAt`. `activeVersionId` moving is the only signal. WF9 was published by someone
+mid-session on 2026-08-25 and nothing else in the instance recorded it.
 
 - **`dry_run` is hardcoded to the string `"true"` in WF4's Config.** It is a string, not a
   boolean. Much of the safety you observe in testing comes from this one literal.

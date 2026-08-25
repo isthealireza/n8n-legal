@@ -1481,5 +1481,10 @@
   "meta": {
     "aiBuilderAssisted": true,
     "builderVariant": "mcp"
+  },
+  "_export": {
+    "kind": "active",
+    "note": "PUBLISHED version. This is what production runs. Draft == active. No wf2.draft.json exists.",
+    "capturedAt": "2026-08-25T02:15:00Z"
   }
 }

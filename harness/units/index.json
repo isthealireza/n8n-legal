@@ -482,8 +482,8 @@
     "nodeId": "00a4aea9-d1ea-4038-b462-e2cd037bede6",
     "mode": "runOnceForAllItems",
     "file": "wf5/build-daily-digest.js",
-    "bytes": 20956,
-    "sha256OfJsCode": "ad149beced78d782d90a135db8c225148c5647bdf6577fc5553d5f322da67bac"
+    "bytes": 23691,
+    "sha256OfJsCode": "5f51a90787d6b427e0962bddd4a5e4739821d039f979d4f66808b1a765047918"
   },
   {
     "workflow": "wf5",
