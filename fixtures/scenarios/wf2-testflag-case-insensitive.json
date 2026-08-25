@@ -1,0 +1,109 @@
+{
+  "id": "wf2-testflag-case-insensitive",
+  "workflow": "wf2",
+  "unit": "Finalise Plan — test-data stamp (D-TESTFLAG-01)",
+  "kind": "pure",
+  "description": "D-TESTFLAG-01: prefix match is case-insensitive; MAT-test-001 must stamp test_data_only.",
+  "why_it_exists": "The regex uses /i flag; verifying it works against lowercase input prevents a future flag removal from silently breaking the case-insensitive behaviour.",
+  "input": {
+    "case_id": "TESTFLAG",
+    "matter_id": "MAT-test-001",
+    "playbook_id": "motor_vehicle_damage_v1",
+    "plan_valid": true,
+    "force_proceed": false,
+    "required_facts": [
+      "incident_description",
+      "incident_datetime",
+      "incident_location",
+      "owner_present",
+      "driver_identity",
+      "own_vehicle_registration",
+      "damage_description"
+    ],
+    "optional_facts": [
+      "other_party_name",
+      "other_party_contact",
+      "other_party_registration",
+      "other_party_insurer",
+      "police_report_number",
+      "witness_details",
+      "insurer_name",
+      "policy_number",
+      "repair_quote_amount",
+      "prior_communications"
+    ],
+    "facts_json": "{\"incident_description\":\"Rear quarter panel struck while parked.\",\"incident_datetime\":\"2026-08-14T18:00:00+08:00\",\"incident_location\":\"Level 2 car park, Perth WA\",\"owner_present\":\"no\",\"driver_identity\":\"vehicle was unattended\",\"own_vehicle_registration\":\"9XYZ876\",\"damage_description\":\"Dent and paint transfer.\"}",
+    "missing_facts_json": "[]",
+    "risk_flags_json": "[]",
+    "questions": [],
+    "now": "2026-08-23T06:00:00.000Z",
+    "items": [
+      {
+        "plan_valid": true,
+        "matter_id": "MAT-test-001",
+        "playbook_id": "motor_vehicle_damage_v1",
+        "facts_json": "{\"incident_description\":\"Rear quarter panel struck while parked.\",\"incident_datetime\":\"2026-08-14T18:00:00+08:00\",\"incident_location\":\"Level 2 car park, Perth WA\",\"owner_present\":\"no\",\"driver_identity\":\"vehicle was unattended\",\"own_vehicle_registration\":\"9XYZ876\",\"damage_description\":\"Dent and paint transfer.\"}",
+        "missing_facts_json": "[]",
+        "risk_flags_json": "[]",
+        "questions": [],
+        "actions": [],
+        "owner_summary": "Parking damage matter."
+      }
+    ],
+    "nodeOutputs": {
+      "Resolve Matter": [
+        {
+          "force_proceed": false
+        }
+      ],
+      "Playbook Library": [
+        {
+          "playbooks": {
+            "motor_vehicle_damage_v1": {
+              "required_facts": [
+                "incident_description",
+                "incident_datetime",
+                "incident_location",
+                "owner_present",
+                "driver_identity",
+                "own_vehicle_registration",
+                "damage_description"
+              ],
+              "optional_facts": [
+                "other_party_name",
+                "other_party_contact",
+                "other_party_registration",
+                "other_party_insurer",
+                "police_report_number",
+                "witness_details",
+                "insurer_name",
+                "policy_number",
+                "repair_quote_amount",
+                "prior_communications"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  },
+  "expect": {
+    "matter_status": "CLASSIFIED",
+    "requires_information": false,
+    "facts_key_equals": {
+      "test_data_only": "true"
+    }
+  },
+  "assertions": [
+    "expect.matter_status verified by adapter",
+    "expect.requires_information verified by adapter",
+    "expect.facts_key_equals verified by adapter"
+  ],
+  "target": {
+    "workflow": "wf2",
+    "unit_file": "harness/units/wf2/finalise-plan.js"
+  },
+  "harness": {
+    "adapter": "finalise-plan"
+  }
+}

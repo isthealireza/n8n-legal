@@ -436,6 +436,16 @@ const finalisePlan = {
         case 'optional_missing_facts_json': case 'planner_contradictions_json':
         case 'unobtainable_facts_json':
           checks.push(mk(k, e[k], out[k], jeq(e[k], out[k]))); break;
+        case 'facts_key_equals':
+          for (const [key, val] of Object.entries(e[k])) {
+            checks.push(mk('facts_json.' + key + ' === ' + JSON.stringify(val), val, facts[key]));
+          }
+          break;
+        case 'facts_key_absent':
+          for (const key of e[k]) {
+            checks.push(mk('facts_json.' + key + ' absent', true, !(key in facts)));
+          }
+          break;
         case 'facts_json_unchanged_keys':
           for (const key of e[k]) {
             const src = JSON.parse(scn.input.facts_json)[key];

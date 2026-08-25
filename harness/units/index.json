@@ -140,8 +140,8 @@
     "nodeId": "7a18e9d1-820c-4aa7-a84b-bab52f95bf74",
     "mode": "runOnceForAllItems",
     "file": "wf2/finalise-plan.js",
-    "bytes": 13381,
-    "sha256OfJsCode": "3d9e63e91ac4ffc375c6a816e03f8a27dc46f85dce9b8418cddec979aa59fd09"
+    "bytes": 12709,
+    "sha256OfJsCode": "d447a3340650f1a4fb986793d51347c6af598b10a624b1ec1988f082f9ff04e1"
   },
   {
     "workflow": "wf3",
