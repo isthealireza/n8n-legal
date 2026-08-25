@@ -1,30 +1,20 @@
 {
   "_capture": {
     "active_version_id": "983da561-5c19-42db-a2b4-1e2e7ac67e0f",
-    "captured_by": "scripts/capture_mcp.py",
-    "captured_on": "2026-08-25",
-    "draft_active_determination": "from_mcp_active_version_id",
-    "draft_diverged_from_published": true,
+    "capture_time": "see exports/last-run.json (untracked, so an unchanged capture does not produce a commit)",
+    "draft_active_determination": "from_active_version_object",
     "draft_version_id": "811b746c-869c-4fc3-94dc-123f60cb7067",
     "key": "WF5",
     "kind": "active",
-    "mcp_only_keys_dropped": [
-      "scopes",
-      "canExecute",
-      "availableInMCP",
-      "nodeCount"
-    ],
-    "not_captured_by": "scripts/sync.py — the n8n public REST API was unreachable from the capture environment (proxy refused CONNECT) and no API key was available. The REST path remains untested against a live instance.",
-    "published_body_from": "get_workflow_version(activeVersionId=983da561-5c19-42db-a2b4-1e2e7ac67e0f): the published graph, swapped into the workflow envelope",
     "scrub_counts": {
       "CASEREF": 3,
-      "CHATID": 3,
+      "CHATID": 4,
       "CREDID": 4,
+      "EMAIL": 1,
       "FILEID": 10
     },
     "scrubbed": true,
-    "source": "mcp-session",
-    "source_detail": "authenticated n8n MCP server, read-only tools only (get_workflow_details / get_workflow_version / get_workflow_versions_diff). NOT the public REST API — see docs/API_CAPABILITIES.md.",
+    "source": "n8n public REST API GET /api/v1/workflows/{id} (read-only)",
     "workflow_id": "zDLoMgW42jUm25Q4",
     "workflow_name": "5 - Inbound Replies and Daily Supervisor"
   },
@@ -498,6 +488,7 @@
       }
     },
     "createdAt": "2026-08-18T07:32:04.800Z",
+    "description": null,
     "id": "zDLoMgW42jUm25Q4",
     "isArchived": false,
     "meta": {
@@ -695,7 +686,7 @@
             ],
             "value": {
               "action_id": "",
-              "chat_id": "<REDACTED_CHATID_3>",
+              "chat_id": "<REDACTED_CHATID_4>",
               "created_at": "={{ $now.toISO() }}",
               "event_id": "={{ $json.unmatched_event_id }}",
               "event_type": "INBOUND_REPLY_UNMATCHED",
@@ -740,7 +731,7 @@
             "appendAttribution": false,
             "parse_mode": "HTML"
           },
-          "chatId": "<REDACTED_CHATID_3>",
+          "chatId": "<REDACTED_CHATID_4>",
           "text": "={{ 'An email arrived that I could not match to a matter.\\n\\nFrom: ' + String($('Match Reply to Matter').item.json.from_address || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '\\nSubject: ' + String($('Match Reply to Matter').item.json.subject || '').slice(0, 300).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '\\n\\nI filed it against no matter. I created no action.' }}"
         },
         "position": [
@@ -1076,7 +1067,7 @@
             "combinator": "and",
             "conditions": [
               {
-                "id": "<REDACTED_CHATID_1>",
+                "id": "<REDACTED_CHATID_2>",
                 "leftValue": "={{ $('Validate Reply JSON').first().json.create_action }}",
                 "operator": {
                   "operation": "true",
@@ -1514,7 +1505,7 @@
             "appendAttribution": false,
             "parse_mode": "HTML"
           },
-          "chatId": "<REDACTED_CHATID_3>",
+          "chatId": "<REDACTED_CHATID_4>",
           "text": "={{ $json.reply.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') }}"
         },
         "position": [
@@ -1742,7 +1733,7 @@
             "appendAttribution": false,
             "parse_mode": "HTML"
           },
-          "chatId": "<REDACTED_CHATID_3>",
+          "chatId": "<REDACTED_CHATID_4>",
           "text": "={{ $json.reply.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') }}"
         },
         "position": [
@@ -1896,7 +1887,7 @@
             "combinator": "and",
             "conditions": [
               {
-                "id": "<REDACTED_CHATID_2>",
+                "id": "<REDACTED_CHATID_3>",
                 "leftValue": "={{ $json.action_id }}",
                 "operator": {
                   "operation": "notEmpty",
@@ -2320,7 +2311,7 @@
         "id": "5dd12e17-95fc-4783-9cf6-b6d92f9d2c61",
         "name": "Build Follow-up Draft Request",
         "parameters": {
-          "jsCode": "// The payload workflow 4 expects on its Execute Workflow Trigger.\nconst rows = $('Find Due Follow-ups').all().map(i => i.json);\nreturn rows.map(r => ({ json: {\n  route: 'FOLLOW_UP_REQUEST',\n  route_group: 'DRAFT',\n  chat_id: '<REDACTED_CHATID_3>',\n  owner_chat_id: '<REDACTED_CHATID_3>',\n  matter_ref: r.matter_id,\n  target_action_id: r.action_id,\n  draft_ref: '',\n  payload_text: r.description,\n  text: r.description,\n  session_matter_id: r.matter_id,\n}}));"
+          "jsCode": "// The payload workflow 4 expects on its Execute Workflow Trigger.\nconst rows = $('Find Due Follow-ups').all().map(i => i.json);\nreturn rows.map(r => ({ json: {\n  route: 'FOLLOW_UP_REQUEST',\n  route_group: 'DRAFT',\n  chat_id: '<REDACTED_CHATID_4>',\n  owner_chat_id: '<REDACTED_CHATID_4>',\n  matter_ref: r.matter_id,\n  target_action_id: r.action_id,\n  draft_ref: '',\n  payload_text: r.description,\n  text: r.description,\n  session_matter_id: r.matter_id,\n}}));"
         },
         "position": [
           1760,
@@ -2387,7 +2378,7 @@
             "appendAttribution": false,
             "parse_mode": "HTML"
           },
-          "chatId": "<REDACTED_CHATID_3>",
+          "chatId": "<REDACTED_CHATID_4>",
           "text": "={{ $json.reply.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') }}"
         },
         "position": [
@@ -2638,7 +2629,7 @@
             ],
             "value": {
               "action_id": "",
-              "chat_id": "<REDACTED_CHATID_3>",
+              "chat_id": "<REDACTED_CHATID_4>",
               "created_at": "={{ $now.toISO() }}",
               "event_id": "={{ $json.event_id || ('EVT-BLOCKED-' + ($json.provider_message_id || 'NO-ID')) }}",
               "event_type": "={{ $json.audit_event || 'INBOUND_REPLY_BLOCKED' }}",
@@ -2685,7 +2676,7 @@
             "appendAttribution": false,
             "parse_mode": "HTML"
           },
-          "chatId": "<REDACTED_CHATID_3>",
+          "chatId": "<REDACTED_CHATID_4>",
           "text": "={{ (function(){ const e = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); const j = $json; if (j.decision === 'ALREADY_RECORDED') { return 'I already have that exact message on ' + e(j.matter_id) + '. The raw message is identical, so I recorded nothing again, created no action and changed no matter.'; } if (j.decision === 'IDEMPOTENCY_CONFLICT') { return 'IDEMPOTENCY CONFLICT on ' + e(j.matter_id) + ' - human review needed.\\n\\nA message I have already recorded has arrived again with DIFFERENT content.\\n\\nMessage id: ' + e(j.provider_message_id) + '\\nStored fingerprint: ' + e(j.stored_fingerprint || 'none recorded') + '\\nFingerprint now: ' + e(j.ingress_fingerprint) + '\\n\\nI changed nothing. The originally recorded message is untouched and no action or matter was updated. Compare the two deliveries yourself before deciding which is authentic.'; } return 'An email arrived that I did not attach to a matter.\\n\\nFrom: ' + e(j.from_address) + '\\nSubject: ' + e(String(j.subject || '').slice(0, 300)) + '\\nThread: ' + e(j.thread_id || 'none') + '\\n\\nBasis: ' + e(j.basis) + '\\nReason: ' + e(j.reason) + '\\n\\nI created no action, classified nothing and changed no matter.'; })() }}"
         },
         "position": [
@@ -2810,7 +2801,7 @@
             ],
             "value": {
               "action_id": "",
-              "chat_id": "<REDACTED_CHATID_3>",
+              "chat_id": "<REDACTED_CHATID_4>",
               "created_at": "={{ $now.toISO() }}",
               "event_id": "={{ $('Build Reply Context').first().json.event_id }}",
               "event_type": "NEW_INBOUND",
@@ -2906,7 +2897,6 @@
         "typeVersion": 4.5
       }
     ],
-    "parentFolderId": null,
     "settings": {
       "availableInMCP": true,
       "binaryMode": "separate",
@@ -2917,9 +2907,54 @@
       "timeSavedMode": "fixed",
       "timezone": "Australia/Perth"
     },
+    "shared": [
+      {
+        "createdAt": "2026-08-18T07:32:04.802Z",
+        "project": {
+          "createdAt": "2026-08-18T03:23:50.734Z",
+          "creatorId": "1d2a2ef0-c1d1-45a4-97bc-06cb2a162d01",
+          "customTelemetryTags": [],
+          "description": null,
+          "icon": null,
+          "id": "23FN58yRHxC1VQNo",
+          "name": "Ali Rad <<REDACTED_EMAIL_1>>",
+          "type": "personal",
+          "updatedAt": "2026-08-18T03:24:02.784Z"
+        },
+        "projectId": "23FN58yRHxC1VQNo",
+        "role": "workflow:owner",
+        "updatedAt": "2026-08-18T07:32:04.802Z",
+        "workflowId": "zDLoMgW42jUm25Q4"
+      }
+    ],
+    "sourceWorkflowId": null,
+    "staticData": {
+      "node:Daily 08:15 Sweep": {
+        "recurrenceRuleSignatures": [
+          null
+        ],
+        "recurrenceRules": [
+          null
+        ]
+      },
+      "node:Daily 09:00 Follow-up Sweep": {
+        "recurrenceRuleSignatures": [
+          null
+        ],
+        "recurrenceRules": [
+          null
+        ]
+      },
+      "node:Gmail Trigger - Replies": {
+        "Gmail Trigger - Replies": {
+          "lastTimeChecked": "<REDACTED_CHATID_1>"
+        }
+      }
+    },
     "tags": [],
     "triggerCount": 3,
     "updatedAt": "2026-08-23T06:15:21.468Z",
+    "versionCounter": 39,
     "versionId": "983da561-5c19-42db-a2b4-1e2e7ac67e0f"
   }
 }

@@ -1,31 +1,21 @@
 {
   "_capture": {
     "active_version_id": "b1c425bf-5830-4e3c-a6f7-bcf2c02ef593",
-    "captured_by": "scripts/capture_mcp.py",
-    "captured_on": "2026-08-25",
-    "draft_active_determination": "from_mcp_active_version_id",
-    "draft_diverged_from_published": true,
+    "capture_time": "see exports/last-run.json (untracked, so an unchanged capture does not produce a commit)",
+    "draft_active_determination": "from_active_version_object",
     "draft_version_id": "9cc644ec-595d-4084-b64d-cfbe265b0712",
     "key": "WF1",
     "kind": "draft",
-    "mcp_only_keys_dropped": [
-      "scopes",
-      "canExecute",
-      "availableInMCP",
-      "nodeCount"
-    ],
-    "not_captured_by": "scripts/sync.py — the n8n public REST API was unreachable from the capture environment (proxy refused CONNECT) and no API key was available. The REST path remains untested against a live instance.",
-    "published_body_from": "get_workflow_version(activeVersionId=b1c425bf-5830-4e3c-a6f7-bcf2c02ef593): the published graph, swapped into the workflow envelope",
     "scrub_counts": {
       "CASEREF": 4,
       "CHATID": 9,
       "CREDID": 3,
       "ELIDEDID": 1,
+      "EMAIL": 1,
       "FILEID": 3
     },
     "scrubbed": true,
-    "source": "mcp-session",
-    "source_detail": "authenticated n8n MCP server, read-only tools only (get_workflow_details / get_workflow_version / get_workflow_versions_diff). NOT the public REST API — see docs/API_CAPABILITIES.md.",
+    "source": "n8n public REST API GET /api/v1/workflows/{id} (read-only)",
     "workflow_id": "xUcAXTgocHPsHy5Y",
     "workflow_name": "1 - Telegram Intake and Command Router"
   },
@@ -406,6 +396,7 @@
       }
     },
     "createdAt": "2026-08-18T07:30:40.630Z",
+    "description": null,
     "id": "xUcAXTgocHPsHy5Y",
     "isArchived": false,
     "meta": {
@@ -1609,7 +1600,6 @@
         "webhookId": "a4f3c867-aa1d-4f35-8576-09aa90620155"
       }
     ],
-    "parentFolderId": null,
     "settings": {
       "availableInMCP": true,
       "binaryMode": "separate",
@@ -1620,9 +1610,32 @@
       "timeSavedMode": "fixed",
       "timezone": "Australia/Perth"
     },
+    "shared": [
+      {
+        "createdAt": "2026-08-18T07:30:40.633Z",
+        "project": {
+          "createdAt": "2026-08-18T03:23:50.734Z",
+          "creatorId": "1d2a2ef0-c1d1-45a4-97bc-06cb2a162d01",
+          "customTelemetryTags": [],
+          "description": null,
+          "icon": null,
+          "id": "23FN58yRHxC1VQNo",
+          "name": "Ali Rad <<REDACTED_EMAIL_1>>",
+          "type": "personal",
+          "updatedAt": "2026-08-18T03:24:02.784Z"
+        },
+        "projectId": "23FN58yRHxC1VQNo",
+        "role": "workflow:owner",
+        "updatedAt": "2026-08-18T07:30:40.633Z",
+        "workflowId": "xUcAXTgocHPsHy5Y"
+      }
+    ],
+    "sourceWorkflowId": null,
+    "staticData": null,
     "tags": [],
     "triggerCount": 1,
     "updatedAt": "2026-08-25T01:19:51.786Z",
+    "versionCounter": 36,
     "versionId": "9cc644ec-595d-4084-b64d-cfbe265b0712"
   }
 }
