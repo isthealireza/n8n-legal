@@ -3,7 +3,7 @@
     "active_version_id": "983da561-5c19-42db-a2b4-1e2e7ac67e0f",
     "capture_time": "see exports/last-run.json (untracked, so an unchanged capture does not produce a commit)",
     "draft_active_determination": "from_active_version_object",
-    "draft_version_id": "ba7ea015-9105-44f7-8212-e3e323d1da6b",
+    "draft_version_id": "46fd06a4-cc54-4357-8fc2-7656910bb0a2",
     "key": "WF5",
     "kind": "draft",
     "scrub_counts": {
@@ -3571,6 +3571,24 @@
                 "name": "safety_mode",
                 "type": "string",
                 "value": "={{ $('Evaluate Safety (Reply)').first().json.safety_mode }}"
+              },
+              {
+                "id": "sp-blocked",
+                "name": "side_effect_blocked",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-gate",
+                "name": "safety_gate",
+                "type": "string",
+                "value": "DRY_RUN"
+              },
+              {
+                "id": "sp-opstatus",
+                "name": "operation_status",
+                "type": "string",
+                "value": "TEST_SUPPRESSED"
               }
             ]
           },
@@ -3657,6 +3675,24 @@
                 "name": "safety_mode",
                 "type": "string",
                 "value": "={{ $('Evaluate Safety (Reply)').first().json.safety_mode }}"
+              },
+              {
+                "id": "sp-blocked",
+                "name": "side_effect_blocked",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-gate",
+                "name": "safety_gate",
+                "type": "string",
+                "value": "DRY_RUN"
+              },
+              {
+                "id": "sp-opstatus",
+                "name": "operation_status",
+                "type": "string",
+                "value": "TEST_SUPPRESSED"
               }
             ]
           },
@@ -3743,6 +3779,24 @@
                 "name": "safety_mode",
                 "type": "string",
                 "value": "={{ $('Evaluate Safety (Reply)').first().json.safety_mode }}"
+              },
+              {
+                "id": "sp-blocked",
+                "name": "side_effect_blocked",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-gate",
+                "name": "safety_gate",
+                "type": "string",
+                "value": "DRY_RUN"
+              },
+              {
+                "id": "sp-opstatus",
+                "name": "operation_status",
+                "type": "string",
+                "value": "TEST_SUPPRESSED"
               }
             ]
           },
@@ -3829,6 +3883,24 @@
                 "name": "safety_mode",
                 "type": "string",
                 "value": "={{ $('Evaluate Safety (Digest)').first().json.safety_mode }}"
+              },
+              {
+                "id": "sp-blocked",
+                "name": "side_effect_blocked",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-gate",
+                "name": "safety_gate",
+                "type": "string",
+                "value": "DRY_RUN"
+              },
+              {
+                "id": "sp-opstatus",
+                "name": "operation_status",
+                "type": "string",
+                "value": "TEST_SUPPRESSED"
               }
             ]
           },
@@ -3915,6 +3987,24 @@
                 "name": "safety_mode",
                 "type": "string",
                 "value": "={{ $('Evaluate Safety (FU)').first().json.safety_mode }}"
+              },
+              {
+                "id": "sp-blocked",
+                "name": "side_effect_blocked",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-gate",
+                "name": "safety_gate",
+                "type": "string",
+                "value": "DRY_RUN"
+              },
+              {
+                "id": "sp-opstatus",
+                "name": "operation_status",
+                "type": "string",
+                "value": "TEST_SUPPRESSED"
               }
             ]
           },
@@ -4001,6 +4091,24 @@
                 "name": "safety_mode",
                 "type": "string",
                 "value": "={{ $('Evaluate Safety (Reply)').first().json.safety_mode }}"
+              },
+              {
+                "id": "sp-blocked",
+                "name": "side_effect_blocked",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-gate",
+                "name": "safety_gate",
+                "type": "string",
+                "value": "DRY_RUN"
+              },
+              {
+                "id": "sp-opstatus",
+                "name": "operation_status",
+                "type": "string",
+                "value": "TEST_SUPPRESSED"
               }
             ]
           },
@@ -4087,6 +4195,24 @@
                 "name": "safety_mode",
                 "type": "string",
                 "value": "={{ $('Evaluate Safety (Reply)').first().json.safety_mode }}"
+              },
+              {
+                "id": "sp-blocked",
+                "name": "side_effect_blocked",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-gate",
+                "name": "safety_gate",
+                "type": "string",
+                "value": "DRY_RUN"
+              },
+              {
+                "id": "sp-opstatus",
+                "name": "operation_status",
+                "type": "string",
+                "value": "TEST_SUPPRESSED"
               }
             ]
           },
@@ -4173,6 +4299,24 @@
                 "name": "safety_mode",
                 "type": "string",
                 "value": "={{ $('Evaluate Safety (Reply)').first().json.safety_mode }}"
+              },
+              {
+                "id": "sp-blocked",
+                "name": "side_effect_blocked",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-gate",
+                "name": "safety_gate",
+                "type": "string",
+                "value": "DRY_RUN"
+              },
+              {
+                "id": "sp-opstatus",
+                "name": "operation_status",
+                "type": "string",
+                "value": "TEST_SUPPRESSED"
               }
             ]
           },
@@ -4259,6 +4403,24 @@
                 "name": "safety_mode",
                 "type": "string",
                 "value": "={{ $('Evaluate Safety (FU)').first().json.safety_mode }}"
+              },
+              {
+                "id": "sp-blocked",
+                "name": "side_effect_blocked",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-gate",
+                "name": "safety_gate",
+                "type": "string",
+                "value": "DRY_RUN"
+              },
+              {
+                "id": "sp-opstatus",
+                "name": "operation_status",
+                "type": "string",
+                "value": "TEST_SUPPRESSED"
               }
             ]
           },
@@ -4345,6 +4507,24 @@
                 "name": "safety_mode",
                 "type": "string",
                 "value": "={{ $('Evaluate Safety (Reply)').first().json.safety_mode }}"
+              },
+              {
+                "id": "sp-blocked",
+                "name": "side_effect_blocked",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-gate",
+                "name": "safety_gate",
+                "type": "string",
+                "value": "DRY_RUN"
+              },
+              {
+                "id": "sp-opstatus",
+                "name": "operation_status",
+                "type": "string",
+                "value": "TEST_SUPPRESSED"
               }
             ]
           },
@@ -4431,6 +4611,24 @@
                 "name": "safety_mode",
                 "type": "string",
                 "value": "={{ $('Evaluate Safety (FU)').first().json.safety_mode }}"
+              },
+              {
+                "id": "sp-blocked",
+                "name": "side_effect_blocked",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-gate",
+                "name": "safety_gate",
+                "type": "string",
+                "value": "DRY_RUN"
+              },
+              {
+                "id": "sp-opstatus",
+                "name": "operation_status",
+                "type": "string",
+                "value": "TEST_SUPPRESSED"
               }
             ]
           },
@@ -4517,6 +4715,24 @@
                 "name": "safety_mode",
                 "type": "string",
                 "value": "={{ $('Evaluate Safety (Reply)').first().json.safety_mode }}"
+              },
+              {
+                "id": "sp-blocked",
+                "name": "side_effect_blocked",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-gate",
+                "name": "safety_gate",
+                "type": "string",
+                "value": "DRY_RUN"
+              },
+              {
+                "id": "sp-opstatus",
+                "name": "operation_status",
+                "type": "string",
+                "value": "TEST_SUPPRESSED"
               }
             ]
           },
@@ -4603,6 +4819,24 @@
                 "name": "safety_mode",
                 "type": "string",
                 "value": "={{ $('Evaluate Safety (FU)').first().json.safety_mode }}"
+              },
+              {
+                "id": "sp-blocked",
+                "name": "side_effect_blocked",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-gate",
+                "name": "safety_gate",
+                "type": "string",
+                "value": "DRY_RUN"
+              },
+              {
+                "id": "sp-opstatus",
+                "name": "operation_status",
+                "type": "string",
+                "value": "TEST_SUPPRESSED"
               }
             ]
           },
@@ -4689,6 +4923,24 @@
                 "name": "safety_mode",
                 "type": "string",
                 "value": "={{ $('Evaluate Safety (Reply)').first().json.safety_mode }}"
+              },
+              {
+                "id": "sp-blocked",
+                "name": "side_effect_blocked",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-gate",
+                "name": "safety_gate",
+                "type": "string",
+                "value": "DRY_RUN"
+              },
+              {
+                "id": "sp-opstatus",
+                "name": "operation_status",
+                "type": "string",
+                "value": "TEST_SUPPRESSED"
               }
             ]
           },
@@ -4775,6 +5027,24 @@
                 "name": "safety_mode",
                 "type": "string",
                 "value": "={{ $('Evaluate Safety (Reply)').first().json.safety_mode }}"
+              },
+              {
+                "id": "sp-blocked",
+                "name": "side_effect_blocked",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-gate",
+                "name": "safety_gate",
+                "type": "string",
+                "value": "DRY_RUN"
+              },
+              {
+                "id": "sp-opstatus",
+                "name": "operation_status",
+                "type": "string",
+                "value": "TEST_SUPPRESSED"
               }
             ]
           },
@@ -4845,8 +5115,8 @@
     },
     "tags": [],
     "triggerCount": 3,
-    "updatedAt": "2026-08-26T06:04:10.282Z",
-    "versionCounter": 41,
-    "versionId": "ba7ea015-9105-44f7-8212-e3e323d1da6b"
+    "updatedAt": "2026-08-26T08:03:00.542Z",
+    "versionCounter": 43,
+    "versionId": "46fd06a4-cc54-4357-8fc2-7656910bb0a2"
   }
 }

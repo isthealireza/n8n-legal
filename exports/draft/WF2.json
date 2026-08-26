@@ -3,7 +3,7 @@
     "active_version_id": "f2a5156f-7183-4117-aa98-74b07734a773",
     "capture_time": "see exports/last-run.json (untracked, so an unchanged capture does not produce a commit)",
     "draft_active_determination": "from_active_version_object",
-    "draft_version_id": "0e675d4a-a01c-4fee-a725-27ff2c522cf0",
+    "draft_version_id": "147da1d0-5d1d-4b14-be37-19b1b50dbe61",
     "key": "WF2",
     "kind": "draft",
     "scrub_counts": {
@@ -1831,6 +1831,24 @@
                 "name": "safety_mode",
                 "type": "string",
                 "value": "={{ $('Evaluate Safety').first().json.safety_mode }}"
+              },
+              {
+                "id": "sp-blocked",
+                "name": "side_effect_blocked",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-gate",
+                "name": "safety_gate",
+                "type": "string",
+                "value": "DRY_RUN"
+              },
+              {
+                "id": "sp-opstatus",
+                "name": "operation_status",
+                "type": "string",
+                "value": "TEST_SUPPRESSED"
               }
             ]
           },
@@ -1917,6 +1935,24 @@
                 "name": "safety_mode",
                 "type": "string",
                 "value": "={{ $('Evaluate Safety').first().json.safety_mode }}"
+              },
+              {
+                "id": "sp-blocked",
+                "name": "side_effect_blocked",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-gate",
+                "name": "safety_gate",
+                "type": "string",
+                "value": "DRY_RUN"
+              },
+              {
+                "id": "sp-opstatus",
+                "name": "operation_status",
+                "type": "string",
+                "value": "TEST_SUPPRESSED"
               }
             ]
           },
@@ -2003,6 +2039,24 @@
                 "name": "safety_mode",
                 "type": "string",
                 "value": "={{ $('Evaluate Safety').first().json.safety_mode }}"
+              },
+              {
+                "id": "sp-blocked",
+                "name": "side_effect_blocked",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-gate",
+                "name": "safety_gate",
+                "type": "string",
+                "value": "DRY_RUN"
+              },
+              {
+                "id": "sp-opstatus",
+                "name": "operation_status",
+                "type": "string",
+                "value": "TEST_SUPPRESSED"
               }
             ]
           },
@@ -2089,6 +2143,24 @@
                 "name": "safety_mode",
                 "type": "string",
                 "value": "={{ $('Evaluate Safety').first().json.safety_mode }}"
+              },
+              {
+                "id": "sp-blocked",
+                "name": "side_effect_blocked",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-gate",
+                "name": "safety_gate",
+                "type": "string",
+                "value": "DRY_RUN"
+              },
+              {
+                "id": "sp-opstatus",
+                "name": "operation_status",
+                "type": "string",
+                "value": "TEST_SUPPRESSED"
               }
             ]
           },
@@ -2175,6 +2247,24 @@
                 "name": "safety_mode",
                 "type": "string",
                 "value": "={{ $('Evaluate Safety').first().json.safety_mode }}"
+              },
+              {
+                "id": "sp-blocked",
+                "name": "side_effect_blocked",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-gate",
+                "name": "safety_gate",
+                "type": "string",
+                "value": "DRY_RUN"
+              },
+              {
+                "id": "sp-opstatus",
+                "name": "operation_status",
+                "type": "string",
+                "value": "TEST_SUPPRESSED"
               }
             ]
           },
@@ -2261,6 +2351,24 @@
                 "name": "safety_mode",
                 "type": "string",
                 "value": "={{ $('Evaluate Safety').first().json.safety_mode }}"
+              },
+              {
+                "id": "sp-blocked",
+                "name": "side_effect_blocked",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-gate",
+                "name": "safety_gate",
+                "type": "string",
+                "value": "DRY_RUN"
+              },
+              {
+                "id": "sp-opstatus",
+                "name": "operation_status",
+                "type": "string",
+                "value": "TEST_SUPPRESSED"
               }
             ]
           },
@@ -2347,6 +2455,24 @@
                 "name": "safety_mode",
                 "type": "string",
                 "value": "={{ $('Evaluate Safety').first().json.safety_mode }}"
+              },
+              {
+                "id": "sp-blocked",
+                "name": "side_effect_blocked",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-gate",
+                "name": "safety_gate",
+                "type": "string",
+                "value": "DRY_RUN"
+              },
+              {
+                "id": "sp-opstatus",
+                "name": "operation_status",
+                "type": "string",
+                "value": "TEST_SUPPRESSED"
               }
             ]
           },
@@ -2433,6 +2559,24 @@
                 "name": "safety_mode",
                 "type": "string",
                 "value": "={{ $('Evaluate Safety').first().json.safety_mode }}"
+              },
+              {
+                "id": "sp-blocked",
+                "name": "side_effect_blocked",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-gate",
+                "name": "safety_gate",
+                "type": "string",
+                "value": "DRY_RUN"
+              },
+              {
+                "id": "sp-opstatus",
+                "name": "operation_status",
+                "type": "string",
+                "value": "TEST_SUPPRESSED"
               }
             ]
           },
@@ -2481,8 +2625,8 @@
     "staticData": null,
     "tags": [],
     "triggerCount": 0,
-    "updatedAt": "2026-08-26T05:54:18.781Z",
-    "versionCounter": 39,
-    "versionId": "0e675d4a-a01c-4fee-a725-27ff2c522cf0"
+    "updatedAt": "2026-08-26T07:58:37.133Z",
+    "versionCounter": 40,
+    "versionId": "147da1d0-5d1d-4b14-be37-19b1b50dbe61"
   }
 }
