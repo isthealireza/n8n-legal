@@ -3,7 +3,7 @@
     "active_version_id": "b1c425bf-5830-4e3c-a6f7-bcf2c02ef593",
     "capture_time": "see exports/last-run.json (untracked, so an unchanged capture does not produce a commit)",
     "draft_active_determination": "from_active_version_object",
-    "draft_version_id": "b4472ef8-1979-4fc9-a69a-ab42b3cd462a",
+    "draft_version_id": "6a400ddd-c756-4aaa-a9cc-3c49f4df41be",
     "key": "WF1",
     "kind": "draft",
     "scrub_counts": {
@@ -1966,6 +1966,7 @@
           "additionalFields": {
             "cache_time": 0
           },
+          "operation": "answerQuery",
           "queryId": "={{ $json.callback_query_id }}",
           "resource": "callback"
         },
@@ -3511,8 +3512,8 @@
     "staticData": null,
     "tags": [],
     "triggerCount": 1,
-    "updatedAt": "2026-08-26T12:06:42.201Z",
-    "versionCounter": 40,
-    "versionId": "b4472ef8-1979-4fc9-a69a-ab42b3cd462a"
+    "updatedAt": "2026-08-26T15:24:33.193Z",
+    "versionCounter": 41,
+    "versionId": "6a400ddd-c756-4aaa-a9cc-3c49f4df41be"
   }
 }

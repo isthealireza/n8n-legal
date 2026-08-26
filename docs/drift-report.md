@@ -7,13 +7,14 @@ in `exports/last-run.json`, which is untracked.
 
 ## Changed since last sync
 
-- Nothing. Every captured body hashes identically to the previous sync.
+- WF1: active body changed
+- WF1: draft body changed
 
 ## Per-workflow state
 
 | key | name | capture | active sha256 (canonical, first 12) | draft present | draft sha256 (first 12) |
 |---|---|---|---|---|---|
-| WF1 | 1 - Telegram Intake and Command Router | ok | `c25227b215fd` | yes | `4f6c4b500094` |
+| WF1 | 1 - Telegram Intake and Command Router | ok | `05a64affd4ca` | yes | `e637f28ae48c` |
 | WF2 | 2 - Matter Classification and Planning | ok | `a48f5fa2b175` | yes | `4abc2ec49486` |
 | WF3 | 3 - Evidence Intake and Storage | ok | `21e2b5652ad3` | yes | `c841a5a25993` |
 | WF4 | 4 - Research Drafting Approval and Dispatch | ok | `90e783b14479` | yes | `7a77cff8e2fa` |
