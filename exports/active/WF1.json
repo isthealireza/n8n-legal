@@ -3,7 +3,7 @@
     "active_version_id": "b1c425bf-5830-4e3c-a6f7-bcf2c02ef593",
     "capture_time": "see exports/last-run.json (untracked, so an unchanged capture does not produce a commit)",
     "draft_active_determination": "from_active_version_object",
-    "draft_version_id": "875bf463-2397-4b7f-a1d1-40f05ea11729",
+    "draft_version_id": "b4472ef8-1979-4fc9-a69a-ab42b3cd462a",
     "key": "WF1",
     "kind": "active",
     "scrub_counts": {
@@ -1635,8 +1635,8 @@
     "staticData": null,
     "tags": [],
     "triggerCount": 1,
-    "updatedAt": "2026-08-26T07:58:01.727Z",
-    "versionCounter": 38,
+    "updatedAt": "2026-08-26T12:06:42.201Z",
+    "versionCounter": 40,
     "versionId": "b1c425bf-5830-4e3c-a6f7-bcf2c02ef593"
   }
 }

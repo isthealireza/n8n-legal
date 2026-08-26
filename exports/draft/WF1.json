@@ -3,7 +3,7 @@
     "active_version_id": "b1c425bf-5830-4e3c-a6f7-bcf2c02ef593",
     "capture_time": "see exports/last-run.json (untracked, so an unchanged capture does not produce a commit)",
     "draft_active_determination": "from_active_version_object",
-    "draft_version_id": "875bf463-2397-4b7f-a1d1-40f05ea11729",
+    "draft_version_id": "b4472ef8-1979-4fc9-a69a-ab42b3cd462a",
     "key": "WF1",
     "kind": "draft",
     "scrub_counts": {
@@ -12,7 +12,7 @@
       "CREDID": 3,
       "ELIDEDID": 1,
       "EMAIL": 1,
-      "FILEID": 4
+      "FILEID": 7
     },
     "scrubbed": true,
     "source": "n8n public REST API GET /api/v1/workflows/{id} (read-only)",
@@ -52,6 +52,29 @@
             {
               "index": 0,
               "node": "Guard - Telegram - Clarify",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Canonical Matter Id OK?": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Guard - Run - Draft and Approval",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "No Validated Matter Id",
+              "type": "main"
+            },
+            {
+              "index": 0,
+              "node": "Build Clarification",
               "type": "main"
             }
           ]
@@ -397,6 +420,17 @@
           ]
         ]
       },
+      "Load Matters (Draft Route)": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Resolve Canonical Matter Id",
+              "type": "main"
+            }
+          ]
+        ]
+      },
       "Load Session": {
         "main": [
           [
@@ -459,6 +493,17 @@
           ]
         ]
       },
+      "Resolve Canonical Matter Id": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Canonical Matter Id OK?",
+              "type": "main"
+            }
+          ]
+        ]
+      },
       "Resolve Route": {
         "main": [
           [
@@ -489,7 +534,7 @@
           [
             {
               "index": 0,
-              "node": "Guard - Run - Draft and Approval",
+              "node": "Load Matters (Draft Route)",
               "type": "main"
             }
           ],
@@ -3335,6 +3380,101 @@
         ],
         "type": "n8n-nodes-base.set",
         "typeVersion": 3.4
+      },
+      {
+        "alwaysOutputData": true,
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "<REDACTED_CREDID_2>",
+            "name": "Google Sheets account"
+          }
+        },
+        "id": "19c8e361-e6fc-44dc-91a2-e10220419c43",
+        "name": "Load Matters (Draft Route)",
+        "notes": "STEP1D-MATTERID-20260826. Read-only. The Matters register on the DRAFT route, so a matter_ref can be validated against the register and its owner before WF4 is called. WF1's other Load Matters node is reachable only from the STATUS route.",
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "<REDACTED_FILEID_1>"
+          },
+          "options": {},
+          "sheetName": {
+            "__rl": true,
+            "mode": "name",
+            "value": "Matters"
+          }
+        },
+        "position": [
+          2452,
+          768
+        ],
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.5
+      },
+      {
+        "id": "4629c9ef-0eab-4029-8306-82884225787f",
+        "name": "Resolve Canonical Matter Id",
+        "notes": "STEP1D-MATTERID-20260826. Emits a validated canonical matter_id for WF4, or fails closed with NO_VALIDATED_MATTER_ID and does not call WF4. Never extracts MAT- tokens from free text. Reads owner, never writes it.",
+        "parameters": {
+          "jsCode": "// STEP1D-MATTERID-20260826 - canonical matter_id at the WF1 -> WF4 boundary.\n// Emits a validated matter_id, or fails closed with NO_VALIDATED_MATTER_ID.\n//\n// BINDING NOTE. This node is fed by Load Matters (Draft Route), a Sheets read, so\n// $input carries REGISTER ROWS and not the routed item. The routed item is read\n// explicitly from $('Resolve Route'), which the Route switch passes through\n// unchanged. Binding it from $input would select a register row as the item.\n//\n// Rules, in order of precedence:\n//   1. an existing non-empty validated matter_id on the routed item\n//   2. the canonical matter_id returned by WF2 after creating or resolving a matter\n//   3. session_matter_id, only if the Sessions row belongs to this chat\n//   4. matter_ref, only if it validates against the Matters register and its owner\n//\n// Precedence alone never confers trust. Every candidate must also be well formed,\n// present exactly once on the register, and owned by the asking chat. MAT- tokens\n// are never extracted from free text: only structured fields are read. The owner is\n// read for comparison and is never written or changed.\n//\n// Rules 1 and 2 are structurally absent on the DRAFT route today - WF1 emits no\n// matter_id, and WF2 is not called in a draft execution - so they are implemented\n// for contract completeness and will simply not match.\n\nconst item = $('Resolve Route').first().json || {};\nconst cfg = $('Config').first().json || {};\n\nconst S = (v) => String(v === null || v === undefined ? '' : v).trim();\nconst U = (v) => S(v).toUpperCase();\nconst SHAPE = /^MAT-\\d{8}-\\d{3}$/;\n\nconst chatId = S(item.chat_id);\nconst ownerId = S(cfg.owner_chat_id);\n\n// The Sessions row for THIS chat. Load Session looks up on chat_id and always\n// outputs, so an absent session yields an empty object rather than an error.\nlet sessionRow = {};\ntry { sessionRow = $('Load Session').first().json || {}; } catch (e) { sessionRow = {}; }\nconst sessionChat = S(sessionRow.chat_id);\nconst sessionIsMine = !!sessionChat && !!chatId && sessionChat === chatId;\n\n// The Matters register, read on this route only.\nlet matters = [];\ntry {\n  matters = ($('Load Matters (Draft Route)').all() || []).map((i) => (i && i.json) || {});\n} catch (e) {\n  matters = [];\n}\n\n// Exactly one row, or nothing. An ambiguous register is refused, not guessed.\nfunction registerRow(id) {\n  const hits = matters.filter((m) => U(m.matter_id) === id);\n  return hits.length === 1 ? hits[0] : null;\n}\n\nfunction validate(id) {\n  if (!id) return { ok: false, why: 'absent' };\n  if (!SHAPE.test(id)) return { ok: false, why: 'malformed_identifier' };\n  const row = registerRow(id);\n  if (!row) return { ok: false, why: '<REDACTED_FILEID_5>' };\n  const rowOwner = S(row.owner_chat_id);\n  if (!rowOwner) return { ok: false, why: 'register_row_has_no_owner' };\n  if (rowOwner !== chatId) return { ok: false, why: 'owned_by_another_chat' };\n  if (ownerId && chatId !== ownerId) return { ok: false, why: '<REDACTED_FILEID_6>' };\n  return { ok: true, row: row };\n}\n\nconst candidates = [\n  { source: 'existing_matter_id', value: U(item.matter_id) },\n  { source: 'wf2_canonical', value: U(item.child_matter_id || item.canonical_matter_id) },\n  { source: 'session_matter_id', value: sessionIsMine ? U(item.session_matter_id) : '' },\n  { source: 'matter_ref', value: U(item.matter_ref) },\n];\n\nconst attempts = [];\nlet chosen = null;\n\nfor (const c of candidates) {\n  if (c.source === 'session_matter_id' && !sessionIsMine) {\n    attempts.push({ source: c.source, value: U(item.session_matter_id), result: '<REDACTED_FILEID_7>' });\n    continue;\n  }\n  const v = validate(c.value);\n  attempts.push({ source: c.source, value: c.value, result: v.ok ? 'accepted' : v.why });\n  if (v.ok) {\n    chosen = { id: c.value, source: c.source };\n    break;\n  }\n}\n\nif (!chosen) {\n  return [{ json: Object.assign({}, item, {\n    ok: false,\n    status: 'NEEDS_INFORMATION',\n    failure_code: 'NO_VALIDATED_MATTER_ID',\n    matter_id: '',\n    wf4_called: false,\n    matter_id_source: '',\n    matter_id_validated: false,\n    matter_id_attempts: attempts,\n  }) }];\n}\n\nreturn [{ json: Object.assign({}, item, {\n  ok: true,\n  matter_id: chosen.id,\n  matter_id_source: chosen.source,\n  matter_id_validated: true,\n  matter_id_attempts: attempts,\n}) }];",
+          "mode": "runOnceForAllItems"
+        },
+        "position": [
+          2632,
+          768
+        ],
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2
+      },
+      {
+        "id": "51e2bb0a-4a08-4267-b426-ef1b64e97338",
+        "name": "Canonical Matter Id OK?",
+        "notes": "STEP1D-MATTERID-20260826. True: a validated canonical matter_id exists, WF4 may be called. False: fail closed, WF4 is not called.",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "canonical-matter-id-ok",
+                "leftValue": "={{ $json.ok === true && $json.matter_id_validated === true && $json.matter_id !== '' }}",
+                "operator": {
+                  "operation": "true",
+                  "singleValue": true,
+                  "type": "boolean"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "options": {
+            "looseTypeValidation": true
+          }
+        },
+        "position": [
+          2812,
+          768
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "id": "47a7375f-5f66-4a8f-baa3-f81de64a3dc5",
+        "name": "No Validated Matter Id",
+        "notes": "STEP1D-MATTERID-20260826. Terminal, fail closed. The item carries ok=false, status=NEEDS_INFORMATION, failure_code=NO_VALIDATED_MATTER_ID, matter_id='', wf4_called=false. WF4 was not called. No external notification is sent from here.",
+        "parameters": {},
+        "position": [
+          2992,
+          908
+        ],
+        "type": "n8n-nodes-base.noOp",
+        "typeVersion": 1
       }
     ],
     "settings": {
@@ -3371,8 +3511,8 @@
     "staticData": null,
     "tags": [],
     "triggerCount": 1,
-    "updatedAt": "2026-08-26T07:58:01.727Z",
-    "versionCounter": 38,
-    "versionId": "875bf463-2397-4b7f-a1d1-40f05ea11729"
+    "updatedAt": "2026-08-26T12:06:42.201Z",
+    "versionCounter": 40,
+    "versionId": "b4472ef8-1979-4fc9-a69a-ab42b3cd462a"
   }
 }

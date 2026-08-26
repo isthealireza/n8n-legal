@@ -8,18 +8,18 @@
       "active": {
         "kind": "active",
         "path": "exports/active/WF1.json",
-        "sha256_body": "9c2f804549c44bd3fd5ad5ae7e8be54d8c378ac5368800ab68947017e6e956f8",
-        "sha256_canonical": "37f3b6a86705ca49a995252486d353cb2d2177b2fe01d41d190769852b2b8dca"
+        "sha256_body": "57ccb777926f083ec9717b734107b4f535af16a44673105b620569f377fdaad5",
+        "sha256_canonical": "c25227b215fd56850f62a47b7774e9bae679e4791224aef3a337fb4bf9c4d18f"
       },
       "active_version_id": "b1c425bf-5830-4e3c-a6f7-bcf2c02ef593",
       "determination": "from_active_version_object",
       "draft": {
         "kind": "draft",
         "path": "exports/draft/WF1.json",
-        "sha256_body": "61cbb256796182fea5c29c71586d03af435ca8d888960ccb7dfca9cb35bc2cbc",
-        "sha256_canonical": "065f0df5b968b3f0ceff6db32cb97abee14b633dbce8d2d46f59fddff47e40ba"
+        "sha256_body": "4c8ddd64ac958a1dbb4793b5a11dfe65a42a1d75df5324ce2c2e462013ac9d30",
+        "sha256_canonical": "4f6c4b500094ad6dfd9a138a1b4e0969c3de622afbfae857cde0cdd8ff65ae15"
       },
-      "draft_version_id": "875bf463-2397-4b7f-a1d1-40f05ea11729",
+      "draft_version_id": "b4472ef8-1979-4fc9-a69a-ab42b3cd462a",
       "id": "xUcAXTgocHPsHy5Y",
       "name": "1 - Telegram Intake and Command Router"
     },
