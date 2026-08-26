@@ -3,7 +3,7 @@
     "active_version_id": "b1c425bf-5830-4e3c-a6f7-bcf2c02ef593",
     "capture_time": "see exports/last-run.json (untracked, so an unchanged capture does not produce a commit)",
     "draft_active_determination": "from_active_version_object",
-    "draft_version_id": "9cc644ec-595d-4084-b64d-cfbe265b0712",
+    "draft_version_id": "02693bdc-0e3e-49c8-a5df-1044b5e977b9",
     "key": "WF1",
     "kind": "draft",
     "scrub_counts": {
@@ -12,7 +12,7 @@
       "CREDID": 3,
       "ELIDEDID": 1,
       "EMAIL": 1,
-      "FILEID": 3
+      "FILEID": 4
     },
     "scrubbed": true,
     "source": "n8n public REST API GET /api/v1/workflows/{id} (read-only)",
@@ -40,7 +40,7 @@
           [
             {
               "index": 0,
-              "node": "Log Security Event",
+              "node": "Guard - Log Security Event",
               "type": "main"
             }
           ]
@@ -51,7 +51,7 @@
           [
             {
               "index": 0,
-              "node": "Telegram - Clarify",
+              "node": "Guard - Telegram - Clarify",
               "type": "main"
             }
           ]
@@ -69,7 +69,7 @@
           [
             {
               "index": 0,
-              "node": "Telegram - Classifier Failed",
+              "node": "Guard - Telegram - Classifier Failed",
               "type": "main"
             }
           ]
@@ -97,12 +97,23 @@
           ]
         ]
       },
+      "Evaluate Safety": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Config",
+              "type": "main"
+            }
+          ]
+        ]
+      },
       "Extract Child Result": {
         "main": [
           [
             {
               "index": 0,
-              "node": "Update Session Matter",
+              "node": "Guard - Update Session Matter",
               "type": "main"
             }
           ]
@@ -113,7 +124,241 @@
           [
             {
               "index": 0,
+              "node": "Guard - Telegram - Status",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Guard - Ack Button": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Ack Button",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "Suppressed - Ack Button",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Guard - Log Security Event": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Log Security Event",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "Suppressed - Log Security Event",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Guard - Run - Approval Decision": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Run - Approval Decision",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "Suppressed - Run - Approval Decision",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Guard - Run - Draft and Approval": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Run - Draft and Approval",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "Suppressed - Run - Draft and Approval",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Guard - Run - Evidence Intake": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Run - Evidence Intake",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "Suppressed - Run - Evidence Intake",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Guard - Run - Matter Planner": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Run - Matter Planner",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "Suppressed - Run - Matter Planner",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Guard - Save Session": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Save Session",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "Suppressed - Save Session",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Guard - Telegram - Clarify": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Telegram - Clarify",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "Suppressed - Telegram - Clarify",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Guard - Telegram - Classifier Failed": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Telegram - Classifier Failed",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "Suppressed - Telegram - Classifier Failed",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Guard - Telegram - Help": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Telegram - Help",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "Suppressed - Telegram - Help",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Guard - Telegram - Status": {
+        "main": [
+          [
+            {
+              "index": 0,
               "node": "Telegram - Status",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "Suppressed - Telegram - Status",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Guard - Telegram - Subworkflow Failed": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Telegram - Subworkflow Failed",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "Suppressed - Telegram - Subworkflow Failed",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Guard - Update Session Matter": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Update Session Matter",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "Suppressed - Update Session Matter",
               "type": "main"
             }
           ]
@@ -135,7 +380,7 @@
           [
             {
               "index": 0,
-              "node": "Ack Button",
+              "node": "Guard - Ack Button",
               "type": "main"
             }
           ]
@@ -230,28 +475,28 @@
           [
             {
               "index": 0,
-              "node": "Run - Matter Planner",
+              "node": "Guard - Run - Matter Planner",
               "type": "main"
             }
           ],
           [
             {
               "index": 0,
-              "node": "Run - Evidence Intake",
+              "node": "Guard - Run - Evidence Intake",
               "type": "main"
             }
           ],
           [
             {
               "index": 0,
-              "node": "Run - Draft and Approval",
+              "node": "Guard - Run - Draft and Approval",
               "type": "main"
             }
           ],
           [
             {
               "index": 0,
-              "node": "Run - Approval Decision",
+              "node": "Guard - Run - Approval Decision",
               "type": "main"
             }
           ],
@@ -265,7 +510,7 @@
           [
             {
               "index": 0,
-              "node": "Telegram - Help",
+              "node": "Guard - Telegram - Help",
               "type": "main"
             }
           ],
@@ -283,14 +528,14 @@
           [
             {
               "index": 0,
-              "node": "Save Session",
+              "node": "Guard - Save Session",
               "type": "main"
             }
           ],
           [
             {
               "index": 0,
-              "node": "Telegram - Subworkflow Failed",
+              "node": "Guard - Telegram - Subworkflow Failed",
               "type": "main"
             }
           ]
@@ -301,14 +546,14 @@
           [
             {
               "index": 0,
-              "node": "Save Session",
+              "node": "Guard - Save Session",
               "type": "main"
             }
           ],
           [
             {
               "index": 0,
-              "node": "Telegram - Subworkflow Failed",
+              "node": "Guard - Telegram - Subworkflow Failed",
               "type": "main"
             }
           ]
@@ -319,14 +564,14 @@
           [
             {
               "index": 0,
-              "node": "Save Session",
+              "node": "Guard - Save Session",
               "type": "main"
             }
           ],
           [
             {
               "index": 0,
-              "node": "Telegram - Subworkflow Failed",
+              "node": "Guard - Telegram - Subworkflow Failed",
               "type": "main"
             }
           ]
@@ -344,7 +589,95 @@
           [
             {
               "index": 0,
-              "node": "Telegram - Subworkflow Failed",
+              "node": "Guard - Telegram - Subworkflow Failed",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Safety Config": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Evaluate Safety",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Suppressed - Log Security Event": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Ignore Unauthorised",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Suppressed - Run - Approval Decision": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Guard - Save Session",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Suppressed - Run - Draft and Approval": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Guard - Save Session",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Suppressed - Run - Evidence Intake": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Guard - Save Session",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Suppressed - Run - Matter Planner": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Extract Child Result",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Suppressed - Telegram - Clarify": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Guard - Save Session",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Suppressed - Telegram - Status": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Guard - Save Session",
               "type": "main"
             }
           ]
@@ -355,7 +688,7 @@
           [
             {
               "index": 0,
-              "node": "Save Session",
+              "node": "Guard - Save Session",
               "type": "main"
             }
           ]
@@ -366,7 +699,7 @@
           [
             {
               "index": 0,
-              "node": "Save Session",
+              "node": "Guard - Save Session",
               "type": "main"
             }
           ]
@@ -377,7 +710,7 @@
           [
             {
               "index": 0,
-              "node": "Config",
+              "node": "Safety Config",
               "type": "main"
             }
           ]
@@ -1598,6 +1931,1176 @@
         "type": "n8n-nodes-base.telegram",
         "typeVersion": 1.2,
         "webhookId": "a4f3c867-aa1d-4f35-8576-09aa90620155"
+      },
+      {
+        "id": "95f5805a-b29f-4a82-969e-45556eafb625",
+        "name": "Safety Config",
+        "notes": "STEP1-KILLSWITCH-20260826. Single source of truth for the safety contract. Set dry_run=false AND live_send_authorised=true AND environment=production to permit external side effects. Any other combination fails closed.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sc-dry-run",
+                "name": "dry_run",
+                "type": "string",
+                "value": "true"
+              },
+              {
+                "id": "sc-live-auth",
+                "name": "live_send_authorised",
+                "type": "string",
+                "value": "false"
+              },
+              {
+                "id": "sc-env",
+                "name": "environment",
+                "type": "string",
+                "value": "test"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          60,
+          750
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "06a7ea92-ecf2-4f28-bbf7-cde0eaef1b40",
+        "name": "Evaluate Safety",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed evaluator. Every guard in this workflow reads side_effects_permitted from here.",
+        "parameters": {
+          "jsCode": "// STEP1-KILLSWITCH-20260826 - global fail-closed safety evaluator.\n// Side effects are permitted ONLY when all three conditions are explicitly met.\n// Anything missing, blank, misspelled or unexpected leaves the system in TEST mode.\nconst s = (v) => String(v === undefined || v === null ? '' : v).trim().toLowerCase();\n\nconst items = $input.all();\nconst cfg = items.length ? (items[0].json || {}) : {};\n\nconst dryRunOff  = s(cfg.dry_run) === 'false';\nconst authorised = s(cfg.live_send_authorised) === 'true';\nconst isProd     = s(cfg.environment) === 'production';\n\nconst side_effects_permitted = dryRunOff && authorised && isProd;\n\nconst reasons = [];\nif (!dryRunOff)  reasons.push('dry_run is not the exact string \"false\" (seen: \"' + s(cfg.dry_run) + '\")');\nif (!authorised) reasons.push('live_send_authorised is not the exact string \"true\" (seen: \"' + s(cfg.live_send_authorised) + '\")');\nif (!isProd)     reasons.push('environment is not \"production\" (seen: \"' + s(cfg.environment) + '\")');\n\nconst safety = {\n  side_effects_permitted: side_effects_permitted,\n  safety_mode: side_effects_permitted ? 'LIVE' : 'TEST_FAIL_CLOSED',\n  safety_reason: side_effects_permitted\n    ? 'All three live-send conditions explicitly satisfied.'\n    : 'Blocked: ' + reasons.join('; '),\n  safety_contract_seen: {\n    dry_run: s(cfg.dry_run),\n    live_send_authorised: s(cfg.live_send_authorised),\n    environment: s(cfg.environment),\n  },\n  safety_change_id: 'STEP1-KILLSWITCH-20260826',\n};\n\n// No input items still yields a decision, so a guard can never read undefined.\nif (!items.length) return [{ json: safety }];\n\nreturn items.map((i) => ({\n  json: Object.assign({}, i.json || {}, safety),\n  binary: i.binary,\n  pairedItem: i.pairedItem,\n}));\n",
+          "mode": "runOnceForAllItems"
+        },
+        "position": [
+          240,
+          750
+        ],
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2
+      },
+      {
+        "id": "4c7e0404-8d98-45cd-8d06-8fcda8b86806",
+        "name": "Guard - Log Security Event",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed guard for Log Security Event.",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "<REDACTED_FILEID_4>",
+                "leftValue": "={{ $('Evaluate Safety').first().json.side_effects_permitted === true }}",
+                "operator": {
+                  "operation": "true",
+                  "singleValue": true,
+                  "type": "boolean"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "options": {
+            "looseTypeValidation": true
+          }
+        },
+        "position": [
+          680,
+          784
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "id": "112f945d-a949-4d89-b476-3736f1787d5c",
+        "name": "Suppressed - Log Security Event",
+        "notes": "STEP1-KILLSWITCH-20260826. Dry-run stand-in for Log Security Event. Records what would have happened; performs no external action.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sp-flag",
+                "name": "safety_suppressed",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-node",
+                "name": "safety_suppressed_node",
+                "type": "string",
+                "value": "Log Security Event"
+              },
+              {
+                "id": "sp-kind",
+                "name": "safety_suppressed_kind",
+                "type": "string",
+                "value": "SHEETS_WRITE"
+              },
+              {
+                "id": "sp-reason",
+                "name": "safety_suppressed_reason",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_reason }}"
+              },
+              {
+                "id": "sp-mode",
+                "name": "safety_mode",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_mode }}"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          680,
+          944
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "83080dfc-38a8-4e00-9c43-963088af629f",
+        "name": "Guard - Save Session",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed guard for Save Session.",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "<REDACTED_FILEID_4>",
+                "leftValue": "={{ $('Evaluate Safety').first().json.side_effects_permitted === true }}",
+                "operator": {
+                  "operation": "true",
+                  "singleValue": true,
+                  "type": "boolean"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "options": {
+            "looseTypeValidation": true
+          }
+        },
+        "position": [
+          2984,
+          624
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "id": "1bc17a40-8293-4931-9b70-1fe5b42bd271",
+        "name": "Suppressed - Save Session",
+        "notes": "STEP1-KILLSWITCH-20260826. Dry-run stand-in for Save Session. Records what would have happened; performs no external action.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sp-flag",
+                "name": "safety_suppressed",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-node",
+                "name": "safety_suppressed_node",
+                "type": "string",
+                "value": "Save Session"
+              },
+              {
+                "id": "sp-kind",
+                "name": "safety_suppressed_kind",
+                "type": "string",
+                "value": "SHEETS_WRITE"
+              },
+              {
+                "id": "sp-reason",
+                "name": "safety_suppressed_reason",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_reason }}"
+              },
+              {
+                "id": "sp-mode",
+                "name": "safety_mode",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_mode }}"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          2984,
+          784
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "d76751e0-8d02-4dc9-920c-39b7126a3072",
+        "name": "Guard - Update Session Matter",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed guard for Update Session Matter.",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "<REDACTED_FILEID_4>",
+                "leftValue": "={{ $('Evaluate Safety').first().json.side_effects_permitted === true }}",
+                "operator": {
+                  "operation": "true",
+                  "singleValue": true,
+                  "type": "boolean"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "options": {
+            "looseTypeValidation": true
+          }
+        },
+        "position": [
+          2760,
+          48
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "id": "6ed8cc82-cf00-45f6-8183-894a4e666a24",
+        "name": "Suppressed - Update Session Matter",
+        "notes": "STEP1-KILLSWITCH-20260826. Dry-run stand-in for Update Session Matter. Records what would have happened; performs no external action.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sp-flag",
+                "name": "safety_suppressed",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-node",
+                "name": "safety_suppressed_node",
+                "type": "string",
+                "value": "Update Session Matter"
+              },
+              {
+                "id": "sp-kind",
+                "name": "safety_suppressed_kind",
+                "type": "string",
+                "value": "SHEETS_WRITE"
+              },
+              {
+                "id": "sp-reason",
+                "name": "safety_suppressed_reason",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_reason }}"
+              },
+              {
+                "id": "sp-mode",
+                "name": "safety_mode",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_mode }}"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          2760,
+          208
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "117316c6-fb4e-4589-a224-a396d018344a",
+        "name": "Guard - Telegram - Classifier Failed",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed guard for Telegram - Classifier Failed.",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "<REDACTED_FILEID_4>",
+                "leftValue": "={{ $('Evaluate Safety').first().json.side_effects_permitted === true }}",
+                "operator": {
+                  "operation": "true",
+                  "singleValue": true,
+                  "type": "boolean"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "options": {
+            "looseTypeValidation": true
+          }
+        },
+        "position": [
+          1624,
+          112
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "id": "289995b4-cbcc-4a1d-b60c-04c05b056de1",
+        "name": "Suppressed - Telegram - Classifier Failed",
+        "notes": "STEP1-KILLSWITCH-20260826. Dry-run stand-in for Telegram - Classifier Failed. Records what would have happened; performs no external action.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sp-flag",
+                "name": "safety_suppressed",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-node",
+                "name": "safety_suppressed_node",
+                "type": "string",
+                "value": "Telegram - Classifier Failed"
+              },
+              {
+                "id": "sp-kind",
+                "name": "safety_suppressed_kind",
+                "type": "string",
+                "value": "TELEGRAM_SEND"
+              },
+              {
+                "id": "sp-reason",
+                "name": "safety_suppressed_reason",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_reason }}"
+              },
+              {
+                "id": "sp-mode",
+                "name": "safety_mode",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_mode }}"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          1624,
+          272
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "7f776f54-d020-4692-bac6-3f7a5b7fb769",
+        "name": "Guard - Telegram - Status",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed guard for Telegram - Status.",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "<REDACTED_FILEID_4>",
+                "leftValue": "={{ $('Evaluate Safety').first().json.side_effects_permitted === true }}",
+                "operator": {
+                  "operation": "true",
+                  "singleValue": true,
+                  "type": "boolean"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "options": {
+            "looseTypeValidation": true
+          }
+        },
+        "position": [
+          2760,
+          768
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "id": "43660f2d-0fd4-4719-af30-079836f55856",
+        "name": "Suppressed - Telegram - Status",
+        "notes": "STEP1-KILLSWITCH-20260826. Dry-run stand-in for Telegram - Status. Records what would have happened; performs no external action.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sp-flag",
+                "name": "safety_suppressed",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-node",
+                "name": "safety_suppressed_node",
+                "type": "string",
+                "value": "Telegram - Status"
+              },
+              {
+                "id": "sp-kind",
+                "name": "safety_suppressed_kind",
+                "type": "string",
+                "value": "TELEGRAM_SEND"
+              },
+              {
+                "id": "sp-reason",
+                "name": "safety_suppressed_reason",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_reason }}"
+              },
+              {
+                "id": "sp-mode",
+                "name": "safety_mode",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_mode }}"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          2760,
+          928
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "5c13e23c-1ad5-47e5-8c0b-d1d53491950e",
+        "name": "Guard - Telegram - Help",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed guard for Telegram - Help.",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "<REDACTED_FILEID_4>",
+                "leftValue": "={{ $('Evaluate Safety').first().json.side_effects_permitted === true }}",
+                "operator": {
+                  "operation": "true",
+                  "singleValue": true,
+                  "type": "boolean"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "options": {
+            "looseTypeValidation": true
+          }
+        },
+        "position": [
+          2328,
+          944
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "id": "5ba25bc4-ff0f-49d3-a5fa-762309d67953",
+        "name": "Suppressed - Telegram - Help",
+        "notes": "STEP1-KILLSWITCH-20260826. Dry-run stand-in for Telegram - Help. Records what would have happened; performs no external action.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sp-flag",
+                "name": "safety_suppressed",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-node",
+                "name": "safety_suppressed_node",
+                "type": "string",
+                "value": "Telegram - Help"
+              },
+              {
+                "id": "sp-kind",
+                "name": "safety_suppressed_kind",
+                "type": "string",
+                "value": "TELEGRAM_SEND"
+              },
+              {
+                "id": "sp-reason",
+                "name": "safety_suppressed_reason",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_reason }}"
+              },
+              {
+                "id": "sp-mode",
+                "name": "safety_mode",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_mode }}"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          2328,
+          1104
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "0015b57d-b43b-418a-bde0-f55fa12f0c94",
+        "name": "Guard - Telegram - Clarify",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed guard for Telegram - Clarify.",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "<REDACTED_FILEID_4>",
+                "leftValue": "={{ $('Evaluate Safety').first().json.side_effects_permitted === true }}",
+                "operator": {
+                  "operation": "true",
+                  "singleValue": true,
+                  "type": "boolean"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "options": {
+            "looseTypeValidation": true
+          }
+        },
+        "position": [
+          2552,
+          1120
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "id": "443c413d-914d-43f2-be59-8a9d81033e70",
+        "name": "Suppressed - Telegram - Clarify",
+        "notes": "STEP1-KILLSWITCH-20260826. Dry-run stand-in for Telegram - Clarify. Records what would have happened; performs no external action.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sp-flag",
+                "name": "safety_suppressed",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-node",
+                "name": "safety_suppressed_node",
+                "type": "string",
+                "value": "Telegram - Clarify"
+              },
+              {
+                "id": "sp-kind",
+                "name": "safety_suppressed_kind",
+                "type": "string",
+                "value": "TELEGRAM_SEND"
+              },
+              {
+                "id": "sp-reason",
+                "name": "safety_suppressed_reason",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_reason }}"
+              },
+              {
+                "id": "sp-mode",
+                "name": "safety_mode",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_mode }}"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          2552,
+          1280
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "00442615-fdac-4ac4-a641-03b0ec30842b",
+        "name": "Guard - Telegram - Subworkflow Failed",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed guard for Telegram - Subworkflow Failed.",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "<REDACTED_FILEID_4>",
+                "leftValue": "={{ $('Evaluate Safety').first().json.side_effects_permitted === true }}",
+                "operator": {
+                  "operation": "true",
+                  "singleValue": true,
+                  "type": "boolean"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "options": {
+            "looseTypeValidation": true
+          }
+        },
+        "position": [
+          2600,
+          144
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "id": "aa1ccf9a-2b52-4ba2-abfa-bdff531932dd",
+        "name": "Suppressed - Telegram - Subworkflow Failed",
+        "notes": "STEP1-KILLSWITCH-20260826. Dry-run stand-in for Telegram - Subworkflow Failed. Records what would have happened; performs no external action.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sp-flag",
+                "name": "safety_suppressed",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-node",
+                "name": "safety_suppressed_node",
+                "type": "string",
+                "value": "Telegram - Subworkflow Failed"
+              },
+              {
+                "id": "sp-kind",
+                "name": "safety_suppressed_kind",
+                "type": "string",
+                "value": "TELEGRAM_SEND"
+              },
+              {
+                "id": "sp-reason",
+                "name": "safety_suppressed_reason",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_reason }}"
+              },
+              {
+                "id": "sp-mode",
+                "name": "safety_mode",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_mode }}"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          2600,
+          304
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "8bd72807-47dd-4c00-a246-7ff52257e145",
+        "name": "Guard - Ack Button",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed guard for Ack Button.",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "<REDACTED_FILEID_4>",
+                "leftValue": "={{ $('Evaluate Safety').first().json.side_effects_permitted === true }}",
+                "operator": {
+                  "operation": "true",
+                  "singleValue": true,
+                  "type": "boolean"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "options": {
+            "looseTypeValidation": true
+          }
+        },
+        "position": [
+          -168,
+          432
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "id": "34544a81-e157-43fd-9613-a3abe0da92ab",
+        "name": "Suppressed - Ack Button",
+        "notes": "STEP1-KILLSWITCH-20260826. Dry-run stand-in for Ack Button. Records what would have happened; performs no external action.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sp-flag",
+                "name": "safety_suppressed",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-node",
+                "name": "safety_suppressed_node",
+                "type": "string",
+                "value": "Ack Button"
+              },
+              {
+                "id": "sp-kind",
+                "name": "safety_suppressed_kind",
+                "type": "string",
+                "value": "TELEGRAM_SEND"
+              },
+              {
+                "id": "sp-reason",
+                "name": "safety_suppressed_reason",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_reason }}"
+              },
+              {
+                "id": "sp-mode",
+                "name": "safety_mode",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_mode }}"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          -168,
+          592
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "7f86d4d4-f996-4c7b-82b5-ec1d8d666e44",
+        "name": "Guard - Run - Matter Planner",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed guard for Run - Matter Planner.",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "<REDACTED_FILEID_4>",
+                "leftValue": "={{ $('Evaluate Safety').first().json.side_effects_permitted === true }}",
+                "operator": {
+                  "operation": "true",
+                  "singleValue": true,
+                  "type": "boolean"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "options": {
+            "looseTypeValidation": true
+          }
+        },
+        "position": [
+          2328,
+          48
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "id": "04c71c3f-6ebc-4351-bca1-41d9a9b9b5a9",
+        "name": "Suppressed - Run - Matter Planner",
+        "notes": "STEP1-KILLSWITCH-20260826. Dry-run stand-in for Run - Matter Planner. Records what would have happened; performs no external action.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sp-flag",
+                "name": "safety_suppressed",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-node",
+                "name": "safety_suppressed_node",
+                "type": "string",
+                "value": "Run - Matter Planner"
+              },
+              {
+                "id": "sp-kind",
+                "name": "safety_suppressed_kind",
+                "type": "string",
+                "value": "CHILD_WORKFLOW"
+              },
+              {
+                "id": "sp-reason",
+                "name": "safety_suppressed_reason",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_reason }}"
+              },
+              {
+                "id": "sp-mode",
+                "name": "safety_mode",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_mode }}"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          2328,
+          208
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "d8dfaaff-b7e3-45e9-96f2-8f42065c9182",
+        "name": "Guard - Run - Evidence Intake",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed guard for Run - Evidence Intake.",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "<REDACTED_FILEID_4>",
+                "leftValue": "={{ $('Evaluate Safety').first().json.side_effects_permitted === true }}",
+                "operator": {
+                  "operation": "true",
+                  "singleValue": true,
+                  "type": "boolean"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "options": {
+            "looseTypeValidation": true
+          }
+        },
+        "position": [
+          2328,
+          224
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "id": "6e9a5d5a-39be-4f64-95bf-afdcbf92d1fa",
+        "name": "Suppressed - Run - Evidence Intake",
+        "notes": "STEP1-KILLSWITCH-20260826. Dry-run stand-in for Run - Evidence Intake. Records what would have happened; performs no external action.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sp-flag",
+                "name": "safety_suppressed",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-node",
+                "name": "safety_suppressed_node",
+                "type": "string",
+                "value": "Run - Evidence Intake"
+              },
+              {
+                "id": "sp-kind",
+                "name": "safety_suppressed_kind",
+                "type": "string",
+                "value": "CHILD_WORKFLOW"
+              },
+              {
+                "id": "sp-reason",
+                "name": "safety_suppressed_reason",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_reason }}"
+              },
+              {
+                "id": "sp-mode",
+                "name": "safety_mode",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_mode }}"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          2328,
+          384
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "e7269284-bf63-4155-b732-2d7e1c001c11",
+        "name": "Guard - Run - Draft and Approval",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed guard for Run - Draft and Approval.",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "<REDACTED_FILEID_4>",
+                "leftValue": "={{ $('Evaluate Safety').first().json.side_effects_permitted === true }}",
+                "operator": {
+                  "operation": "true",
+                  "singleValue": true,
+                  "type": "boolean"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "options": {
+            "looseTypeValidation": true
+          }
+        },
+        "position": [
+          2328,
+          400
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "id": "74c92283-2648-4bbd-913f-53b3deb019db",
+        "name": "Suppressed - Run - Draft and Approval",
+        "notes": "STEP1-KILLSWITCH-20260826. Dry-run stand-in for Run - Draft and Approval. Records what would have happened; performs no external action.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sp-flag",
+                "name": "safety_suppressed",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-node",
+                "name": "safety_suppressed_node",
+                "type": "string",
+                "value": "Run - Draft and Approval"
+              },
+              {
+                "id": "sp-kind",
+                "name": "safety_suppressed_kind",
+                "type": "string",
+                "value": "CHILD_WORKFLOW"
+              },
+              {
+                "id": "sp-reason",
+                "name": "safety_suppressed_reason",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_reason }}"
+              },
+              {
+                "id": "sp-mode",
+                "name": "safety_mode",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_mode }}"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          2328,
+          560
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "ced4473c-75ac-475a-abfb-158d559ef6ce",
+        "name": "Guard - Run - Approval Decision",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed guard for Run - Approval Decision.",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "<REDACTED_FILEID_4>",
+                "leftValue": "={{ $('Evaluate Safety').first().json.side_effects_permitted === true }}",
+                "operator": {
+                  "operation": "true",
+                  "singleValue": true,
+                  "type": "boolean"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "options": {
+            "looseTypeValidation": true
+          }
+        },
+        "position": [
+          2328,
+          592
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "id": "7d7f03bc-965a-463b-95ba-8dde91d10f66",
+        "name": "Suppressed - Run - Approval Decision",
+        "notes": "STEP1-KILLSWITCH-20260826. Dry-run stand-in for Run - Approval Decision. Records what would have happened; performs no external action.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sp-flag",
+                "name": "safety_suppressed",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-node",
+                "name": "safety_suppressed_node",
+                "type": "string",
+                "value": "Run - Approval Decision"
+              },
+              {
+                "id": "sp-kind",
+                "name": "safety_suppressed_kind",
+                "type": "string",
+                "value": "CHILD_WORKFLOW"
+              },
+              {
+                "id": "sp-reason",
+                "name": "safety_suppressed_reason",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_reason }}"
+              },
+              {
+                "id": "sp-mode",
+                "name": "safety_mode",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_mode }}"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          2328,
+          752
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
       }
     ],
     "settings": {
@@ -1634,8 +3137,8 @@
     "staticData": null,
     "tags": [],
     "triggerCount": 1,
-    "updatedAt": "2026-08-25T01:19:51.786Z",
-    "versionCounter": 36,
-    "versionId": "9cc644ec-595d-4084-b64d-cfbe265b0712"
+    "updatedAt": "2026-08-26T06:02:57.828Z",
+    "versionCounter": 37,
+    "versionId": "02693bdc-0e3e-49c8-a5df-1044b5e977b9"
   }
 }

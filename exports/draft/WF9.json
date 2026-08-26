@@ -5,12 +5,12 @@
     "draft_active_determination": "from_active_version_object",
     "draft_version_id": "b9fd4303-40e6-4883-a232-497cbfd3f536",
     "key": "WF9",
-    "kind": "active",
+    "kind": "draft",
     "scrub_counts": {
       "CHATID": 2,
       "CREDID": 2,
       "EMAIL": 1,
-      "FILEID": 1
+      "FILEID": 2
     },
     "scrubbed": true,
     "source": "n8n public REST API GET /api/v1/workflows/{id} (read-only)",
@@ -26,14 +26,14 @@
           [
             {
               "index": 0,
-              "node": "Mark Action Failed",
+              "node": "Guard - Mark Action Failed",
               "type": "main"
             }
           ],
           [
             {
               "index": 0,
-              "node": "Telegram - Error",
+              "node": "Guard - Telegram - Error",
               "type": "main"
             }
           ]
@@ -55,7 +55,7 @@
           [
             {
               "index": 0,
-              "node": "Append Error Event",
+              "node": "Guard - Append Error Event",
               "type": "main"
             }
           ]
@@ -66,7 +66,72 @@
           [
             {
               "index": 0,
+              "node": "Safety Config",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Evaluate Safety": {
+        "main": [
+          [
+            {
+              "index": 0,
               "node": "Build Error Record",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Guard - Append Error Event": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Append Error Event",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "Suppressed - Append Error Event",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Guard - Mark Action Failed": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Mark Action Failed",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "Suppressed - Mark Action Failed",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Guard - Telegram - Error": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Telegram - Error",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "Suppressed - Telegram - Error",
               "type": "main"
             }
           ]
@@ -77,7 +142,40 @@
           [
             {
               "index": 0,
-              "node": "Telegram - Error",
+              "node": "Guard - Telegram - Error",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Safety Config": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Evaluate Safety",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Suppressed - Append Error Event": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Action Known?",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Suppressed - Mark Action Failed": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Guard - Telegram - Error",
               "type": "main"
             }
           ]
@@ -551,6 +649,316 @@
         ],
         "type": "n8n-nodes-base.stickyNote",
         "typeVersion": 1
+      },
+      {
+        "id": "05b0e23b-ccc0-4617-9042-54dca433e0dc",
+        "name": "Safety Config",
+        "notes": "STEP1-KILLSWITCH-20260826. Single source of truth for the safety contract. Set dry_run=false AND live_send_authorised=true AND environment=production to permit external side effects. Any other combination fails closed.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sc-dry-run",
+                "name": "dry_run",
+                "type": "string",
+                "value": "true"
+              },
+              {
+                "id": "sc-live-auth",
+                "name": "live_send_authorised",
+                "type": "string",
+                "value": "false"
+              },
+              {
+                "id": "sc-env",
+                "name": "environment",
+                "type": "string",
+                "value": "test"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          -540,
+          190
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "5cdb583b-c1ac-4e49-b382-e79a7acd1ba1",
+        "name": "Evaluate Safety",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed evaluator. Every guard in this workflow reads side_effects_permitted from here.",
+        "parameters": {
+          "jsCode": "// STEP1-KILLSWITCH-20260826 - global fail-closed safety evaluator.\n// Side effects are permitted ONLY when all three conditions are explicitly met.\n// Anything missing, blank, misspelled or unexpected leaves the system in TEST mode.\nconst s = (v) => String(v === undefined || v === null ? '' : v).trim().toLowerCase();\n\nconst items = $input.all();\nconst cfg = items.length ? (items[0].json || {}) : {};\n\nconst dryRunOff  = s(cfg.dry_run) === 'false';\nconst authorised = s(cfg.live_send_authorised) === 'true';\nconst isProd     = s(cfg.environment) === 'production';\n\nconst side_effects_permitted = dryRunOff && authorised && isProd;\n\nconst reasons = [];\nif (!dryRunOff)  reasons.push('dry_run is not the exact string \"false\" (seen: \"' + s(cfg.dry_run) + '\")');\nif (!authorised) reasons.push('live_send_authorised is not the exact string \"true\" (seen: \"' + s(cfg.live_send_authorised) + '\")');\nif (!isProd)     reasons.push('environment is not \"production\" (seen: \"' + s(cfg.environment) + '\")');\n\nconst safety = {\n  side_effects_permitted: side_effects_permitted,\n  safety_mode: side_effects_permitted ? 'LIVE' : 'TEST_FAIL_CLOSED',\n  safety_reason: side_effects_permitted\n    ? 'All three live-send conditions explicitly satisfied.'\n    : 'Blocked: ' + reasons.join('; '),\n  safety_contract_seen: {\n    dry_run: s(cfg.dry_run),\n    live_send_authorised: s(cfg.live_send_authorised),\n    environment: s(cfg.environment),\n  },\n  safety_change_id: 'STEP1-KILLSWITCH-20260826',\n};\n\n// No input items still yields a decision, so a guard can never read undefined.\nif (!items.length) return [{ json: safety }];\n\nreturn items.map((i) => ({\n  json: Object.assign({}, i.json || {}, safety),\n  binary: i.binary,\n  pairedItem: i.pairedItem,\n}));\n",
+          "mode": "runOnceForAllItems"
+        },
+        "position": [
+          -360,
+          190
+        ],
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2
+      },
+      {
+        "id": "a43c03be-96bd-447d-8f04-3f6174c39c54",
+        "name": "Guard - Append Error Event",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed guard for Append Error Event.",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "<REDACTED_FILEID_2>",
+                "leftValue": "={{ $('Evaluate Safety').first().json.side_effects_permitted === true }}",
+                "operator": {
+                  "operation": "true",
+                  "singleValue": true,
+                  "type": "boolean"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "options": {
+            "looseTypeValidation": true
+          }
+        },
+        "position": [
+          -360,
+          0
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "id": "1050928f-83d9-472f-80e5-ef9ca6511309",
+        "name": "Suppressed - Append Error Event",
+        "notes": "STEP1-KILLSWITCH-20260826. Dry-run stand-in for Append Error Event. Records what would have happened; performs no external action.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sp-flag",
+                "name": "safety_suppressed",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-node",
+                "name": "safety_suppressed_node",
+                "type": "string",
+                "value": "Append Error Event"
+              },
+              {
+                "id": "sp-kind",
+                "name": "safety_suppressed_kind",
+                "type": "string",
+                "value": "SHEETS_WRITE"
+              },
+              {
+                "id": "sp-reason",
+                "name": "safety_suppressed_reason",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_reason }}"
+              },
+              {
+                "id": "sp-mode",
+                "name": "safety_mode",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_mode }}"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          -360,
+          160
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "9c4082b6-f6f2-423b-8ecf-65b92ea2714d",
+        "name": "Guard - Mark Action Failed",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed guard for Mark Action Failed.",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "<REDACTED_FILEID_2>",
+                "leftValue": "={{ $('Evaluate Safety').first().json.side_effects_permitted === true }}",
+                "operator": {
+                  "operation": "true",
+                  "singleValue": true,
+                  "type": "boolean"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "options": {
+            "looseTypeValidation": true
+          }
+        },
+        "position": [
+          80,
+          -140
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "id": "9492c661-ec10-4581-a0f9-8d3cd22a6248",
+        "name": "Suppressed - Mark Action Failed",
+        "notes": "STEP1-KILLSWITCH-20260826. Dry-run stand-in for Mark Action Failed. Records what would have happened; performs no external action.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sp-flag",
+                "name": "safety_suppressed",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-node",
+                "name": "safety_suppressed_node",
+                "type": "string",
+                "value": "Mark Action Failed"
+              },
+              {
+                "id": "sp-kind",
+                "name": "safety_suppressed_kind",
+                "type": "string",
+                "value": "SHEETS_WRITE"
+              },
+              {
+                "id": "sp-reason",
+                "name": "safety_suppressed_reason",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_reason }}"
+              },
+              {
+                "id": "sp-mode",
+                "name": "safety_mode",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_mode }}"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          80,
+          20
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "aac30894-9261-4d5b-90b0-13d1abab13e0",
+        "name": "Guard - Telegram - Error",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed guard for Telegram - Error.",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "<REDACTED_FILEID_2>",
+                "leftValue": "={{ $('Evaluate Safety').first().json.side_effects_permitted === true }}",
+                "operator": {
+                  "operation": "true",
+                  "singleValue": true,
+                  "type": "boolean"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "options": {
+            "looseTypeValidation": true
+          }
+        },
+        "position": [
+          300,
+          0
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "id": "828353df-28a2-463a-a494-8ca9619dca3d",
+        "name": "Suppressed - Telegram - Error",
+        "notes": "STEP1-KILLSWITCH-20260826. Dry-run stand-in for Telegram - Error. Records what would have happened; performs no external action.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sp-flag",
+                "name": "safety_suppressed",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-node",
+                "name": "safety_suppressed_node",
+                "type": "string",
+                "value": "Telegram - Error"
+              },
+              {
+                "id": "sp-kind",
+                "name": "safety_suppressed_kind",
+                "type": "string",
+                "value": "TELEGRAM_SEND"
+              },
+              {
+                "id": "sp-reason",
+                "name": "safety_suppressed_reason",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_reason }}"
+              },
+              {
+                "id": "sp-mode",
+                "name": "safety_mode",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_mode }}"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          300,
+          160
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
       }
     ],
     "settings": {
@@ -587,6 +995,6 @@
     "triggerCount": 0,
     "updatedAt": "2026-08-26T05:55:02.803Z",
     "versionCounter": 13,
-    "versionId": "a5b10619-31e4-4246-8988-90a08bd45ab1"
+    "versionId": "b9fd4303-40e6-4883-a232-497cbfd3f536"
   }
 }

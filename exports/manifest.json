@@ -8,18 +8,18 @@
       "active": {
         "kind": "active",
         "path": "exports/active/WF1.json",
-        "sha256_body": "2bc2fc99dfa0f730ce9b6d6676de974293222148268454e04d797b0dc54f98bf",
-        "sha256_canonical": "ca8f4a4e99ca903e50c796b4ad0c116e385d438a0a83fd1c92577800e5fc6b84"
+        "sha256_body": "329a108904582d369ff5b2cfe819664203809a93a51fc7d33a1e6267015ae643",
+        "sha256_canonical": "d79d89ab473af208bcdc592f05873f31644c480e9ec21c300fae30b51fc2eb77"
       },
       "active_version_id": "b1c425bf-5830-4e3c-a6f7-bcf2c02ef593",
       "determination": "from_active_version_object",
       "draft": {
         "kind": "draft",
         "path": "exports/draft/WF1.json",
-        "sha256_body": "c6307f96b48416a837a6cd2824542bc7bb95cbaa7fa2d9fd8611eadfd17a24dc",
-        "sha256_canonical": "140b1ce6ad85df0b30ac422faf6d1554ce6e092eb48ad7cb84ab8b4ec32f78f3"
+        "sha256_body": "5d6efe1d828a7436323e4907c21b7d40c93f849a680de61c5123bc9cc8d6c685",
+        "sha256_canonical": "25434d3b094bcf9cfa400e4c249384b205e82e0b9aca8b53349b000c864b4415"
       },
-      "draft_version_id": "9cc644ec-595d-4084-b64d-cfbe265b0712",
+      "draft_version_id": "02693bdc-0e3e-49c8-a5df-1044b5e977b9",
       "id": "xUcAXTgocHPsHy5Y",
       "name": "1 - Telegram Intake and Command Router"
     },
@@ -27,13 +27,18 @@
       "active": {
         "kind": "active",
         "path": "exports/active/WF2.json",
-        "sha256_body": "0ec6616cedbe95968602093b2e5fbab2651e08b2ffe72bff58d48bfe1eaab5c1",
-        "sha256_canonical": "e10aa189ed187d8ceb22a53c490f11b802b0c296ee844246e388e00d045310ab"
+        "sha256_body": "54905820b6dd9e9d329a014da925ac5467072a5f3f14aeae3baa2a449dc9b584",
+        "sha256_canonical": "1bebac331dceb51187fd3fd79d2e37bad36fb35e9fdc9bdf1d57f7fffb1ffd4f"
       },
       "active_version_id": "f2a5156f-7183-4117-aa98-74b07734a773",
       "determination": "from_active_version_object",
-      "draft": null,
-      "draft_version_id": "f2a5156f-7183-4117-aa98-74b07734a773",
+      "draft": {
+        "kind": "draft",
+        "path": "exports/draft/WF2.json",
+        "sha256_body": "b7ae3a11fd6f1d2d2475e8f645e32bb0750ebee994b064344600d73a6884e7d8",
+        "sha256_canonical": "e38cb65dca8251c14f4306d0b5ebac20bae1d5d4f2daa674bb6d7dc627062dff"
+      },
+      "draft_version_id": "0e675d4a-a01c-4fee-a725-27ff2c522cf0",
       "id": "OaVCEsrt2qpo28rB",
       "name": "2 - Matter Classification and Planning"
     },
@@ -41,13 +46,18 @@
       "active": {
         "kind": "active",
         "path": "exports/active/WF3.json",
-        "sha256_body": "b38adc1145633acb0bca9dc718485500d60b264568a10e3a62b8d8c4018abb48",
-        "sha256_canonical": "2e1844d69a07e8c35399efcbb8df92ce0d4526d02e053d3e05c3201227a55b90"
+        "sha256_body": "5c57ed702d1ea2ff98a6a530c84b0272b7d5d2d2970d2d441f4c85e1f20863bc",
+        "sha256_canonical": "d811d9915968a6faa7a35d80923e2fad89b7fc5f4e6f67e5d62b8a3ec1c49f21"
       },
       "active_version_id": "644bbdb3-6e78-42c1-a250-3cf9ba05fadc",
       "determination": "from_active_version_object",
-      "draft": null,
-      "draft_version_id": "644bbdb3-6e78-42c1-a250-3cf9ba05fadc",
+      "draft": {
+        "kind": "draft",
+        "path": "exports/draft/WF3.json",
+        "sha256_body": "09287a577b269c3e69753d584d1e595d7f1d152120c0e6ffd5e94eb324fbb979",
+        "sha256_canonical": "94e14b3dbdd5ecea286dbc8d3d3478c6ef68cc892f4c46b72533e22751232424"
+      },
+      "draft_version_id": "19f820a5-4984-474f-a0a3-47a89972ca7f",
       "id": "1rhaSTTviUBanJIy",
       "name": "3 - Evidence Intake and Storage"
     },
@@ -55,13 +65,18 @@
       "active": {
         "kind": "active",
         "path": "exports/active/WF4.json",
-        "sha256_body": "488f5068ed2b0a13417cc70ca7df16c38187f3ef4f4afc9e0e5fb8f0a17ca240",
-        "sha256_canonical": "9b9c4b637877fbfddcadff2efced4f8c8385b4d37f79be232a9eca95a13f4db1"
+        "sha256_body": "a863cdfe105f23059c7ea5b3352054945ae0b1e266288c413e904d1f709b494f",
+        "sha256_canonical": "f501d6a7b2ec7d2aeebe94ffe47803f65cdc1bf35dcfcc8aeee41e6cb5ecb72a"
       },
       "active_version_id": "902130f4-58d0-4189-bf80-273c753c9c34",
       "determination": "from_active_version_object",
-      "draft": null,
-      "draft_version_id": "902130f4-58d0-4189-bf80-273c753c9c34",
+      "draft": {
+        "kind": "draft",
+        "path": "exports/draft/WF4.json",
+        "sha256_body": "0658e60bf0990a8e11cd0c9ab77cdb5fcd30c5161d231f1b021c9903ba24970a",
+        "sha256_canonical": "9715c6ae34e32ec6799c875dd8a0153439d22a6c7e6c4b132c6080221cf5f8f9"
+      },
+      "draft_version_id": "44fb2e95-618a-4645-893e-9d10a4e70620",
       "id": "zKr24IThF30e6jXw",
       "name": "4 - Research Drafting Approval and Dispatch"
     },
@@ -69,18 +84,18 @@
       "active": {
         "kind": "active",
         "path": "exports/active/WF5.json",
-        "sha256_body": "302a7d088196286ac6437fbe16eeb68dfc6eab5fe89523dab0837701a9323df9",
-        "sha256_canonical": "fef1afc9eecbb0edc02f8ac3267f59b383ec089f4c5a106a75b1839915b98a9f"
+        "sha256_body": "5b4a5866e9fada8e6eb4d7fbe4e8c2865ad581ead9bf5da190956b6163c354e3",
+        "sha256_canonical": "c8d7185c248a730702a8e4bfa3f2f9697f274aec128892978b96fa8839545050"
       },
       "active_version_id": "983da561-5c19-42db-a2b4-1e2e7ac67e0f",
       "determination": "from_active_version_object",
       "draft": {
         "kind": "draft",
         "path": "exports/draft/WF5.json",
-        "sha256_body": "3f2ce7312688549be7507433e367114cbe44abc1df208ce518c05c26218d1d38",
-        "sha256_canonical": "553e0a6a0906fa5bab2f67f27f30fee03ba75bb4409ced905860a26aa9515528"
+        "sha256_body": "a445621de1b70b0c700bba7511c25aec40e2a2b3d3bd5b0a1ebfe22b2968153a",
+        "sha256_canonical": "2828ebba63885c3d8ab33c4bc1b11a640e20c05bf214dfc81714bf29b84d12a9"
       },
-      "draft_version_id": "811b746c-869c-4fc3-94dc-123f60cb7067",
+      "draft_version_id": "ba7ea015-9105-44f7-8212-e3e323d1da6b",
       "id": "zDLoMgW42jUm25Q4",
       "name": "5 - Inbound Replies and Daily Supervisor"
     },
@@ -88,13 +103,18 @@
       "active": {
         "kind": "active",
         "path": "exports/active/WF9.json",
-        "sha256_body": "bcc23dc477d3460f7050652bc288f7dc4f4154bb281d8befceb5bbab1a81eac9",
-        "sha256_canonical": "44ce03650373851eb0d60f4f1d84f0b2d57b082d7e7c597636779769a5aabd75"
+        "sha256_body": "7f6fab79b6ade9c3915301b65fb71822bd1936ce8c4734ea0cbd367220c77523",
+        "sha256_canonical": "71f3b358ab9bb3c87e174a325bab1b1ff862ae01c23c6d9f079fd357278b11f9"
       },
       "active_version_id": "a5b10619-31e4-4246-8988-90a08bd45ab1",
       "determination": "from_active_version_object",
-      "draft": null,
-      "draft_version_id": "a5b10619-31e4-4246-8988-90a08bd45ab1",
+      "draft": {
+        "kind": "draft",
+        "path": "exports/draft/WF9.json",
+        "sha256_body": "f645269fddc5a1d05a86296c092d7fbefd8dc33d5753ba857cafe845e9ae4863",
+        "sha256_canonical": "56754f08a4c3a431466c43dcfd91dcc434d9c653cb3e432fbec41fffd6f31a2a"
+      },
+      "draft_version_id": "b9fd4303-40e6-4883-a232-497cbfd3f536",
       "id": "JfaCOxRq0FjZ5JWb",
       "name": "9 - Error Handler"
     }

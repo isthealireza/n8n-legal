@@ -5,13 +5,13 @@
     "draft_active_determination": "from_active_version_object",
     "draft_version_id": "19f820a5-4984-474f-a0a3-47a89972ca7f",
     "key": "WF3",
-    "kind": "active",
+    "kind": "draft",
     "scrub_counts": {
       "CASEREF": 3,
       "CHATID": 6,
       "CREDID": 4,
       "EMAIL": 1,
-      "FILEID": 2
+      "FILEID": 3
     },
     "scrubbed": true,
     "source": "n8n public REST API GET /api/v1/workflows/{id} (read-only)",
@@ -38,7 +38,7 @@
           [
             {
               "index": 0,
-              "node": "Telegram - Evidence Stored",
+              "node": "Guard - Telegram - Evidence Stored",
               "type": "main"
             }
           ]
@@ -82,7 +82,18 @@
           [
             {
               "index": 0,
-              "node": "Vision - Describe Evidence",
+              "node": "Guard - Vision - Describe Evidence",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Evaluate Safety": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Config",
               "type": "main"
             }
           ]
@@ -147,7 +158,7 @@
           [
             {
               "index": 0,
-              "node": "Append Evidence",
+              "node": "Guard - Append Evidence",
               "type": "main"
             }
           ]
@@ -176,7 +187,151 @@
           [
             {
               "index": 0,
+              "node": "Guard - Create Matter Folder",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Guard - Append Evidence": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Append Evidence",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "Suppressed - Append Evidence",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Guard - Create Matter Folder": {
+        "main": [
+          [
+            {
+              "index": 0,
               "node": "Create Matter Folder",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "Suppressed - Create Matter Folder",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Guard - Store Extracted Text in Drive": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Store Extracted Text in Drive",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "Suppressed - Store Extracted Text in Drive",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Guard - Telegram - Evidence Stored": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Telegram - Evidence Stored",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "Suppressed - Telegram - Evidence Stored",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Guard - Telegram - No File Attached": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Telegram - No File Attached",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "Suppressed - Telegram - No File Attached",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Guard - Touch Matter": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Touch Matter",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "Suppressed - Touch Matter",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Guard - Upload to Drive": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Upload to Drive",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "Suppressed - Upload to Drive",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Guard - Vision - Describe Evidence": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Vision - Describe Evidence",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "Suppressed - Vision - Describe Evidence",
               "type": "main"
             }
           ]
@@ -187,7 +342,7 @@
           [
             {
               "index": 0,
-              "node": "Store Extracted Text in Drive",
+              "node": "Guard - Store Extracted Text in Drive",
               "type": "main"
             }
           ],
@@ -212,7 +367,7 @@
           [
             {
               "index": 0,
-              "node": "Telegram - No File Attached",
+              "node": "Guard - Telegram - No File Attached",
               "type": "main"
             }
           ]
@@ -223,7 +378,7 @@
           [
             {
               "index": 0,
-              "node": "Upload to Drive",
+              "node": "Guard - Upload to Drive",
               "type": "main"
             }
           ]
@@ -306,6 +461,17 @@
           ]
         ]
       },
+      "Safety Config": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Evaluate Safety",
+              "type": "main"
+            }
+          ]
+        ]
+      },
       "Set Folder Id": {
         "main": [
           [
@@ -322,7 +488,7 @@
           [
             {
               "index": 0,
-              "node": "Touch Matter",
+              "node": "Guard - Touch Matter",
               "type": "main"
             }
           ],
@@ -341,6 +507,72 @@
             {
               "index": 0,
               "node": "Finalise Evidence Row",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Suppressed - Append Evidence": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Skip Touch If Unassigned",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Suppressed - Create Matter Folder": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Set Folder Id",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Suppressed - Store Extracted Text in Drive": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Finalise Evidence Row",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Suppressed - Touch Matter": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Build Confirmation",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Suppressed - Upload to Drive": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Re-download for Extraction",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Suppressed - Vision - Describe Evidence": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Parse Vision Result",
               "type": "main"
             }
           ]
@@ -395,7 +627,7 @@
           [
             {
               "index": 0,
-              "node": "Config",
+              "node": "Safety Config",
               "type": "main"
             }
           ]
@@ -1597,6 +1829,746 @@
         ],
         "type": "n8n-nodes-base.code",
         "typeVersion": 2
+      },
+      {
+        "id": "add05546-304f-4deb-8810-ebe6f4c9eb9b",
+        "name": "Safety Config",
+        "notes": "STEP1-KILLSWITCH-20260826. Single source of truth for the safety contract. Set dry_run=false AND live_send_authorised=true AND environment=production to permit external side effects. Any other combination fails closed.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sc-dry-run",
+                "name": "dry_run",
+                "type": "string",
+                "value": "true"
+              },
+              {
+                "id": "sc-live-auth",
+                "name": "live_send_authorised",
+                "type": "string",
+                "value": "false"
+              },
+              {
+                "id": "sc-env",
+                "name": "environment",
+                "type": "string",
+                "value": "test"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          60,
+          750
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "74832836-c45d-4adf-929c-fc2f673d50a0",
+        "name": "Evaluate Safety",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed evaluator. Every guard in this workflow reads side_effects_permitted from here.",
+        "parameters": {
+          "jsCode": "// STEP1-KILLSWITCH-20260826 - global fail-closed safety evaluator.\n// Side effects are permitted ONLY when all three conditions are explicitly met.\n// Anything missing, blank, misspelled or unexpected leaves the system in TEST mode.\nconst s = (v) => String(v === undefined || v === null ? '' : v).trim().toLowerCase();\n\nconst items = $input.all();\nconst cfg = items.length ? (items[0].json || {}) : {};\n\nconst dryRunOff  = s(cfg.dry_run) === 'false';\nconst authorised = s(cfg.live_send_authorised) === 'true';\nconst isProd     = s(cfg.environment) === 'production';\n\nconst side_effects_permitted = dryRunOff && authorised && isProd;\n\nconst reasons = [];\nif (!dryRunOff)  reasons.push('dry_run is not the exact string \"false\" (seen: \"' + s(cfg.dry_run) + '\")');\nif (!authorised) reasons.push('live_send_authorised is not the exact string \"true\" (seen: \"' + s(cfg.live_send_authorised) + '\")');\nif (!isProd)     reasons.push('environment is not \"production\" (seen: \"' + s(cfg.environment) + '\")');\n\nconst safety = {\n  side_effects_permitted: side_effects_permitted,\n  safety_mode: side_effects_permitted ? 'LIVE' : 'TEST_FAIL_CLOSED',\n  safety_reason: side_effects_permitted\n    ? 'All three live-send conditions explicitly satisfied.'\n    : 'Blocked: ' + reasons.join('; '),\n  safety_contract_seen: {\n    dry_run: s(cfg.dry_run),\n    live_send_authorised: s(cfg.live_send_authorised),\n    environment: s(cfg.environment),\n  },\n  safety_change_id: 'STEP1-KILLSWITCH-20260826',\n};\n\n// No input items still yields a decision, so a guard can never read undefined.\nif (!items.length) return [{ json: safety }];\n\nreturn items.map((i) => ({\n  json: Object.assign({}, i.json || {}, safety),\n  binary: i.binary,\n  pairedItem: i.pairedItem,\n}));\n",
+          "mode": "runOnceForAllItems"
+        },
+        "position": [
+          240,
+          750
+        ],
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2
+      },
+      {
+        "id": "cd236450-6a9d-4a7c-ac6b-0192056136a2",
+        "name": "Guard - Telegram - No File Attached",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed guard for Telegram - No File Attached.",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "<REDACTED_FILEID_3>",
+                "leftValue": "={{ $('Evaluate Safety').first().json.side_effects_permitted === true }}",
+                "operator": {
+                  "operation": "true",
+                  "singleValue": true,
+                  "type": "boolean"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "options": {
+            "looseTypeValidation": true
+          }
+        },
+        "position": [
+          1128,
+          784
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "id": "201355f0-de22-484a-9e9e-2af77bbd54b9",
+        "name": "Suppressed - Telegram - No File Attached",
+        "notes": "STEP1-KILLSWITCH-20260826. Dry-run stand-in for Telegram - No File Attached. Records what would have happened; performs no external action.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sp-flag",
+                "name": "safety_suppressed",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-node",
+                "name": "safety_suppressed_node",
+                "type": "string",
+                "value": "Telegram - No File Attached"
+              },
+              {
+                "id": "sp-kind",
+                "name": "safety_suppressed_kind",
+                "type": "string",
+                "value": "TELEGRAM_SEND"
+              },
+              {
+                "id": "sp-reason",
+                "name": "safety_suppressed_reason",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_reason }}"
+              },
+              {
+                "id": "sp-mode",
+                "name": "safety_mode",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_mode }}"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          1128,
+          944
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "fe3d47f5-5bfc-42d6-b42b-db73cd31975e",
+        "name": "Guard - Create Matter Folder",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed guard for Create Matter Folder.",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "<REDACTED_FILEID_3>",
+                "leftValue": "={{ $('Evaluate Safety').first().json.side_effects_permitted === true }}",
+                "operator": {
+                  "operation": "true",
+                  "singleValue": true,
+                  "type": "boolean"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "options": {
+            "looseTypeValidation": true
+          }
+        },
+        "position": [
+          1560,
+          544
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "id": "340826b8-dccd-43e2-83d9-851a06697103",
+        "name": "Suppressed - Create Matter Folder",
+        "notes": "STEP1-KILLSWITCH-20260826. Dry-run stand-in for Create Matter Folder. Records what would have happened; performs no external action.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sp-flag",
+                "name": "safety_suppressed",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-node",
+                "name": "safety_suppressed_node",
+                "type": "string",
+                "value": "Create Matter Folder"
+              },
+              {
+                "id": "sp-kind",
+                "name": "safety_suppressed_kind",
+                "type": "string",
+                "value": "DRIVE_WRITE"
+              },
+              {
+                "id": "sp-reason",
+                "name": "safety_suppressed_reason",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_reason }}"
+              },
+              {
+                "id": "sp-mode",
+                "name": "safety_mode",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_mode }}"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          1560,
+          704
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "81815554-5168-46d5-9ae6-e89a02b5f8ba",
+        "name": "Guard - Upload to Drive",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed guard for Upload to Drive.",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "<REDACTED_FILEID_3>",
+                "leftValue": "={{ $('Evaluate Safety').first().json.side_effects_permitted === true }}",
+                "operator": {
+                  "operation": "true",
+                  "singleValue": true,
+                  "type": "boolean"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "options": {
+            "looseTypeValidation": true
+          }
+        },
+        "position": [
+          2440,
+          400
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "id": "a84990c6-abea-4819-a1b5-ef6021a51695",
+        "name": "Suppressed - Upload to Drive",
+        "notes": "STEP1-KILLSWITCH-20260826. Dry-run stand-in for Upload to Drive. Records what would have happened; performs no external action.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sp-flag",
+                "name": "safety_suppressed",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-node",
+                "name": "safety_suppressed_node",
+                "type": "string",
+                "value": "Upload to Drive"
+              },
+              {
+                "id": "sp-kind",
+                "name": "safety_suppressed_kind",
+                "type": "string",
+                "value": "DRIVE_WRITE"
+              },
+              {
+                "id": "sp-reason",
+                "name": "safety_suppressed_reason",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_reason }}"
+              },
+              {
+                "id": "sp-mode",
+                "name": "safety_mode",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_mode }}"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          2440,
+          560
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "b46129c5-19e1-4973-9c5a-e4748e52a56d",
+        "name": "Guard - Store Extracted Text in Drive",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed guard for Store Extracted Text in Drive.",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "<REDACTED_FILEID_3>",
+                "leftValue": "={{ $('Evaluate Safety').first().json.side_effects_permitted === true }}",
+                "operator": {
+                  "operation": "true",
+                  "singleValue": true,
+                  "type": "boolean"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "options": {
+            "looseTypeValidation": true
+          }
+        },
+        "position": [
+          3768,
+          272
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "id": "6af3f08a-0ff8-4904-9d40-73ecfc86ec39",
+        "name": "Suppressed - Store Extracted Text in Drive",
+        "notes": "STEP1-KILLSWITCH-20260826. Dry-run stand-in for Store Extracted Text in Drive. Records what would have happened; performs no external action.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sp-flag",
+                "name": "safety_suppressed",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-node",
+                "name": "safety_suppressed_node",
+                "type": "string",
+                "value": "Store Extracted Text in Drive"
+              },
+              {
+                "id": "sp-kind",
+                "name": "safety_suppressed_kind",
+                "type": "string",
+                "value": "DRIVE_WRITE"
+              },
+              {
+                "id": "sp-reason",
+                "name": "safety_suppressed_reason",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_reason }}"
+              },
+              {
+                "id": "sp-mode",
+                "name": "safety_mode",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_mode }}"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          3768,
+          432
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "76fc3e5a-9354-4da0-8ddc-fadd7e285b83",
+        "name": "Guard - Append Evidence",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed guard for Append Evidence.",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "<REDACTED_FILEID_3>",
+                "leftValue": "={{ $('Evaluate Safety').first().json.side_effects_permitted === true }}",
+                "operator": {
+                  "operation": "true",
+                  "singleValue": true,
+                  "type": "boolean"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "options": {
+            "looseTypeValidation": true
+          }
+        },
+        "position": [
+          4200,
+          400
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "id": "06748bb2-b698-4320-bb3d-e2bc4a6bd33e",
+        "name": "Suppressed - Append Evidence",
+        "notes": "STEP1-KILLSWITCH-20260826. Dry-run stand-in for Append Evidence. Records what would have happened; performs no external action.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sp-flag",
+                "name": "safety_suppressed",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-node",
+                "name": "safety_suppressed_node",
+                "type": "string",
+                "value": "Append Evidence"
+              },
+              {
+                "id": "sp-kind",
+                "name": "safety_suppressed_kind",
+                "type": "string",
+                "value": "SHEETS_WRITE"
+              },
+              {
+                "id": "sp-reason",
+                "name": "safety_suppressed_reason",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_reason }}"
+              },
+              {
+                "id": "sp-mode",
+                "name": "safety_mode",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_mode }}"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          4200,
+          560
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "17b44d6c-6e66-4df5-af78-f4aa0309496c",
+        "name": "Guard - Touch Matter",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed guard for Touch Matter.",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "<REDACTED_FILEID_3>",
+                "leftValue": "={{ $('Evaluate Safety').first().json.side_effects_permitted === true }}",
+                "operator": {
+                  "operation": "true",
+                  "singleValue": true,
+                  "type": "boolean"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "options": {
+            "looseTypeValidation": true
+          }
+        },
+        "position": [
+          4424,
+          400
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "id": "098581a8-66ab-46bd-9cc7-15d033e71071",
+        "name": "Suppressed - Touch Matter",
+        "notes": "STEP1-KILLSWITCH-20260826. Dry-run stand-in for Touch Matter. Records what would have happened; performs no external action.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sp-flag",
+                "name": "safety_suppressed",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-node",
+                "name": "safety_suppressed_node",
+                "type": "string",
+                "value": "Touch Matter"
+              },
+              {
+                "id": "sp-kind",
+                "name": "safety_suppressed_kind",
+                "type": "string",
+                "value": "SHEETS_WRITE"
+              },
+              {
+                "id": "sp-reason",
+                "name": "safety_suppressed_reason",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_reason }}"
+              },
+              {
+                "id": "sp-mode",
+                "name": "safety_mode",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_mode }}"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          4424,
+          560
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "6ea86084-1eaf-4fa6-8329-b03673f5e982",
+        "name": "Guard - Telegram - Evidence Stored",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed guard for Telegram - Evidence Stored.",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "<REDACTED_FILEID_3>",
+                "leftValue": "={{ $('Evaluate Safety').first().json.side_effects_permitted === true }}",
+                "operator": {
+                  "operation": "true",
+                  "singleValue": true,
+                  "type": "boolean"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "options": {
+            "looseTypeValidation": true
+          }
+        },
+        "position": [
+          4872,
+          400
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "id": "4391fdac-244f-499f-b72d-ff40a4bab74d",
+        "name": "Suppressed - Telegram - Evidence Stored",
+        "notes": "STEP1-KILLSWITCH-20260826. Dry-run stand-in for Telegram - Evidence Stored. Records what would have happened; performs no external action.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sp-flag",
+                "name": "safety_suppressed",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-node",
+                "name": "safety_suppressed_node",
+                "type": "string",
+                "value": "Telegram - Evidence Stored"
+              },
+              {
+                "id": "sp-kind",
+                "name": "safety_suppressed_kind",
+                "type": "string",
+                "value": "TELEGRAM_SEND"
+              },
+              {
+                "id": "sp-reason",
+                "name": "safety_suppressed_reason",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_reason }}"
+              },
+              {
+                "id": "sp-mode",
+                "name": "safety_mode",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_mode }}"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          4872,
+          560
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "e2f6182a-2d9f-4514-82ec-9548d8160868",
+        "name": "Guard - Vision - Describe Evidence",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed guard for Vision - Describe Evidence.",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "<REDACTED_FILEID_3>",
+                "leftValue": "={{ $('Evaluate Safety').first().json.side_effects_permitted === true }}",
+                "operator": {
+                  "operation": "true",
+                  "singleValue": true,
+                  "type": "boolean"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "options": {
+            "looseTypeValidation": true
+          }
+        },
+        "position": [
+          3200,
+          880
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "id": "332666e7-3672-4b68-940d-bce57f1c9e97",
+        "name": "Suppressed - Vision - Describe Evidence",
+        "notes": "STEP1-KILLSWITCH-20260826. Dry-run stand-in for Vision - Describe Evidence. Records what would have happened; performs no external action.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sp-flag",
+                "name": "safety_suppressed",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-node",
+                "name": "safety_suppressed_node",
+                "type": "string",
+                "value": "Vision - Describe Evidence"
+              },
+              {
+                "id": "sp-kind",
+                "name": "safety_suppressed_kind",
+                "type": "string",
+                "value": "HTTP_NON_GET"
+              },
+              {
+                "id": "sp-reason",
+                "name": "safety_suppressed_reason",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_reason }}"
+              },
+              {
+                "id": "sp-mode",
+                "name": "safety_mode",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety').first().json.safety_mode }}"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          3200,
+          1040
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
       }
     ],
     "settings": {
@@ -1635,6 +2607,6 @@
     "triggerCount": 0,
     "updatedAt": "2026-08-26T05:55:03.958Z",
     "versionCounter": 9,
-    "versionId": "644bbdb3-6e78-42c1-a250-3cf9ba05fadc"
+    "versionId": "19f820a5-4984-474f-a0a3-47a89972ca7f"
   }
 }

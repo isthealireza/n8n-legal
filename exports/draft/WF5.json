@@ -3,7 +3,7 @@
     "active_version_id": "983da561-5c19-42db-a2b4-1e2e7ac67e0f",
     "capture_time": "see exports/last-run.json (untracked, so an unchanged capture does not produce a commit)",
     "draft_active_determination": "from_active_version_object",
-    "draft_version_id": "811b746c-869c-4fc3-94dc-123f60cb7067",
+    "draft_version_id": "ba7ea015-9105-44f7-8212-e3e323d1da6b",
     "key": "WF5",
     "kind": "draft",
     "scrub_counts": {
@@ -11,7 +11,7 @@
       "CHATID": 4,
       "CREDID": 4,
       "EMAIL": 1,
-      "FILEID": 10
+      "FILEID": 11
     },
     "scrubbed": true,
     "source": "n8n public REST API GET /api/v1/workflows/{id} (read-only)",
@@ -27,7 +27,7 @@
           [
             {
               "index": 0,
-              "node": "Append Follow-up Action",
+              "node": "Guard - Append Follow-up Action",
               "type": "main"
             }
           ],
@@ -45,7 +45,7 @@
           [
             {
               "index": 0,
-              "node": "Mark Matter Follow-up Due",
+              "node": "Guard - Mark Matter Follow-up Due",
               "type": "main"
             }
           ]
@@ -56,7 +56,7 @@
           [
             {
               "index": 0,
-              "node": "Touch Matter (Reply)",
+              "node": "Guard - Touch Matter (Reply)",
               "type": "main"
             }
           ]
@@ -67,7 +67,7 @@
           [
             {
               "index": 0,
-              "node": "Telegram - Daily Digest",
+              "node": "Guard - Telegram - Daily Digest",
               "type": "main"
             }
           ]
@@ -78,7 +78,7 @@
           [
             {
               "index": 0,
-              "node": "Run - Draft Follow-up",
+              "node": "Guard - Run - Draft Follow-up",
               "type": "main"
             }
           ]
@@ -89,7 +89,7 @@
           [
             {
               "index": 0,
-              "node": "Telegram - Follow-ups Raised",
+              "node": "Guard - Telegram - Follow-ups Raised",
               "type": "main"
             }
           ]
@@ -111,7 +111,7 @@
           [
             {
               "index": 0,
-              "node": "Telegram - Reply Received",
+              "node": "Guard - Telegram - Reply Received",
               "type": "main"
             }
           ]
@@ -122,14 +122,14 @@
           [
             {
               "index": 0,
-              "node": "Append Next Action",
+              "node": "Guard - Append Next Action",
               "type": "main"
             }
           ],
           [
             {
               "index": 0,
-              "node": "Touch Matter (Reply)",
+              "node": "Guard - Touch Matter (Reply)",
               "type": "main"
             }
           ]
@@ -140,7 +140,7 @@
           [
             {
               "index": 0,
-              "node": "Load Matters (Digest)",
+              "node": "Safety Config (Digest)",
               "type": "main"
             }
           ]
@@ -151,7 +151,7 @@
           [
             {
               "index": 0,
-              "node": "Load Matters (FU)",
+              "node": "Safety Config (FU)",
               "type": "main"
             }
           ]
@@ -175,6 +175,39 @@
           ]
         ]
       },
+      "Evaluate Safety (Digest)": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Load Matters (Digest)",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Evaluate Safety (FU)": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Load Matters (FU)",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Evaluate Safety (Reply)": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Match Reply to Matter",
+              "type": "main"
+            }
+          ]
+        ]
+      },
       "Find Due Follow-ups": {
         "main": [
           [
@@ -191,7 +224,277 @@
           [
             {
               "index": 0,
-              "node": "Match Reply to Matter",
+              "node": "Safety Config (Reply)",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Guard - Append Follow-up Action": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Append Follow-up Action",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "Suppressed - Append Follow-up Action",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Guard - Append Next Action": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Append Next Action",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "Suppressed - Append Next Action",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Guard - DeepSeek - Reply Classifier": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "DeepSeek - Reply Classifier",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "Suppressed - DeepSeek - Reply Classifier",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Guard - Log Inbound": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Log Inbound",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "Suppressed - Log Inbound",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Guard - Log New Inbound": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Log New Inbound",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "Suppressed - Log New Inbound",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Guard - Log Unmatched Reply": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Log Unmatched Reply",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "Suppressed - Log Unmatched Reply",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Guard - Log Unverified Sender": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Log Unverified Sender",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "Suppressed - Log Unverified Sender",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Guard - Mark Matter Follow-up Due": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Mark Matter Follow-up Due",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "Suppressed - Mark Matter Follow-up Due",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Guard - Run - Draft Follow-up": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Run - Draft Follow-up",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "Suppressed - Run - Draft Follow-up",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Guard - Telegram - Daily Digest": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Telegram - Daily Digest",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "Suppressed - Telegram - Daily Digest",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Guard - Telegram - Follow-ups Raised": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Telegram - Follow-ups Raised",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "Suppressed - Telegram - Follow-ups Raised",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Guard - Telegram - Reply Received": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Telegram - Reply Received",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "Suppressed - Telegram - Reply Received",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Guard - Telegram - Unmatched Reply": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Telegram - Unmatched Reply",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "Suppressed - Telegram - Unmatched Reply",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Guard - Telegram - Unverified Sender": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Telegram - Unverified Sender",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "Suppressed - Telegram - Unverified Sender",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Guard - Touch Matter (Reply)": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Touch Matter (Reply)",
+              "type": "main"
+            }
+          ],
+          [
+            {
+              "index": 0,
+              "node": "Suppressed - Touch Matter (Reply)",
               "type": "main"
             }
           ]
@@ -345,7 +648,7 @@
           [
             {
               "index": 0,
-              "node": "Log New Inbound",
+              "node": "Guard - Log New Inbound",
               "type": "main"
             }
           ]
@@ -367,7 +670,7 @@
           [
             {
               "index": 0,
-              "node": "Telegram - Unmatched Reply",
+              "node": "Guard - Telegram - Unmatched Reply",
               "type": "main"
             }
           ]
@@ -378,7 +681,7 @@
           [
             {
               "index": 0,
-              "node": "Telegram - Unverified Sender",
+              "node": "Guard - Telegram - Unverified Sender",
               "type": "main"
             }
           ]
@@ -429,7 +732,7 @@
           [
             {
               "index": 0,
-              "node": "Log Unmatched Reply",
+              "node": "Guard - Log Unmatched Reply",
               "type": "main"
             }
           ]
@@ -446,19 +749,162 @@
           ]
         ]
       },
+      "Safety Config (Digest)": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Evaluate Safety (Digest)",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Safety Config (FU)": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Evaluate Safety (FU)",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Safety Config (Reply)": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Evaluate Safety (Reply)",
+              "type": "main"
+            }
+          ]
+        ]
+      },
       "Sender Verified?": {
         "main": [
           [
             {
               "index": 0,
-              "node": "DeepSeek - Reply Classifier",
+              "node": "Guard - DeepSeek - Reply Classifier",
               "type": "main"
             }
           ],
           [
             {
               "index": 0,
-              "node": "Log Unverified Sender",
+              "node": "Guard - Log Unverified Sender",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Suppressed - Append Follow-up Action": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Guard - Mark Matter Follow-up Due",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Suppressed - Append Next Action": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Guard - Touch Matter (Reply)",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Suppressed - DeepSeek - Reply Classifier": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Parse Classifier JSON",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Suppressed - Log Inbound": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Guard - Log New Inbound",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Suppressed - Log New Inbound": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Create Next Action?",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Suppressed - Log Unmatched Reply": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Guard - Telegram - Unmatched Reply",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Suppressed - Log Unverified Sender": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Guard - Telegram - Unverified Sender",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Suppressed - Mark Matter Follow-up Due": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Build Follow-up Draft Request",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Suppressed - Run - Draft Follow-up": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Build Follow-up Notice",
+              "type": "main"
+            }
+          ]
+        ]
+      },
+      "Suppressed - Touch Matter (Reply)": {
+        "main": [
+          [
+            {
+              "index": 0,
+              "node": "Build Reply Notice",
               "type": "main"
             }
           ]
@@ -480,7 +926,7 @@
           [
             {
               "index": 0,
-              "node": "Log Inbound",
+              "node": "Guard - Log Inbound",
               "type": "main"
             }
           ]
@@ -825,7 +1271,7 @@
         "id": "8af1d1d2-c474-45bc-957f-c9902c1bbe59",
         "name": "Validate Reply JSON",
         "parameters": {
-          "jsCode": "const c = $('Build Reply Context').first().json;\nlet raw = $input.first().json;\nif (raw && raw.output) raw = raw.output;\nif (typeof raw === 'string') { try { raw = JSON.parse(raw); } catch (e) { raw = null; } }\n\nconst allowed = ['ACKNOWLEDGEMENT','REQUEST_FOR_INFORMATION','DENIAL','OFFER','COUNTEROFFER',\n  'SETTLEMENT_PROPOSAL','ACCEPTANCE','REJECTION','DEADLINE_NOTICE','NEW_EVIDENCE','ESCALATION','UNKNOWN'];\n\nconst ok = raw && typeof raw === 'object' && allowed.includes(raw.classification);\nconst cls = ok ? raw.classification : 'UNKNOWN';\n\n// ---------------------------------------------------------------------------\n// D3. A deadline the sender stated has to land in a column Date.parse can read,\n// or it is invisible to the daily digest and to the follow-up detector. The raw\n// wording is never discarded: it is what the owner must actually act on, and it\n// is the only defensible record of what the other side said.\n//\n// Order matters. The numeric day/month/year branch runs BEFORE Date.parse,\n// because Date.parse reads a bare 5/8/2026 as 8 May (US) while Western\n// Australia means 5 August. Getting that backwards moves a legal deadline by\n// nearly three months and records it as if it were certain.\n// ---------------------------------------------------------------------------\nconst MONTHS = 'January|February|March|April|May|June|July|August|September|October|November|December';\nfunction normaliseDeadline(input) {\n  const rawText = String(input == null ? '' : input).trim();\n  if (!rawText) return { iso: '', raw: '', parsed: false, ambiguous: false };\n\n  // 1. Numeric d/m/y, day first.\n  const au = rawText.match(/\\b(\\d{1,2})[\\/.\\-](\\d{1,2})[\\/.\\-](\\d{4})\\b/);\n  if (au) {\n    const dNum = Number(au[1]), mNum = Number(au[2]);\n    if (mNum >= 1 && mNum <= 12 && dNum >= 1 && dNum <= 31) {\n      const t = Date.parse(au[3] + '-' + String(mNum).padStart(2, '0') + '-' + String(dNum).padStart(2, '0') + 'T00:00:00Z');\n      // Ambiguous only when both numbers could be a month, e.g. 5/8 vs 8/5.\n      if (!Number.isNaN(t)) return { iso: new Date(t).toISOString(), raw: rawText, parsed: true, ambiguous: dNum <= 12 };\n    }\n  }\n\n  // 2. A month name, e.g. \"5pm AWST on 25 August 2026\" or \"COB 25 Aug 2026\".\n  const prose = rawText.match(new RegExp('(\\\\d{1,2})\\\\s+(' + MONTHS + '|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\\\\.?\\\\s+(\\\\d{4})', 'i'));\n  if (prose) {\n    const t = Date.parse(prose[1] + ' ' + prose[2] + ' ' + prose[3] + ' 00:00:00Z');\n    if (!Number.isNaN(t)) return { iso: new Date(t).toISOString(), raw: rawText, parsed: true, ambiguous: false };\n  }\n\n  // 3. An ISO date, possibly embedded in a longer string.\n  const iso = rawText.match(/(\\d{4})-(\\d{2})-(\\d{2})/);\n  if (iso) {\n    const t = Date.parse(iso[0] + 'T00:00:00Z');\n    if (!Number.isNaN(t)) return { iso: new Date(t).toISOString(), raw: rawText, parsed: true, ambiguous: false };\n  }\n\n  // 4. Last resort: anything else Date.parse understands, e.g. \"August 25, 2026\".\n  const t = Date.parse(rawText);\n  if (!Number.isNaN(t)) return { iso: new Date(t).toISOString(), raw: rawText, parsed: true, ambiguous: false };\n\n  // Relative wording such as \"within 21 days\" is deliberately NOT resolved here.\n  // Doing so would require knowing the start date and the counting rule, which is\n  // exactly the kind of limitation calculation this system must never invent.\n  return { iso: '', raw: rawText, parsed: false, ambiguous: false };\n}\n\nconst statedFlag = ok && raw.deadline_is_stated === true;\nconst dl = normaliseDeadline(ok ? raw.deadline_date : '');\n\nlet deadlineBasis = '';\nif (dl.raw) {\n  if (statedFlag) deadlineBasis = dl.parsed ? 'STATED_BY_SENDER' : 'STATED_BY_SENDER_UNPARSED';\n  else deadlineBasis = 'UNVERIFIED_ESTIMATE';\n}\nif (dl.parsed && dl.ambiguous) deadlineBasis = deadlineBasis + '_AMBIGUOUS_DMY';\nconst deadlineUnparsed = !!dl.raw && !dl.parsed;\n\n// An offer or settlement proposal is never actioned automatically. It becomes a decision for the owner.\nconst decisionClasses = ['OFFER','COUNTEROFFER','SETTLEMENT_PROPOSAL','ACCEPTANCE','REJECTION'];\nconst needsOwnerDecision = decisionClasses.includes(cls);\n\nconst createAction = ok && (raw.response_needed === true || needsOwnerDecision);\nconst nextType = needsOwnerDecision ? 'OWNER_DECISION'\n  : String((ok && raw.suggested_next_action_type) || 'REVIEW_DOCUMENT').toUpperCase();\n\n// Fail-safe. The previous version whitelisted the types that DO need approval and\n// defaulted everything else to FALSE, so OWNER_DECISION and REVIEW_AND_DECIDE --\n// which is what a settlement offer produces -- were written requires_approval FALSE.\n// Now only an explicitly harmless, purely internal action skips approval.\nconst NO_APPROVAL_NEEDED = ['REVIEW_DOCUMENT','COLLECT_INFORMATION','FILE_NOTE'];\nconst requiresApproval = NO_APPROVAL_NEEDED.includes(nextType) ? 'FALSE' : 'TRUE';\n\nlet nextDescription = needsOwnerDecision\n  ? 'An offer or proposal arrived. It requires your decision. I accepted nothing. I rejected nothing.'\n  : String((ok && raw.suggested_next_action) || 'Review the reply and decide the next step.');\nif (deadlineUnparsed) {\n  nextDescription = 'UNPARSED DEADLINE, CONFIRM IT YOURSELF: the sender wrote \"' + dl.raw\n    + '\", which I could not turn into a calendar date. This action has no due date. It will NOT appear in the daily overdue list. '\n    + nextDescription;\n} else if (dl.parsed && dl.ambiguous) {\n  nextDescription = 'AMBIGUOUS DATE: the sender wrote \"' + dl.raw + '\". I read it day first, as '\n    + dl.iso.slice(0, 10) + '. If they meant month first, correct it. ' + nextDescription;\n}\n\nreturn [{ json: {\n  ...c,\n  json_valid: !!ok,\n  classification: cls,\n  summary: ok ? String(raw.summary || '').slice(0, 700) : 'The classifier returned nothing usable. Read the email yourself.',\n  response_needed: ok ? raw.response_needed === true : true,\n  requests: ok && Array.isArray(raw.requests) ? raw.requests.map(String) : [],\n  deadline_date: dl.raw,\n  due_at_iso: dl.iso,\n  deadline_parsed: dl.parsed,\n  deadline_unparsed: deadlineUnparsed,\n  deadline_ambiguous: dl.ambiguous,\n  deadline_basis: deadlineBasis,\n  notes: ok ? String(raw.notes || '') : 'CLASSIFIER_FAILED',\n  needs_owner_decision: needsOwnerDecision,\n  create_action: createAction,\n  next_action_type: nextType,\n  next_action_description: nextDescription.slice(0, 700),\n  next_action_priority: (needsOwnerDecision || deadlineUnparsed || dl.ambiguous) ? 'HIGH' : 'MEDIUM',\n  <REDACTED_FILEID_10>: requiresApproval,\n  // communication_id is NOT regenerated here. Build Reply Context supplies a\n  // deterministic 'COM-' + provider_message_id, and a stored value wins over a\n  // recomputed one, so it is created once and identical on every replay. It\n  // arrives via the ...c spread above. Regenerating it from the clock made the\n  // Telegram notice report an id that did not exist in the Communications sheet.\n}}];"
+          "jsCode": "const c = $('Build Reply Context').first().json;\nlet raw = $input.first().json;\nif (raw && raw.output) raw = raw.output;\nif (typeof raw === 'string') { try { raw = JSON.parse(raw); } catch (e) { raw = null; } }\n\nconst allowed = ['ACKNOWLEDGEMENT','REQUEST_FOR_INFORMATION','DENIAL','OFFER','COUNTEROFFER',\n  'SETTLEMENT_PROPOSAL','ACCEPTANCE','REJECTION','DEADLINE_NOTICE','NEW_EVIDENCE','ESCALATION','UNKNOWN'];\n\nconst ok = raw && typeof raw === 'object' && allowed.includes(raw.classification);\nconst cls = ok ? raw.classification : 'UNKNOWN';\n\n// ---------------------------------------------------------------------------\n// D3. A deadline the sender stated has to land in a column Date.parse can read,\n// or it is invisible to the daily digest and to the follow-up detector. The raw\n// wording is never discarded: it is what the owner must actually act on, and it\n// is the only defensible record of what the other side said.\n//\n// Order matters. The numeric day/month/year branch runs BEFORE Date.parse,\n// because Date.parse reads a bare 5/8/2026 as 8 May (US) while Western\n// Australia means 5 August. Getting that backwards moves a legal deadline by\n// nearly three months and records it as if it were certain.\n// ---------------------------------------------------------------------------\nconst MONTHS = 'January|February|March|April|May|June|July|August|September|October|November|December';\nfunction normaliseDeadline(input) {\n  const rawText = String(input == null ? '' : input).trim();\n  if (!rawText) return { iso: '', raw: '', parsed: false, ambiguous: false };\n\n  // 1. Numeric d/m/y, day first.\n  const au = rawText.match(/\\b(\\d{1,2})[\\/.\\-](\\d{1,2})[\\/.\\-](\\d{4})\\b/);\n  if (au) {\n    const dNum = Number(au[1]), mNum = Number(au[2]);\n    if (mNum >= 1 && mNum <= 12 && dNum >= 1 && dNum <= 31) {\n      const t = Date.parse(au[3] + '-' + String(mNum).padStart(2, '0') + '-' + String(dNum).padStart(2, '0') + 'T00:00:00Z');\n      // Ambiguous only when both numbers could be a month, e.g. 5/8 vs 8/5.\n      if (!Number.isNaN(t)) return { iso: new Date(t).toISOString(), raw: rawText, parsed: true, ambiguous: dNum <= 12 };\n    }\n  }\n\n  // 2. A month name, e.g. \"5pm AWST on 25 August 2026\" or \"COB 25 Aug 2026\".\n  const prose = rawText.match(new RegExp('(\\\\d{1,2})\\\\s+(' + MONTHS + '|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\\\\.?\\\\s+(\\\\d{4})', 'i'));\n  if (prose) {\n    const t = Date.parse(prose[1] + ' ' + prose[2] + ' ' + prose[3] + ' 00:00:00Z');\n    if (!Number.isNaN(t)) return { iso: new Date(t).toISOString(), raw: rawText, parsed: true, ambiguous: false };\n  }\n\n  // 3. An ISO date, possibly embedded in a longer string.\n  const iso = rawText.match(/(\\d{4})-(\\d{2})-(\\d{2})/);\n  if (iso) {\n    const t = Date.parse(iso[0] + 'T00:00:00Z');\n    if (!Number.isNaN(t)) return { iso: new Date(t).toISOString(), raw: rawText, parsed: true, ambiguous: false };\n  }\n\n  // 4. Last resort: anything else Date.parse understands, e.g. \"August 25, 2026\".\n  const t = Date.parse(rawText);\n  if (!Number.isNaN(t)) return { iso: new Date(t).toISOString(), raw: rawText, parsed: true, ambiguous: false };\n\n  // Relative wording such as \"within 21 days\" is deliberately NOT resolved here.\n  // Doing so would require knowing the start date and the counting rule, which is\n  // exactly the kind of limitation calculation this system must never invent.\n  return { iso: '', raw: rawText, parsed: false, ambiguous: false };\n}\n\nconst statedFlag = ok && raw.deadline_is_stated === true;\nconst dl = normaliseDeadline(ok ? raw.deadline_date : '');\n\nlet deadlineBasis = '';\nif (dl.raw) {\n  if (statedFlag) deadlineBasis = dl.parsed ? 'STATED_BY_SENDER' : 'STATED_BY_SENDER_UNPARSED';\n  else deadlineBasis = 'UNVERIFIED_ESTIMATE';\n}\nif (dl.parsed && dl.ambiguous) deadlineBasis = deadlineBasis + '_AMBIGUOUS_DMY';\nconst deadlineUnparsed = !!dl.raw && !dl.parsed;\n\n// An offer or settlement proposal is never actioned automatically. It becomes a decision for the owner.\nconst decisionClasses = ['OFFER','COUNTEROFFER','SETTLEMENT_PROPOSAL','ACCEPTANCE','REJECTION'];\nconst needsOwnerDecision = decisionClasses.includes(cls);\n\nconst createAction = ok && (raw.response_needed === true || needsOwnerDecision);\nconst nextType = needsOwnerDecision ? 'OWNER_DECISION'\n  : String((ok && raw.suggested_next_action_type) || 'REVIEW_DOCUMENT').toUpperCase();\n\n// Fail-safe. The previous version whitelisted the types that DO need approval and\n// defaulted everything else to FALSE, so OWNER_DECISION and REVIEW_AND_DECIDE --\n// which is what a settlement offer produces -- were written requires_approval FALSE.\n// Now only an explicitly harmless, purely internal action skips approval.\nconst NO_APPROVAL_NEEDED = ['REVIEW_DOCUMENT','COLLECT_INFORMATION','FILE_NOTE'];\nconst requiresApproval = NO_APPROVAL_NEEDED.includes(nextType) ? 'FALSE' : 'TRUE';\n\nlet nextDescription = needsOwnerDecision\n  ? 'An offer or proposal arrived. It requires your decision. I accepted nothing. I rejected nothing.'\n  : String((ok && raw.suggested_next_action) || 'Review the reply and decide the next step.');\nif (deadlineUnparsed) {\n  nextDescription = 'UNPARSED DEADLINE, CONFIRM IT YOURSELF: the sender wrote \"' + dl.raw\n    + '\", which I could not turn into a calendar date. This action has no due date. It will NOT appear in the daily overdue list. '\n    + nextDescription;\n} else if (dl.parsed && dl.ambiguous) {\n  nextDescription = 'AMBIGUOUS DATE: the sender wrote \"' + dl.raw + '\". I read it day first, as '\n    + dl.iso.slice(0, 10) + '. If they meant month first, correct it. ' + nextDescription;\n}\n\nreturn [{ json: {\n  ...c,\n  json_valid: !!ok,\n  classification: cls,\n  summary: ok ? String(raw.summary || '').slice(0, 700) : 'The classifier returned nothing usable. Read the email yourself.',\n  response_needed: ok ? raw.response_needed === true : true,\n  requests: ok && Array.isArray(raw.requests) ? raw.requests.map(String) : [],\n  deadline_date: dl.raw,\n  due_at_iso: dl.iso,\n  deadline_parsed: dl.parsed,\n  deadline_unparsed: deadlineUnparsed,\n  deadline_ambiguous: dl.ambiguous,\n  deadline_basis: deadlineBasis,\n  notes: ok ? String(raw.notes || '') : 'CLASSIFIER_FAILED',\n  needs_owner_decision: needsOwnerDecision,\n  create_action: createAction,\n  next_action_type: nextType,\n  next_action_description: nextDescription.slice(0, 700),\n  next_action_priority: (needsOwnerDecision || deadlineUnparsed || dl.ambiguous) ? 'HIGH' : 'MEDIUM',\n  <REDACTED_FILEID_11>: requiresApproval,\n  // communication_id is NOT regenerated here. Build Reply Context supplies a\n  // deterministic 'COM-' + provider_message_id, and a stored value wins over a\n  // recomputed one, so it is created once and identical on every replay. It\n  // arrives via the ...c spread above. Regenerating it from the clock made the\n  // Telegram notice report an id that did not exist in the Communications sheet.\n}}];"
         },
         "position": [
           1552,
@@ -1290,7 +1736,7 @@
               "matter_id": "={{ $('Validate Reply JSON').first().json.matter_id }}",
               "priority": "={{ $('Validate Reply JSON').first().json.next_action_priority }}",
               "recipient": "={{ $('Validate Reply JSON').first().json.from_address }}",
-              "requires_approval": "={{ $('Validate Reply JSON').first().json.<REDACTED_FILEID_10> }}",
+              "requires_approval": "={{ $('Validate Reply JSON').first().json.<REDACTED_FILEID_11> }}",
               "status": "READY",
               "updated_at": "={{ $now.toISO() }}"
             }
@@ -2895,6 +3341,1452 @@
         ],
         "type": "n8n-nodes-base.googleSheets",
         "typeVersion": 4.5
+      },
+      {
+        "id": "1afac563-ed7d-4fdb-b782-9908421acb9d",
+        "name": "Safety Config (Reply)",
+        "notes": "STEP1-KILLSWITCH-20260826. Single source of truth for the safety contract. Set dry_run=false AND live_send_authorised=true AND environment=production to permit external side effects. Any other combination fails closed.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sc-dry-run",
+                "name": "dry_run",
+                "type": "string",
+                "value": "true"
+              },
+              {
+                "id": "sc-live-auth",
+                "name": "live_send_authorised",
+                "type": "string",
+                "value": "false"
+              },
+              {
+                "id": "sc-env",
+                "name": "environment",
+                "type": "string",
+                "value": "test"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          60,
+          798
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "0794d519-2ed3-47bd-88a7-6aa0bb133670",
+        "name": "Evaluate Safety (Reply)",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed evaluator. Every guard in this workflow reads side_effects_permitted from here.",
+        "parameters": {
+          "jsCode": "// STEP1-KILLSWITCH-20260826 - global fail-closed safety evaluator.\n// Side effects are permitted ONLY when all three conditions are explicitly met.\n// Anything missing, blank, misspelled or unexpected leaves the system in TEST mode.\nconst s = (v) => String(v === undefined || v === null ? '' : v).trim().toLowerCase();\n\nconst items = $input.all();\nconst cfg = items.length ? (items[0].json || {}) : {};\n\nconst dryRunOff  = s(cfg.dry_run) === 'false';\nconst authorised = s(cfg.live_send_authorised) === 'true';\nconst isProd     = s(cfg.environment) === 'production';\n\nconst side_effects_permitted = dryRunOff && authorised && isProd;\n\nconst reasons = [];\nif (!dryRunOff)  reasons.push('dry_run is not the exact string \"false\" (seen: \"' + s(cfg.dry_run) + '\")');\nif (!authorised) reasons.push('live_send_authorised is not the exact string \"true\" (seen: \"' + s(cfg.live_send_authorised) + '\")');\nif (!isProd)     reasons.push('environment is not \"production\" (seen: \"' + s(cfg.environment) + '\")');\n\nconst safety = {\n  side_effects_permitted: side_effects_permitted,\n  safety_mode: side_effects_permitted ? 'LIVE' : 'TEST_FAIL_CLOSED',\n  safety_reason: side_effects_permitted\n    ? 'All three live-send conditions explicitly satisfied.'\n    : 'Blocked: ' + reasons.join('; '),\n  safety_contract_seen: {\n    dry_run: s(cfg.dry_run),\n    live_send_authorised: s(cfg.live_send_authorised),\n    environment: s(cfg.environment),\n  },\n  safety_change_id: 'STEP1-KILLSWITCH-20260826',\n};\n\n// No input items still yields a decision, so a guard can never read undefined.\nif (!items.length) return [{ json: safety }];\n\nreturn items.map((i) => ({\n  json: Object.assign({}, i.json || {}, safety),\n  binary: i.binary,\n  pairedItem: i.pairedItem,\n}));",
+          "mode": "runOnceForAllItems"
+        },
+        "position": [
+          240,
+          798
+        ],
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2
+      },
+      {
+        "id": "120b8e88-74b7-4d2f-b8c8-2f46c04cc0cd",
+        "name": "Safety Config (Digest)",
+        "notes": "STEP1-KILLSWITCH-20260826. Single source of truth for the safety contract. Set dry_run=false AND live_send_authorised=true AND environment=production to permit external side effects. Any other combination fails closed.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sc-dry-run",
+                "name": "dry_run",
+                "type": "string",
+                "value": "true"
+              },
+              {
+                "id": "sc-live-auth",
+                "name": "live_send_authorised",
+                "type": "string",
+                "value": "false"
+              },
+              {
+                "id": "sc-env",
+                "name": "environment",
+                "type": "string",
+                "value": "test"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          60,
+          1390
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "34fe3621-0ec1-47ed-9e72-96a7ec184e35",
+        "name": "Evaluate Safety (Digest)",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed evaluator. Every guard in this workflow reads side_effects_permitted from here.",
+        "parameters": {
+          "jsCode": "// STEP1-KILLSWITCH-20260826 - global fail-closed safety evaluator.\n// Side effects are permitted ONLY when all three conditions are explicitly met.\n// Anything missing, blank, misspelled or unexpected leaves the system in TEST mode.\nconst s = (v) => String(v === undefined || v === null ? '' : v).trim().toLowerCase();\n\nconst items = $input.all();\nconst cfg = items.length ? (items[0].json || {}) : {};\n\nconst dryRunOff  = s(cfg.dry_run) === 'false';\nconst authorised = s(cfg.live_send_authorised) === 'true';\nconst isProd     = s(cfg.environment) === 'production';\n\nconst side_effects_permitted = dryRunOff && authorised && isProd;\n\nconst reasons = [];\nif (!dryRunOff)  reasons.push('dry_run is not the exact string \"false\" (seen: \"' + s(cfg.dry_run) + '\")');\nif (!authorised) reasons.push('live_send_authorised is not the exact string \"true\" (seen: \"' + s(cfg.live_send_authorised) + '\")');\nif (!isProd)     reasons.push('environment is not \"production\" (seen: \"' + s(cfg.environment) + '\")');\n\nconst safety = {\n  side_effects_permitted: side_effects_permitted,\n  safety_mode: side_effects_permitted ? 'LIVE' : 'TEST_FAIL_CLOSED',\n  safety_reason: side_effects_permitted\n    ? 'All three live-send conditions explicitly satisfied.'\n    : 'Blocked: ' + reasons.join('; '),\n  safety_contract_seen: {\n    dry_run: s(cfg.dry_run),\n    live_send_authorised: s(cfg.live_send_authorised),\n    environment: s(cfg.environment),\n  },\n  safety_change_id: 'STEP1-KILLSWITCH-20260826',\n};\n\n// No input items still yields a decision, so a guard can never read undefined.\nif (!items.length) return [{ json: safety }];\n\nreturn items.map((i) => ({\n  json: Object.assign({}, i.json || {}, safety),\n  binary: i.binary,\n  pairedItem: i.pairedItem,\n}));",
+          "mode": "runOnceForAllItems"
+        },
+        "position": [
+          240,
+          1390
+        ],
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2
+      },
+      {
+        "id": "f1d7cf5e-0f94-4d63-927e-34f728d78495",
+        "name": "Safety Config (FU)",
+        "notes": "STEP1-KILLSWITCH-20260826. Single source of truth for the safety contract. Set dry_run=false AND live_send_authorised=true AND environment=production to permit external side effects. Any other combination fails closed.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sc-dry-run",
+                "name": "dry_run",
+                "type": "string",
+                "value": "true"
+              },
+              {
+                "id": "sc-live-auth",
+                "name": "live_send_authorised",
+                "type": "string",
+                "value": "false"
+              },
+              {
+                "id": "sc-env",
+                "name": "environment",
+                "type": "string",
+                "value": "test"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          60,
+          1902
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "c2e36071-986c-4f72-b66f-d0ca4c58f44d",
+        "name": "Evaluate Safety (FU)",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed evaluator. Every guard in this workflow reads side_effects_permitted from here.",
+        "parameters": {
+          "jsCode": "// STEP1-KILLSWITCH-20260826 - global fail-closed safety evaluator.\n// Side effects are permitted ONLY when all three conditions are explicitly met.\n// Anything missing, blank, misspelled or unexpected leaves the system in TEST mode.\nconst s = (v) => String(v === undefined || v === null ? '' : v).trim().toLowerCase();\n\nconst items = $input.all();\nconst cfg = items.length ? (items[0].json || {}) : {};\n\nconst dryRunOff  = s(cfg.dry_run) === 'false';\nconst authorised = s(cfg.live_send_authorised) === 'true';\nconst isProd     = s(cfg.environment) === 'production';\n\nconst side_effects_permitted = dryRunOff && authorised && isProd;\n\nconst reasons = [];\nif (!dryRunOff)  reasons.push('dry_run is not the exact string \"false\" (seen: \"' + s(cfg.dry_run) + '\")');\nif (!authorised) reasons.push('live_send_authorised is not the exact string \"true\" (seen: \"' + s(cfg.live_send_authorised) + '\")');\nif (!isProd)     reasons.push('environment is not \"production\" (seen: \"' + s(cfg.environment) + '\")');\n\nconst safety = {\n  side_effects_permitted: side_effects_permitted,\n  safety_mode: side_effects_permitted ? 'LIVE' : 'TEST_FAIL_CLOSED',\n  safety_reason: side_effects_permitted\n    ? 'All three live-send conditions explicitly satisfied.'\n    : 'Blocked: ' + reasons.join('; '),\n  safety_contract_seen: {\n    dry_run: s(cfg.dry_run),\n    live_send_authorised: s(cfg.live_send_authorised),\n    environment: s(cfg.environment),\n  },\n  safety_change_id: 'STEP1-KILLSWITCH-20260826',\n};\n\n// No input items still yields a decision, so a guard can never read undefined.\nif (!items.length) return [{ json: safety }];\n\nreturn items.map((i) => ({\n  json: Object.assign({}, i.json || {}, safety),\n  binary: i.binary,\n  pairedItem: i.pairedItem,\n}));",
+          "mode": "runOnceForAllItems"
+        },
+        "position": [
+          240,
+          1902
+        ],
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2
+      },
+      {
+        "id": "5eac3786-4bc6-4bee-9a5f-157bc55f4734",
+        "name": "Guard - Telegram - Unmatched Reply",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed guard for Telegram - Unmatched Reply.",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "<REDACTED_FILEID_10>",
+                "leftValue": "={{ $('Evaluate Safety (Reply)').first().json.side_effects_permitted === true }}",
+                "operator": {
+                  "operation": "true",
+                  "singleValue": true,
+                  "type": "boolean"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "options": {
+            "looseTypeValidation": true
+          }
+        },
+        "position": [
+          680,
+          800
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "id": "19d60c69-41fb-48cb-818f-dbad40d3a9b2",
+        "name": "Suppressed - Telegram - Unmatched Reply",
+        "notes": "STEP1-KILLSWITCH-20260826. Dry-run stand-in for Telegram - Unmatched Reply. Records what would have happened; performs no external action.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sp-flag",
+                "name": "safety_suppressed",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-node",
+                "name": "safety_suppressed_node",
+                "type": "string",
+                "value": "Telegram - Unmatched Reply"
+              },
+              {
+                "id": "sp-kind",
+                "name": "safety_suppressed_kind",
+                "type": "string",
+                "value": "TELEGRAM_SEND"
+              },
+              {
+                "id": "sp-reason",
+                "name": "safety_suppressed_reason",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety (Reply)').first().json.safety_reason }}"
+              },
+              {
+                "id": "sp-mode",
+                "name": "safety_mode",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety (Reply)').first().json.safety_mode }}"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          680,
+          960
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "c5a86f76-27ca-4f4e-8e64-e28f499e80e2",
+        "name": "Guard - Telegram - Unverified Sender",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed guard for Telegram - Unverified Sender.",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "<REDACTED_FILEID_10>",
+                "leftValue": "={{ $('Evaluate Safety (Reply)').first().json.side_effects_permitted === true }}",
+                "operator": {
+                  "operation": "true",
+                  "singleValue": true,
+                  "type": "boolean"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "options": {
+            "looseTypeValidation": true
+          }
+        },
+        "position": [
+          728,
+          208
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "id": "5cdef992-50cb-4660-9ab8-c28100157ec2",
+        "name": "Suppressed - Telegram - Unverified Sender",
+        "notes": "STEP1-KILLSWITCH-20260826. Dry-run stand-in for Telegram - Unverified Sender. Records what would have happened; performs no external action.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sp-flag",
+                "name": "safety_suppressed",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-node",
+                "name": "safety_suppressed_node",
+                "type": "string",
+                "value": "Telegram - Unverified Sender"
+              },
+              {
+                "id": "sp-kind",
+                "name": "safety_suppressed_kind",
+                "type": "string",
+                "value": "TELEGRAM_SEND"
+              },
+              {
+                "id": "sp-reason",
+                "name": "safety_suppressed_reason",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety (Reply)').first().json.safety_reason }}"
+              },
+              {
+                "id": "sp-mode",
+                "name": "safety_mode",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety (Reply)').first().json.safety_mode }}"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          728,
+          368
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "44f3506b-35ec-4100-b4db-1c52f6db9bd3",
+        "name": "Guard - Telegram - Reply Received",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed guard for Telegram - Reply Received.",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "<REDACTED_FILEID_10>",
+                "leftValue": "={{ $('Evaluate Safety (Reply)').first().json.side_effects_permitted === true }}",
+                "operator": {
+                  "operation": "true",
+                  "singleValue": true,
+                  "type": "boolean"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "options": {
+            "looseTypeValidation": true
+          }
+        },
+        "position": [
+          2664,
+          608
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "id": "fbebaa14-ef13-475d-a66b-6671fb575402",
+        "name": "Suppressed - Telegram - Reply Received",
+        "notes": "STEP1-KILLSWITCH-20260826. Dry-run stand-in for Telegram - Reply Received. Records what would have happened; performs no external action.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sp-flag",
+                "name": "safety_suppressed",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-node",
+                "name": "safety_suppressed_node",
+                "type": "string",
+                "value": "Telegram - Reply Received"
+              },
+              {
+                "id": "sp-kind",
+                "name": "safety_suppressed_kind",
+                "type": "string",
+                "value": "TELEGRAM_SEND"
+              },
+              {
+                "id": "sp-reason",
+                "name": "safety_suppressed_reason",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety (Reply)').first().json.safety_reason }}"
+              },
+              {
+                "id": "sp-mode",
+                "name": "safety_mode",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety (Reply)').first().json.safety_mode }}"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          2664,
+          768
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "3ef9ef6a-8a92-44e6-9fb0-437f100f7c81",
+        "name": "Guard - Telegram - Daily Digest",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed guard for Telegram - Daily Digest.",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "<REDACTED_FILEID_10>",
+                "leftValue": "={{ $('Evaluate Safety (Digest)').first().json.side_effects_permitted === true }}",
+                "operator": {
+                  "operation": "true",
+                  "singleValue": true,
+                  "type": "boolean"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "options": {
+            "looseTypeValidation": true
+          }
+        },
+        "position": [
+          1352,
+          1200
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "id": "ce02dcc9-6d53-4cd8-850f-c4ea72efa5c0",
+        "name": "Suppressed - Telegram - Daily Digest",
+        "notes": "STEP1-KILLSWITCH-20260826. Dry-run stand-in for Telegram - Daily Digest. Records what would have happened; performs no external action.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sp-flag",
+                "name": "safety_suppressed",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-node",
+                "name": "safety_suppressed_node",
+                "type": "string",
+                "value": "Telegram - Daily Digest"
+              },
+              {
+                "id": "sp-kind",
+                "name": "safety_suppressed_kind",
+                "type": "string",
+                "value": "TELEGRAM_SEND"
+              },
+              {
+                "id": "sp-reason",
+                "name": "safety_suppressed_reason",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety (Digest)').first().json.safety_reason }}"
+              },
+              {
+                "id": "sp-mode",
+                "name": "safety_mode",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety (Digest)').first().json.safety_mode }}"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          1352,
+          1360
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "b04d0e8e-0e8b-465a-9083-0d78c07cfb5d",
+        "name": "Guard - Telegram - Follow-ups Raised",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed guard for Telegram - Follow-ups Raised.",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "<REDACTED_FILEID_10>",
+                "leftValue": "={{ $('Evaluate Safety (FU)').first().json.side_effects_permitted === true }}",
+                "operator": {
+                  "operation": "true",
+                  "singleValue": true,
+                  "type": "boolean"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "options": {
+            "looseTypeValidation": true
+          }
+        },
+        "position": [
+          2232,
+          1632
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "id": "9f1ab38d-3298-46e3-b497-fcc556bc6073",
+        "name": "Suppressed - Telegram - Follow-ups Raised",
+        "notes": "STEP1-KILLSWITCH-20260826. Dry-run stand-in for Telegram - Follow-ups Raised. Records what would have happened; performs no external action.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sp-flag",
+                "name": "safety_suppressed",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-node",
+                "name": "safety_suppressed_node",
+                "type": "string",
+                "value": "Telegram - Follow-ups Raised"
+              },
+              {
+                "id": "sp-kind",
+                "name": "safety_suppressed_kind",
+                "type": "string",
+                "value": "TELEGRAM_SEND"
+              },
+              {
+                "id": "sp-reason",
+                "name": "safety_suppressed_reason",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety (FU)').first().json.safety_reason }}"
+              },
+              {
+                "id": "sp-mode",
+                "name": "safety_mode",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety (FU)').first().json.safety_mode }}"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          2232,
+          1792
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "ab0884f4-9536-4e51-b99a-8eb86ee53293",
+        "name": "Guard - Log Unmatched Reply",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed guard for Log Unmatched Reply.",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "<REDACTED_FILEID_10>",
+                "leftValue": "={{ $('Evaluate Safety (Reply)').first().json.side_effects_permitted === true }}",
+                "operator": {
+                  "operation": "true",
+                  "singleValue": true,
+                  "type": "boolean"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "options": {
+            "looseTypeValidation": true
+          }
+        },
+        "position": [
+          472,
+          800
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "id": "443cc81d-3541-4bce-ac93-3fb3de5096ce",
+        "name": "Suppressed - Log Unmatched Reply",
+        "notes": "STEP1-KILLSWITCH-20260826. Dry-run stand-in for Log Unmatched Reply. Records what would have happened; performs no external action.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sp-flag",
+                "name": "safety_suppressed",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-node",
+                "name": "safety_suppressed_node",
+                "type": "string",
+                "value": "Log Unmatched Reply"
+              },
+              {
+                "id": "sp-kind",
+                "name": "safety_suppressed_kind",
+                "type": "string",
+                "value": "SHEETS_WRITE"
+              },
+              {
+                "id": "sp-reason",
+                "name": "safety_suppressed_reason",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety (Reply)').first().json.safety_reason }}"
+              },
+              {
+                "id": "sp-mode",
+                "name": "safety_mode",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety (Reply)').first().json.safety_mode }}"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          472,
+          960
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "bf0385eb-f5d4-4347-bb3d-5a52f1a7a0d6",
+        "name": "Guard - Log Unverified Sender",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed guard for Log Unverified Sender.",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "<REDACTED_FILEID_10>",
+                "leftValue": "={{ $('Evaluate Safety (Reply)').first().json.side_effects_permitted === true }}",
+                "operator": {
+                  "operation": "true",
+                  "singleValue": true,
+                  "type": "boolean"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "options": {
+            "looseTypeValidation": true
+          }
+        },
+        "position": [
+          -312,
+          448
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "id": "99fb5936-630d-4e1a-9079-be764c64c2cd",
+        "name": "Suppressed - Log Unverified Sender",
+        "notes": "STEP1-KILLSWITCH-20260826. Dry-run stand-in for Log Unverified Sender. Records what would have happened; performs no external action.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sp-flag",
+                "name": "safety_suppressed",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-node",
+                "name": "safety_suppressed_node",
+                "type": "string",
+                "value": "Log Unverified Sender"
+              },
+              {
+                "id": "sp-kind",
+                "name": "safety_suppressed_kind",
+                "type": "string",
+                "value": "SHEETS_WRITE"
+              },
+              {
+                "id": "sp-reason",
+                "name": "safety_suppressed_reason",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety (Reply)').first().json.safety_reason }}"
+              },
+              {
+                "id": "sp-mode",
+                "name": "safety_mode",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety (Reply)').first().json.safety_mode }}"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          -312,
+          608
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "b3769f27-b949-4271-b727-7929b461f0c5",
+        "name": "Guard - Touch Matter (Reply)",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed guard for Touch Matter (Reply).",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "<REDACTED_FILEID_10>",
+                "leftValue": "={{ $('Evaluate Safety (Reply)').first().json.side_effects_permitted === true }}",
+                "operator": {
+                  "operation": "true",
+                  "singleValue": true,
+                  "type": "boolean"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "options": {
+            "looseTypeValidation": true
+          }
+        },
+        "position": [
+          2232,
+          608
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "id": "2b925680-7055-4604-be7d-b437ed0e5ef5",
+        "name": "Suppressed - Touch Matter (Reply)",
+        "notes": "STEP1-KILLSWITCH-20260826. Dry-run stand-in for Touch Matter (Reply). Records what would have happened; performs no external action.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sp-flag",
+                "name": "safety_suppressed",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-node",
+                "name": "safety_suppressed_node",
+                "type": "string",
+                "value": "Touch Matter (Reply)"
+              },
+              {
+                "id": "sp-kind",
+                "name": "safety_suppressed_kind",
+                "type": "string",
+                "value": "SHEETS_WRITE"
+              },
+              {
+                "id": "sp-reason",
+                "name": "safety_suppressed_reason",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety (Reply)').first().json.safety_reason }}"
+              },
+              {
+                "id": "sp-mode",
+                "name": "safety_mode",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety (Reply)').first().json.safety_mode }}"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          2232,
+          768
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "0b6a3b96-ed0a-4e47-9df2-d055bc6e3137",
+        "name": "Guard - Run - Draft Follow-up",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed guard for Run - Draft Follow-up.",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "<REDACTED_FILEID_10>",
+                "leftValue": "={{ $('Evaluate Safety (FU)').first().json.side_effects_permitted === true }}",
+                "operator": {
+                  "operation": "true",
+                  "singleValue": true,
+                  "type": "boolean"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "options": {
+            "looseTypeValidation": true
+          }
+        },
+        "position": [
+          1784,
+          1632
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "id": "581baaff-b708-46be-9492-5df69b397327",
+        "name": "Suppressed - Run - Draft Follow-up",
+        "notes": "STEP1-KILLSWITCH-20260826. Dry-run stand-in for Run - Draft Follow-up. Records what would have happened; performs no external action.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sp-flag",
+                "name": "safety_suppressed",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-node",
+                "name": "safety_suppressed_node",
+                "type": "string",
+                "value": "Run - Draft Follow-up"
+              },
+              {
+                "id": "sp-kind",
+                "name": "safety_suppressed_kind",
+                "type": "string",
+                "value": "CHILD_WORKFLOW"
+              },
+              {
+                "id": "sp-reason",
+                "name": "safety_suppressed_reason",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety (FU)').first().json.safety_reason }}"
+              },
+              {
+                "id": "sp-mode",
+                "name": "safety_mode",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety (FU)').first().json.safety_mode }}"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          1784,
+          1792
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "49a133fc-a380-4af8-bef1-b566513ee009",
+        "name": "Guard - Append Next Action",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed guard for Append Next Action.",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "<REDACTED_FILEID_10>",
+                "leftValue": "={{ $('Evaluate Safety (Reply)').first().json.side_effects_permitted === true }}",
+                "operator": {
+                  "operation": "true",
+                  "singleValue": true,
+                  "type": "boolean"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "options": {
+            "looseTypeValidation": true
+          }
+        },
+        "position": [
+          2008,
+          480
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "id": "dd8c70ff-81dc-444e-b424-7fb8bef8d86a",
+        "name": "Suppressed - Append Next Action",
+        "notes": "STEP1-KILLSWITCH-20260826. Dry-run stand-in for Append Next Action. Records what would have happened; performs no external action.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sp-flag",
+                "name": "safety_suppressed",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-node",
+                "name": "safety_suppressed_node",
+                "type": "string",
+                "value": "Append Next Action"
+              },
+              {
+                "id": "sp-kind",
+                "name": "safety_suppressed_kind",
+                "type": "string",
+                "value": "SHEETS_WRITE"
+              },
+              {
+                "id": "sp-reason",
+                "name": "safety_suppressed_reason",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety (Reply)').first().json.safety_reason }}"
+              },
+              {
+                "id": "sp-mode",
+                "name": "safety_mode",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety (Reply)').first().json.safety_mode }}"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          2008,
+          640
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "23ff5395-62fc-43c9-861e-1a47684e9c6a",
+        "name": "Guard - Mark Matter Follow-up Due",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed guard for Mark Matter Follow-up Due.",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "<REDACTED_FILEID_10>",
+                "leftValue": "={{ $('Evaluate Safety (FU)').first().json.side_effects_permitted === true }}",
+                "operator": {
+                  "operation": "true",
+                  "singleValue": true,
+                  "type": "boolean"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "options": {
+            "looseTypeValidation": true
+          }
+        },
+        "position": [
+          1352,
+          1632
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "id": "c7643215-6858-49e3-a235-2dd3f6445a43",
+        "name": "Suppressed - Mark Matter Follow-up Due",
+        "notes": "STEP1-KILLSWITCH-20260826. Dry-run stand-in for Mark Matter Follow-up Due. Records what would have happened; performs no external action.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sp-flag",
+                "name": "safety_suppressed",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-node",
+                "name": "safety_suppressed_node",
+                "type": "string",
+                "value": "Mark Matter Follow-up Due"
+              },
+              {
+                "id": "sp-kind",
+                "name": "safety_suppressed_kind",
+                "type": "string",
+                "value": "SHEETS_WRITE"
+              },
+              {
+                "id": "sp-reason",
+                "name": "safety_suppressed_reason",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety (FU)').first().json.safety_reason }}"
+              },
+              {
+                "id": "sp-mode",
+                "name": "safety_mode",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety (FU)').first().json.safety_mode }}"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          1352,
+          1792
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "cbfaac50-330e-4af2-8197-f15f9251256f",
+        "name": "Guard - Log New Inbound",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed guard for Log New Inbound.",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "<REDACTED_FILEID_10>",
+                "leftValue": "={{ $('Evaluate Safety (Reply)').first().json.side_effects_permitted === true }}",
+                "operator": {
+                  "operation": "true",
+                  "singleValue": true,
+                  "type": "boolean"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "options": {
+            "looseTypeValidation": true
+          }
+        },
+        "position": [
+          984,
+          -128
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "id": "69f8d1fd-95dc-48fc-b223-5f0c25eca62c",
+        "name": "Suppressed - Log New Inbound",
+        "notes": "STEP1-KILLSWITCH-20260826. Dry-run stand-in for Log New Inbound. Records what would have happened; performs no external action.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sp-flag",
+                "name": "safety_suppressed",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-node",
+                "name": "safety_suppressed_node",
+                "type": "string",
+                "value": "Log New Inbound"
+              },
+              {
+                "id": "sp-kind",
+                "name": "safety_suppressed_kind",
+                "type": "string",
+                "value": "SHEETS_WRITE"
+              },
+              {
+                "id": "sp-reason",
+                "name": "safety_suppressed_reason",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety (Reply)').first().json.safety_reason }}"
+              },
+              {
+                "id": "sp-mode",
+                "name": "safety_mode",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety (Reply)').first().json.safety_mode }}"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          984,
+          32
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "a3da47cf-c679-49d2-a607-3476b48bc99a",
+        "name": "Guard - Append Follow-up Action",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed guard for Append Follow-up Action.",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "<REDACTED_FILEID_10>",
+                "leftValue": "={{ $('Evaluate Safety (FU)').first().json.side_effects_permitted === true }}",
+                "operator": {
+                  "operation": "true",
+                  "singleValue": true,
+                  "type": "boolean"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "options": {
+            "looseTypeValidation": true
+          }
+        },
+        "position": [
+          1128,
+          1632
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "id": "0569271f-c817-473f-a971-d9dbcd2ba926",
+        "name": "Suppressed - Append Follow-up Action",
+        "notes": "STEP1-KILLSWITCH-20260826. Dry-run stand-in for Append Follow-up Action. Records what would have happened; performs no external action.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sp-flag",
+                "name": "safety_suppressed",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-node",
+                "name": "safety_suppressed_node",
+                "type": "string",
+                "value": "Append Follow-up Action"
+              },
+              {
+                "id": "sp-kind",
+                "name": "safety_suppressed_kind",
+                "type": "string",
+                "value": "SHEETS_WRITE"
+              },
+              {
+                "id": "sp-reason",
+                "name": "safety_suppressed_reason",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety (FU)').first().json.safety_reason }}"
+              },
+              {
+                "id": "sp-mode",
+                "name": "safety_mode",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety (FU)').first().json.safety_mode }}"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          1128,
+          1792
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "5b87c266-b097-4d75-a941-c4ae52478026",
+        "name": "Guard - Log Inbound",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed guard for Log Inbound.",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "<REDACTED_FILEID_10>",
+                "leftValue": "={{ $('Evaluate Safety (Reply)').first().json.side_effects_permitted === true }}",
+                "operator": {
+                  "operation": "true",
+                  "singleValue": true,
+                  "type": "boolean"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "options": {
+            "looseTypeValidation": true
+          }
+        },
+        "position": [
+          1560,
+          608
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "id": "d2b16f37-7be5-495b-a5be-108c4d5d9f70",
+        "name": "Suppressed - Log Inbound",
+        "notes": "STEP1-KILLSWITCH-20260826. Dry-run stand-in for Log Inbound. Records what would have happened; performs no external action.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sp-flag",
+                "name": "safety_suppressed",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-node",
+                "name": "safety_suppressed_node",
+                "type": "string",
+                "value": "Log Inbound"
+              },
+              {
+                "id": "sp-kind",
+                "name": "safety_suppressed_kind",
+                "type": "string",
+                "value": "SHEETS_WRITE"
+              },
+              {
+                "id": "sp-reason",
+                "name": "safety_suppressed_reason",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety (Reply)').first().json.safety_reason }}"
+              },
+              {
+                "id": "sp-mode",
+                "name": "safety_mode",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety (Reply)').first().json.safety_mode }}"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          1560,
+          768
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
+      },
+      {
+        "id": "54480ea8-e3c3-4858-ad29-ec9de11548f5",
+        "name": "Guard - DeepSeek - Reply Classifier",
+        "notes": "STEP1-KILLSWITCH-20260826. Fail-closed guard for DeepSeek - Reply Classifier.",
+        "parameters": {
+          "conditions": {
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "<REDACTED_FILEID_10>",
+                "leftValue": "={{ $('Evaluate Safety (Reply)').first().json.side_effects_permitted === true }}",
+                "operator": {
+                  "operation": "true",
+                  "singleValue": true,
+                  "type": "boolean"
+                },
+                "rightValue": ""
+              }
+            ],
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 2
+            }
+          },
+          "options": {
+            "looseTypeValidation": true
+          }
+        },
+        "position": [
+          1128,
+          608
+        ],
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2
+      },
+      {
+        "id": "20f7e2a3-065f-422d-abd7-c846ccec788b",
+        "name": "Suppressed - DeepSeek - Reply Classifier",
+        "notes": "STEP1-KILLSWITCH-20260826. Dry-run stand-in for DeepSeek - Reply Classifier. Records what would have happened; performs no external action.",
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "sp-flag",
+                "name": "safety_suppressed",
+                "type": "boolean",
+                "value": "={{ true }}"
+              },
+              {
+                "id": "sp-node",
+                "name": "safety_suppressed_node",
+                "type": "string",
+                "value": "DeepSeek - Reply Classifier"
+              },
+              {
+                "id": "sp-kind",
+                "name": "safety_suppressed_kind",
+                "type": "string",
+                "value": "HTTP_NON_GET"
+              },
+              {
+                "id": "sp-reason",
+                "name": "safety_suppressed_reason",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety (Reply)').first().json.safety_reason }}"
+              },
+              {
+                "id": "sp-mode",
+                "name": "safety_mode",
+                "type": "string",
+                "value": "={{ $('Evaluate Safety (Reply)').first().json.safety_mode }}"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "mode": "manual"
+        },
+        "position": [
+          1128,
+          768
+        ],
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4
       }
     ],
     "settings": {
@@ -2953,8 +4845,8 @@
     },
     "tags": [],
     "triggerCount": 3,
-    "updatedAt": "2026-08-23T06:15:21.468Z",
-    "versionCounter": 39,
-    "versionId": "811b746c-869c-4fc3-94dc-123f60cb7067"
+    "updatedAt": "2026-08-26T06:04:10.282Z",
+    "versionCounter": 41,
+    "versionId": "ba7ea015-9105-44f7-8212-e3e323d1da6b"
   }
 }
