@@ -46,18 +46,18 @@
       "active": {
         "kind": "active",
         "path": "exports/active/WF3.json",
-        "sha256_body": "a40b45f16817232beca3c187ecae01401a7988167656df32dd22694f8137cee2",
-        "sha256_canonical": "bb720857eb7d3a746d96af210f51ef6f179e98e877beb6af60e84540fe461b3c"
+        "sha256_body": "b3ba63a377bda1bf610d39ac89528c4c4b65224cc47926a9c3b98e268db7f1d6",
+        "sha256_canonical": "21e2b5652ad3d30a3e6f22ac6a58b7e24287e6122acb58bfd2810f626314fe40"
       },
       "active_version_id": "644bbdb3-6e78-42c1-a250-3cf9ba05fadc",
       "determination": "from_active_version_object",
       "draft": {
         "kind": "draft",
         "path": "exports/draft/WF3.json",
-        "sha256_body": "411b064ced28c606050e361da3ca0642a89545cb9758697c64533dad9858fc5b",
-        "sha256_canonical": "8abe5e8dab87a5188a9570ad18b9b0191181edf971b8d9697c0ef7b3866d6386"
+        "sha256_body": "719d2c6801144ba3e83358eb1ae82914613e3b8c275eea7982973dd373e5b8b3",
+        "sha256_canonical": "c841a5a25993ff1016a86505cd3439ecf4a7a154f180bae044f5ee2567c9894c"
       },
-      "draft_version_id": "78d42d99-6d6b-473d-8dc6-427622f2c337",
+      "draft_version_id": "a7625897-20c7-4ecf-a5dd-c46f1f2f9caf",
       "id": "1rhaSTTviUBanJIy",
       "name": "3 - Evidence Intake and Storage"
     },

@@ -3,7 +3,7 @@
     "active_version_id": "644bbdb3-6e78-42c1-a250-3cf9ba05fadc",
     "capture_time": "see exports/last-run.json (untracked, so an unchanged capture does not produce a commit)",
     "draft_active_determination": "from_active_version_object",
-    "draft_version_id": "78d42d99-6d6b-473d-8dc6-427622f2c337",
+    "draft_version_id": "a7625897-20c7-4ecf-a5dd-c46f1f2f9caf",
     "key": "WF3",
     "kind": "draft",
     "scrub_counts": {
@@ -11,7 +11,7 @@
       "CHATID": 6,
       "CREDID": 4,
       "EMAIL": 1,
-      "FILEID": 3
+      "FILEID": 4
     },
     "scrubbed": true,
     "source": "n8n public REST API GET /api/v1/workflows/{id} (read-only)",
@@ -1164,7 +1164,7 @@
         "id": "cf83bea8-e83b-44c4-ab67-cba14a15302f",
         "name": "Build Evidence Record",
         "parameters": {
-          "jsCode": "const base = $('Hash File').first().json;\nconst upload = $('Upload to Drive').first().json;\nconst src = $input.first().json || {};\n\n// Extracted document text is EVIDENCE CONTENT. It is stored, never executed.\n// It is written to Google Drive as a text file. It is NOT written to Google Sheets.\nlet text = String(src.text || src.data || '').trim();\nlet status = 'COMPLETED';\nif (base.evidence_kind === 'OTHER') { status = 'NOT_ATTEMPTED'; text = ''; }\nelse if (!text) { status = 'FAILED'; }\n\nconst truncated = text.length > 200000;\nif (truncated) text = text.slice(0, 200000);\n\nconst notes = [];\nif (base.evidence_kind === 'OTHER') notes.push('Unsupported file type for text extraction. REQUIRES_HUMAN_REVIEW.');\nif (status === 'FAILED') notes.push('Text extraction produced nothing. REQUIRES_HUMAN_REVIEW.');\nif (truncated) notes.push('Extracted text truncated at 200000 characters.');\nif (base.hash === 'NOT_COMPUTED') notes.push('Hash not computed in this runtime.');\nif (base.matter_id === 'UNASSIGNED') notes.push('No matter could be resolved. Filed as UNASSIGNED.');\n\nreturn [{ json: {\n  evidence_id: base.evidence_id,\n  matter_id: base.matter_id,\n  folder_id: base.folder_id,\n  file_name: base.safe_file_name,\n  file_type: base.mime_type,\n  drive_url: String(upload.webViewLink || ('https://drive.google.<REDACTED_CASEREF_2>' + (upload.id || '') + '/view')),\n  drive_file_id: String(upload.id || ''),\n  source: 'telegram',\n  uploaded_at: new Date().toISOString(),\n  hash: base.hash,\n  size_bytes: base.size_bytes,\n  extraction_status: status,\n  extracted_chars: text.length,\n  reliability: 'USER_PROVIDED',\n  notes: notes.join(' '),\n  has_text: text.length > 0,\n  text_file_name: base.evidence_id + '__extracted.txt',\n  // carried in the execution context only. Never written to a Sheets cell.\n  extracted_text: text,\n  caption: String(base.caption || base.text || ''),\n}}];"
+          "jsCode": "const base = $('Hash File').first().json;\n// <REDACTED_FILEID_3>: Upload to Drive is behind a fail-closed guard,\n// so in test mode it never executes and $() on it throws. Degrade to {} instead.\nlet upload = {};\n\ntry {\n  upload = $('Upload to Drive').first()?.json ?? {};\n} catch {\n  upload = {};\n}\nconst src = $input.first().json || {};\n\n// Extracted document text is EVIDENCE CONTENT. It is stored, never executed.\n// It is written to Google Drive as a text file. It is NOT written to Google Sheets.\nlet text = String(src.text || src.data || '').trim();\nlet status = 'COMPLETED';\nif (base.evidence_kind === 'OTHER') { status = 'NOT_ATTEMPTED'; text = ''; }\nelse if (!text) { status = 'FAILED'; }\n\nconst truncated = text.length > 200000;\nif (truncated) text = text.slice(0, 200000);\n\nconst notes = [];\nif (base.evidence_kind === 'OTHER') notes.push('Unsupported file type for text extraction. REQUIRES_HUMAN_REVIEW.');\nif (status === 'FAILED') notes.push('Text extraction produced nothing. REQUIRES_HUMAN_REVIEW.');\nif (truncated) notes.push('Extracted text truncated at 200000 characters.');\nif (base.hash === 'NOT_COMPUTED') notes.push('Hash not computed in this runtime.');\nif (base.matter_id === 'UNASSIGNED') notes.push('No matter could be resolved. Filed as UNASSIGNED.');\n\nreturn [{ json: {\n  evidence_id: base.evidence_id,\n  matter_id: base.matter_id,\n  folder_id: base.folder_id,\n  file_name: base.safe_file_name,\n  file_type: base.mime_type,\n  drive_url: String(upload.webViewLink || ('https://drive.google.<REDACTED_CASEREF_2>' + (upload.id || '') + '/view')),\n  drive_file_id: String(upload.id || ''),\n  source: 'telegram',\n  uploaded_at: new Date().toISOString(),\n  hash: base.hash,\n  size_bytes: base.size_bytes,\n  extraction_status: status,\n  extracted_chars: text.length,\n  reliability: 'USER_PROVIDED',\n  notes: notes.join(' '),\n  has_text: text.length > 0,\n  text_file_name: base.evidence_id + '__extracted.txt',\n  // carried in the execution context only. Never written to a Sheets cell.\n  extracted_text: text,\n  caption: String(base.caption || base.text || ''),\n}}];"
         },
         "position": [
           3520,
@@ -1891,7 +1891,7 @@
             "combinator": "and",
             "conditions": [
               {
-                "id": "<REDACTED_FILEID_3>",
+                "id": "<REDACTED_FILEID_4>",
                 "leftValue": "={{ $('Evaluate Safety').first().json.side_effects_permitted === true }}",
                 "operator": {
                   "operation": "true",
@@ -1995,7 +1995,7 @@
             "combinator": "and",
             "conditions": [
               {
-                "id": "<REDACTED_FILEID_3>",
+                "id": "<REDACTED_FILEID_4>",
                 "leftValue": "={{ $('Evaluate Safety').first().json.side_effects_permitted === true }}",
                 "operator": {
                   "operation": "true",
@@ -2077,6 +2077,12 @@
                 "name": "operation_status",
                 "type": "string",
                 "value": "TEST_SUPPRESSED"
+              },
+              {
+                "id": "sp-synthetic-folder-id",
+                "name": "id",
+                "type": "string",
+                "value": "={{ 'TEST-DRIVE-FOLDER-' + $('Resolve Evidence Target').first().json.matter_id }}"
               }
             ]
           },
@@ -2099,7 +2105,7 @@
             "combinator": "and",
             "conditions": [
               {
-                "id": "<REDACTED_FILEID_3>",
+                "id": "<REDACTED_FILEID_4>",
                 "leftValue": "={{ $('Evaluate Safety').first().json.side_effects_permitted === true }}",
                 "operator": {
                   "operation": "true",
@@ -2203,7 +2209,7 @@
             "combinator": "and",
             "conditions": [
               {
-                "id": "<REDACTED_FILEID_3>",
+                "id": "<REDACTED_FILEID_4>",
                 "leftValue": "={{ $('Evaluate Safety').first().json.side_effects_permitted === true }}",
                 "operator": {
                   "operation": "true",
@@ -2307,7 +2313,7 @@
             "combinator": "and",
             "conditions": [
               {
-                "id": "<REDACTED_FILEID_3>",
+                "id": "<REDACTED_FILEID_4>",
                 "leftValue": "={{ $('Evaluate Safety').first().json.side_effects_permitted === true }}",
                 "operator": {
                   "operation": "true",
@@ -2411,7 +2417,7 @@
             "combinator": "and",
             "conditions": [
               {
-                "id": "<REDACTED_FILEID_3>",
+                "id": "<REDACTED_FILEID_4>",
                 "leftValue": "={{ $('Evaluate Safety').first().json.side_effects_permitted === true }}",
                 "operator": {
                   "operation": "true",
@@ -2515,7 +2521,7 @@
             "combinator": "and",
             "conditions": [
               {
-                "id": "<REDACTED_FILEID_3>",
+                "id": "<REDACTED_FILEID_4>",
                 "leftValue": "={{ $('Evaluate Safety').first().json.side_effects_permitted === true }}",
                 "operator": {
                   "operation": "true",
@@ -2619,7 +2625,7 @@
             "combinator": "and",
             "conditions": [
               {
-                "id": "<REDACTED_FILEID_3>",
+                "id": "<REDACTED_FILEID_4>",
                 "leftValue": "={{ $('Evaluate Safety').first().json.side_effects_permitted === true }}",
                 "operator": {
                   "operation": "true",
@@ -2749,8 +2755,8 @@
     "staticData": null,
     "tags": [],
     "triggerCount": 0,
-    "updatedAt": "2026-08-26T07:59:10.790Z",
-    "versionCounter": 10,
-    "versionId": "78d42d99-6d6b-473d-8dc6-427622f2c337"
+    "updatedAt": "2026-08-26T10:17:55.547Z",
+    "versionCounter": 13,
+    "versionId": "a7625897-20c7-4ecf-a5dd-c46f1f2f9caf"
   }
 }
