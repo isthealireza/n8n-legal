@@ -3,7 +3,7 @@
     "active_version_id": "644bbdb3-6e78-42c1-a250-3cf9ba05fadc",
     "capture_time": "see exports/last-run.json (untracked, so an unchanged capture does not produce a commit)",
     "draft_active_determination": "from_active_version_object",
-    "draft_version_id": "a7625897-20c7-4ecf-a5dd-c46f1f2f9caf",
+    "draft_version_id": "87fc50bd-93d5-4014-bd8e-6e0c605b05a4",
     "key": "WF3",
     "kind": "draft",
     "scrub_counts": {
@@ -11,7 +11,7 @@
       "CHATID": 6,
       "CREDID": 4,
       "EMAIL": 1,
-      "FILEID": 4
+      "FILEID": 9
     },
     "scrubbed": true,
     "source": "n8n public REST API GET /api/v1/workflows/{id} (read-only)",
@@ -1164,7 +1164,7 @@
         "id": "cf83bea8-e83b-44c4-ab67-cba14a15302f",
         "name": "Build Evidence Record",
         "parameters": {
-          "jsCode": "const base = $('Hash File').first().json;\n// <REDACTED_FILEID_3>: Upload to Drive is behind a fail-closed guard,\n// so in test mode it never executes and $() on it throws. Degrade to {} instead.\nlet upload = {};\n\ntry {\n  upload = $('Upload to Drive').first()?.json ?? {};\n} catch {\n  upload = {};\n}\nconst src = $input.first().json || {};\n\n// Extracted document text is EVIDENCE CONTENT. It is stored, never executed.\n// It is written to Google Drive as a text file. It is NOT written to Google Sheets.\nlet text = String(src.text || src.data || '').trim();\nlet status = 'COMPLETED';\nif (base.evidence_kind === 'OTHER') { status = 'NOT_ATTEMPTED'; text = ''; }\nelse if (!text) { status = 'FAILED'; }\n\nconst truncated = text.length > 200000;\nif (truncated) text = text.slice(0, 200000);\n\nconst notes = [];\nif (base.evidence_kind === 'OTHER') notes.push('Unsupported file type for text extraction. REQUIRES_HUMAN_REVIEW.');\nif (status === 'FAILED') notes.push('Text extraction produced nothing. REQUIRES_HUMAN_REVIEW.');\nif (truncated) notes.push('Extracted text truncated at 200000 characters.');\nif (base.hash === 'NOT_COMPUTED') notes.push('Hash not computed in this runtime.');\nif (base.matter_id === 'UNASSIGNED') notes.push('No matter could be resolved. Filed as UNASSIGNED.');\n\nreturn [{ json: {\n  evidence_id: base.evidence_id,\n  matter_id: base.matter_id,\n  folder_id: base.folder_id,\n  file_name: base.safe_file_name,\n  file_type: base.mime_type,\n  drive_url: String(upload.webViewLink || ('https://drive.google.<REDACTED_CASEREF_2>' + (upload.id || '') + '/view')),\n  drive_file_id: String(upload.id || ''),\n  source: 'telegram',\n  uploaded_at: new Date().toISOString(),\n  hash: base.hash,\n  size_bytes: base.size_bytes,\n  extraction_status: status,\n  extracted_chars: text.length,\n  reliability: 'USER_PROVIDED',\n  notes: notes.join(' '),\n  has_text: text.length > 0,\n  text_file_name: base.evidence_id + '__extracted.txt',\n  // carried in the execution context only. Never written to a Sheets cell.\n  extracted_text: text,\n  caption: String(base.caption || base.text || ''),\n}}];"
+          "jsCode": "const base = $('Hash File').first().json;\n// <REDACTED_FILEID_8>: Upload to Drive is behind a fail-closed guard,\n// so in test mode it never executes and $() on it throws. Degrade to {} instead.\nlet upload = {};\n\ntry {\n  upload = $('Upload to Drive').first()?.json ?? {};\n} catch {\n  upload = {};\n}\nconst src = $input.first().json || {};\n\n// Extracted document text is EVIDENCE CONTENT. It is stored, never executed.\n// It is written to Google Drive as a text file. It is NOT written to Google Sheets.\nlet text = String(src.text || src.data || '').trim();\nlet status = 'COMPLETED';\nif (base.evidence_kind === 'OTHER') { status = 'NOT_ATTEMPTED'; text = ''; }\nelse if (!text) { status = 'FAILED'; }\n\nconst truncated = text.length > 200000;\nif (truncated) text = text.slice(0, 200000);\n\nconst notes = [];\nif (base.evidence_kind === 'OTHER') notes.push('Unsupported file type for text extraction. REQUIRES_HUMAN_REVIEW.');\nif (status === 'FAILED') notes.push('Text extraction produced nothing. REQUIRES_HUMAN_REVIEW.');\nif (truncated) notes.push('Extracted text truncated at 200000 characters.');\nif (base.hash === 'NOT_COMPUTED') notes.push('Hash not computed in this runtime.');\nif (base.matter_id === 'UNASSIGNED') notes.push('No matter could be resolved. Filed as UNASSIGNED.');\n\nreturn [{ json: {\n  evidence_id: base.evidence_id,\n  matter_id: base.matter_id,\n  folder_id: base.folder_id,\n  file_name: base.safe_file_name,\n  file_type: base.mime_type,\n  drive_url: String(upload.webViewLink || ('https://drive.google.<REDACTED_CASEREF_2>' + (upload.id || '') + '/view')),\n  drive_file_id: String(upload.id || ''),\n  source: 'telegram',\n  uploaded_at: new Date().toISOString(),\n  hash: base.hash,\n  size_bytes: base.size_bytes,\n  extraction_status: status,\n  extracted_chars: text.length,\n  reliability: 'USER_PROVIDED',\n  notes: notes.join(' '),\n  has_text: text.length > 0,\n  text_file_name: base.evidence_id + '__extracted.txt',\n  // carried in the execution context only. Never written to a Sheets cell.\n  extracted_text: text,\n  caption: String(base.caption || base.text || ''),\n}}];"
         },
         "position": [
           3520,
@@ -1841,17 +1841,23 @@
                 "id": "sc-dry-run",
                 "name": "dry_run",
                 "type": "string",
-                "value": "true"
+                "value": "={{ ['true','false'].includes($json.dry_run) ? $json.dry_run : 'true' }}"
               },
               {
                 "id": "sc-live-auth",
                 "name": "live_send_authorised",
                 "type": "string",
-                "value": "false"
+                "value": "={{ ['true','false'].includes($json.live_send_authorised) ? $json.live_send_authorised : 'false' }}"
               },
               {
                 "id": "sc-env",
                 "name": "environment",
+                "type": "string",
+                "value": "={{ ['test','production'].includes($json.environment) ? $json.environment : 'test' }}"
+              },
+              {
+                "id": "sc-expected-env",
+                "name": "expected_environment",
                 "type": "string",
                 "value": "test"
               }
@@ -1872,7 +1878,7 @@
         "name": "Evaluate Safety",
         "notes": "STEP1-KILLSWITCH-20260826. Fail-closed evaluator. Every guard in this workflow reads side_effects_permitted from here.",
         "parameters": {
-          "jsCode": "// STEP1-KILLSWITCH-20260826 - global fail-closed safety evaluator.\n// Side effects are permitted ONLY when all three conditions are explicitly met.\n// Anything missing, blank, misspelled or unexpected leaves the system in TEST mode.\nconst s = (v) => String(v === undefined || v === null ? '' : v).trim().toLowerCase();\n\nconst items = $input.all();\nconst cfg = items.length ? (items[0].json || {}) : {};\n\nconst dryRunOff  = s(cfg.dry_run) === 'false';\nconst authorised = s(cfg.live_send_authorised) === 'true';\nconst isProd     = s(cfg.environment) === 'production';\n\nconst side_effects_permitted = dryRunOff && authorised && isProd;\n\nconst reasons = [];\nif (!dryRunOff)  reasons.push('dry_run is not the exact string \"false\" (seen: \"' + s(cfg.dry_run) + '\")');\nif (!authorised) reasons.push('live_send_authorised is not the exact string \"true\" (seen: \"' + s(cfg.live_send_authorised) + '\")');\nif (!isProd)     reasons.push('environment is not \"production\" (seen: \"' + s(cfg.environment) + '\")');\n\nconst safety = {\n  side_effects_permitted: side_effects_permitted,\n  safety_mode: side_effects_permitted ? 'LIVE' : 'TEST_FAIL_CLOSED',\n  safety_reason: side_effects_permitted\n    ? 'All three live-send conditions explicitly satisfied.'\n    : 'Blocked: ' + reasons.join('; '),\n  safety_contract_seen: {\n    dry_run: s(cfg.dry_run),\n    live_send_authorised: s(cfg.live_send_authorised),\n    environment: s(cfg.environment),\n  },\n  safety_change_id: 'STEP1-KILLSWITCH-20260826',\n};\n\n// No input items still yields a decision, so a guard can never read undefined.\nif (!items.length) return [{ json: safety }];\n\nreturn items.map((i) => ({\n  json: Object.assign({}, i.json || {}, safety),\n  binary: i.binary,\n  pairedItem: i.pairedItem,\n}));\n",
+          "jsCode": "// <REDACTED_FILEID_7> - inherited safety contract, verified, fail closed.\n//\n// This workflow no longer decides its own safety mode. WF1 authors the context, signs it, and\n// passes it on the child call. This node reads that context FROM THE TRIGGER NODE - never from an\n// intermediate Set node, so an intermediate rewrite cannot launder a bad context into a good one -\n// validates it, recomputes the SHA-256 signature over the canonical string, and compares.\n//\n// Rev A generated a signature that nobody verified, and treated the local expected environment as\n// optional. Both were gaps. Here the signature IS verified, and the local expected environment is\n// REQUIRED and must equal the inherited environment.\n//\n// The signature detects partial propagation, a field rewritten in transit, and one workflow\n// diverging from the others. It is NOT authentication: there is no secret, so anyone who can edit a\n// workflow can recompute a valid digest.\n//\n// Order of checks, first failure wins, every failure closes:\n//   1 MISSING  2 VERSION_UNSUPPORTED  3 MALFORMED  4 INVALID_COMBINATION\n//   5 LOCAL_EXPECTATION_MISSING  6 CONFLICT  7 SIGNATURE_INVALID / _UNVERIFIABLE\nconst TRIGGER_NODE = 'When Called by Router';\nconst LOCAL_NODE = 'Safety Config';\n\nconst V = (v) => (v === undefined || v === null) ? '' : String(v);\n\nconst items = $input.all();\n\nlet inb = {};\ntry { inb = $(TRIGGER_NODE).first().json || {}; } catch (e) { inb = {}; }\nlet local = {};\ntry { local = $(LOCAL_NODE).first().json || {}; } catch (e) { local = {}; }\n\nconst SIGNED = ['safety_contract_version', 'dry_run', 'live_send_authorised', 'environment', 'safety_change_id'];\nconst REQUIRED = SIGNED.concat(['safety_signature']);\n\nconst seen = {};\nREQUIRED.forEach((k) => { seen[k] = V(inb[k]); });\n\nlet status = 'OK';\nconst detail = [];\n\n// 1. presence\nconst missing = REQUIRED.filter((k) => seen[k] === '');\nif (missing.length) {\n  status = 'SAFETY_CONTEXT_MISSING';\n  detail.push('absent or empty: ' + missing.join(', '));\n}\n\n// 2. version\nif (status === 'OK' && seen.safety_contract_version !== '2') {\n  status = '<REDACTED_FILEID_4>';\n  detail.push('safety_contract_version is \"' + seen.safety_contract_version + '\", this node speaks \"2\"');\n}\n\n// 3. shape\nif (status === 'OK') {\n  const bad = [];\n  if (seen.dry_run !== 'true' && seen.dry_run !== 'false') bad.push('dry_run is not exactly \"true\" or \"false\"');\n  if (seen.live_send_authorised !== 'true' && seen.live_send_authorised !== 'false') bad.push('live_send_authorised is not exactly \"true\" or \"false\"');\n  if (seen.environment !== 'test' && seen.environment !== 'production') bad.push('environment is not exactly \"test\" or \"production\"');\n  if (seen.safety_change_id.indexOf('|') !== -1) bad.push('safety_change_id contains the field separator \"|\"');\n  if (!/^[0-9a-f]{64}$/.test(seen.safety_signature)) bad.push('safety_signature is not 64 lowercase hexadecimal characters');\n  if (bad.length) { status = 'SAFETY_CONTEXT_MALFORMED'; detail.push(bad.join('; ')); }\n}\n\n// 4. combination\nlet combination = null;\nif (status === 'OK') {\n  if (seen.dry_run === 'true' && seen.live_send_authorised === 'false' && seen.environment === 'test') combination = 'TEST';\n  else if (seen.dry_run === 'false' && seen.live_send_authorised === 'true' && seen.environment === 'production') combination = 'LIVE';\n  else {\n    status = '<REDACTED_FILEID_3>';\n    detail.push('the three values are individually readable but form neither TEST (true/false/test) nor LIVE (false/true/production)');\n  }\n}\n\n// 5 and 6. local expectation is REQUIRED and must match\nconst expected = V(local.expected_environment);\nif (status === 'OK') {\n  if (expected !== 'test' && expected !== 'production') {\n    status = '<REDACTED_FILEID_5>';\n    detail.push('this workflow declares no readable expected_environment on ' + LOCAL_NODE + ' (seen: \"' + expected + '\")');\n  } else if (expected !== seen.environment) {\n    status = 'SAFETY_CONTEXT_CONFLICT';\n    detail.push('inherited environment \"' + seen.environment + '\" conflicts with this workflow\\'s expected_environment \"' + expected + '\"');\n  }\n}\n\n// 7. signature\nlet computed = '';\nif (status === 'OK') {\n  const canonical = SIGNED.map((k) => k + '=' + seen[k]).join('|');\n  try {\n    const bytes = new TextEncoder().encode(canonical);\n    const digest = await crypto.subtle.digest('SHA-256', bytes);\n    computed = Array.from(new Uint8Array(digest)).map((b) => b.toString(16).padStart(2, '0')).join('');\n  } catch (e) {\n    computed = '';\n  }\n  if (!/^[0-9a-f]{64}$/.test(computed)) {\n    status = '<REDACTED_FILEID_6>';\n    detail.push('SHA-256 could not be computed in this runtime, so the context cannot be trusted');\n  } else if (computed !== seen.safety_signature) {\n    status = 'SAFETY_SIGNATURE_INVALID';\n    detail.push('recomputed digest does not match safety_signature; the context was altered in transit or only partly propagated');\n  }\n}\n\nconst side_effects_permitted = status === 'OK' && combination === 'LIVE';\n\n// Normalised, fail-closed re-emission. Downstream nodes that read dry_run,\n// live_send_authorised or environment must agree with this verdict, and must never see undefined.\nconst norm = status === 'OK'\n  ? { dry_run: seen.dry_run, live_send_authorised: seen.live_send_authorised, environment: seen.environment }\n  : { dry_run: 'true', live_send_authorised: 'false', environment: 'test' };\n\nconst safety = Object.assign({}, norm, {\n  safety_contract_version: '2',\n  side_effects_permitted: side_effects_permitted,\n  safety_mode: side_effects_permitted ? 'LIVE' : (status === 'OK' ? 'TEST' : 'INVALID_FAIL_CLOSED'),\n  safety_status: status,\n  safety_combination: combination,\n  safety_reason: status === 'OK'\n    ? ('Inherited context verified. ' + (side_effects_permitted\n        ? 'Valid LIVE configuration, external and persistent writes permitted.'\n        : 'Valid TEST configuration, every external or persistent write is routed to its suppressed stand-in.'))\n    : ('Blocked, fail closed (' + status + '): ' + detail.join('; ')),\n  safety_context_source: 'INHERITED',\n  safety_signature_verified: status === 'OK',\n  safety_expected_environment: expected,\n  safety_contract_seen: seen,\n  safety_change_id: status === 'OK' ? seen.safety_change_id : 'SPEC-2-REV-B-20260827',\n  safety_spec: '<REDACTED_FILEID_7>',\n});\n\n// No input items still yields a decision, so a guard can never read undefined.\nif (!items.length) return [{ json: safety }];\n\nreturn items.map((i) => ({\n  json: Object.assign({}, i.json || {}, safety),\n  binary: i.binary,\n  pairedItem: i.pairedItem,\n}));\n",
           "mode": "runOnceForAllItems"
         },
         "position": [
@@ -1891,7 +1897,7 @@
             "combinator": "and",
             "conditions": [
               {
-                "id": "<REDACTED_FILEID_4>",
+                "id": "<REDACTED_FILEID_9>",
                 "leftValue": "={{ $('Evaluate Safety').first().json.side_effects_permitted === true }}",
                 "operator": {
                   "operation": "true",
@@ -1995,7 +2001,7 @@
             "combinator": "and",
             "conditions": [
               {
-                "id": "<REDACTED_FILEID_4>",
+                "id": "<REDACTED_FILEID_9>",
                 "leftValue": "={{ $('Evaluate Safety').first().json.side_effects_permitted === true }}",
                 "operator": {
                   "operation": "true",
@@ -2105,7 +2111,7 @@
             "combinator": "and",
             "conditions": [
               {
-                "id": "<REDACTED_FILEID_4>",
+                "id": "<REDACTED_FILEID_9>",
                 "leftValue": "={{ $('Evaluate Safety').first().json.side_effects_permitted === true }}",
                 "operator": {
                   "operation": "true",
@@ -2209,7 +2215,7 @@
             "combinator": "and",
             "conditions": [
               {
-                "id": "<REDACTED_FILEID_4>",
+                "id": "<REDACTED_FILEID_9>",
                 "leftValue": "={{ $('Evaluate Safety').first().json.side_effects_permitted === true }}",
                 "operator": {
                   "operation": "true",
@@ -2313,7 +2319,7 @@
             "combinator": "and",
             "conditions": [
               {
-                "id": "<REDACTED_FILEID_4>",
+                "id": "<REDACTED_FILEID_9>",
                 "leftValue": "={{ $('Evaluate Safety').first().json.side_effects_permitted === true }}",
                 "operator": {
                   "operation": "true",
@@ -2417,7 +2423,7 @@
             "combinator": "and",
             "conditions": [
               {
-                "id": "<REDACTED_FILEID_4>",
+                "id": "<REDACTED_FILEID_9>",
                 "leftValue": "={{ $('Evaluate Safety').first().json.side_effects_permitted === true }}",
                 "operator": {
                   "operation": "true",
@@ -2521,7 +2527,7 @@
             "combinator": "and",
             "conditions": [
               {
-                "id": "<REDACTED_FILEID_4>",
+                "id": "<REDACTED_FILEID_9>",
                 "leftValue": "={{ $('Evaluate Safety').first().json.side_effects_permitted === true }}",
                 "operator": {
                   "operation": "true",
@@ -2625,7 +2631,7 @@
             "combinator": "and",
             "conditions": [
               {
-                "id": "<REDACTED_FILEID_4>",
+                "id": "<REDACTED_FILEID_9>",
                 "leftValue": "={{ $('Evaluate Safety').first().json.side_effects_permitted === true }}",
                 "operator": {
                   "operation": "true",
@@ -2755,8 +2761,8 @@
     "staticData": null,
     "tags": [],
     "triggerCount": 0,
-    "updatedAt": "2026-08-26T10:17:55.547Z",
-    "versionCounter": 13,
-    "versionId": "a7625897-20c7-4ecf-a5dd-c46f1f2f9caf"
+    "updatedAt": "2026-08-27T02:32:46.272Z",
+    "versionCounter": 14,
+    "versionId": "87fc50bd-93d5-4014-bd8e-6e0c605b05a4"
   }
 }
