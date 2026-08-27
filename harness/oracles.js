@@ -43,8 +43,10 @@ function fnv1aHex16(s) {
 /** Integrity Guard / Verify Selected Row form -> 8 hex, EIGHT-zero pad. */
 function fnvGuard(s) { return pad8(fnv32(s, 0x811c9dc5)); }
 
+// D-STATUS-01 (2026-08-25): 'status' added to match integrity-guard.js and verify-selected-row.js.
+// All three must use the identical field list so their fingerprints are comparable.
 const FP_FIELDS = ['action_id', 'matter_id', 'action_type', 'priority', 'depends_on_json',
-  'recipient', 'channel', 'requires_approval', 'idempotency_key', 'created_at'];
+  'recipient', 'channel', 'requires_approval', 'idempotency_key', 'created_at', 'status'];
 const S = v => String(v === null || v === undefined ? '' : v).trim();
 
 function rowFingerprint(row) {

@@ -190,7 +190,7 @@
   "assertions": [
     "integrity_code is CHANNEL_MISMATCH",
     "integrity_detail carries both the gate channel and the row channel",
-    "KNOWN GAP: the production check is `U(gate.channel) !== U(row.channel) && U(gate.channel) !== \"NONE\"`, so a gate channel of NONE bypasses this comparison entirely. This suite never injects channel NONE, so that path is untested."
+    "NONE bypass is now closed: D-CHANNEL-01 replaced the single combined condition with two explicit guards. See wf4-verify-channel-none-at-gate.json for that path."
   ],
   "target": {
     "workflow": "wf4",

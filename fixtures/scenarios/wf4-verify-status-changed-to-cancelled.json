@@ -1,0 +1,132 @@
+{
+  "workflow": "wf4",
+  "unit": "WF4 Integrity Guard and Verify Selected Row fail-closed gates",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "hTz7VbLHENx8ZB1N",
+    "name": "QA - WF4 Integrity Guard Runtime"
+  },
+  "id": "wf4-verify-status-changed-to-cancelled",
+  "description": "If an action row's status is flipped to CANCELLED between the Integrity Guard read and the Verify Selected Row read, the branch halts with FINGERPRINT_CHANGED.",
+  "why_it_exists": "D-STATUS-01 (2026-08-25). FINDINGS.md §4 proved that the original FP_FIELDS omitted 'status'. A guard that passed on AWAITING_APPROVAL gave integrity_ok: true even after the row was CANCELLED, because the fingerprint was computed without status. The fix adds 'status' to FP_FIELDS in both Integrity Guard and Verify Selected Row. This scenario simulates the TOCTOU window: the guard sees AWAITING_APPROVAL (clean), then load_actions_at_verify delivers the same row but with status=CANCELLED (changed between the two reads). The verify must detect the fingerprint mismatch and halt.",
+  "input": {
+    "case_id": "C5G",
+    "config": {
+      "matter_id": "MAT-QA-CLEAN",
+      "route_group": "APPROVAL",
+      "approval_id": "APR-QACLEAN"
+    },
+    "actions": [
+      {
+        "action_id": "ACT-QA-CLEAN-001",
+        "matter_id": "MAT-QA-CLEAN",
+        "action_type": "CONTACT_INSURER",
+        "status": "AWAITING_APPROVAL",
+        "priority": "HIGH",
+        "depends_on_json": "[]",
+        "recipient": "claims@insurer.example",
+        "channel": "GMAIL",
+        "requires_approval": "TRUE",
+        "draft_id": "DRF-QA-CLEAN-001-v1",
+        "approval_id": "APR-QACLEAN",
+        "due_at": "",
+        "deadline_basis": "",
+        "blocked_reason": "",
+        "idempotency_key": "MAT-QA-CLEAN|PQA|001",
+        "created_at": "2026-08-21T00:00:00Z",
+        "updated_at": "2026-08-21T00:00:00Z"
+      }
+    ],
+    "approvals": [
+      {
+        "approval_id": "APR-QACLEAN",
+        "matter_id": "MAT-QA-CLEAN",
+        "action_id": "ACT-QA-CLEAN-001",
+        "draft_id": "DRF-QA-CLEAN-001-v1",
+        "status": "PENDING"
+      }
+    ],
+    "injected_fault": {
+      "where": "Load Actions seen by Verify Selected Row (TOCTOU window — status changed after guard passed)",
+      "load_actions_at_verify": [
+        {
+          "action_id": "ACT-QA-CLEAN-001",
+          "matter_id": "MAT-QA-CLEAN",
+          "action_type": "CONTACT_INSURER",
+          "status": "CANCELLED",
+          "priority": "HIGH",
+          "depends_on_json": "[]",
+          "recipient": "claims@insurer.example",
+          "channel": "GMAIL",
+          "requires_approval": "TRUE",
+          "draft_id": "DRF-QA-CLEAN-001-v1",
+          "approval_id": "APR-QACLEAN",
+          "due_at": "",
+          "deadline_basis": "",
+          "blocked_reason": "",
+          "idempotency_key": "MAT-QA-CLEAN|PQA|001",
+          "created_at": "2026-08-21T00:00:00Z",
+          "updated_at": "2026-08-21T10:00:00Z"
+        }
+      ]
+    },
+    "now": "2026-08-23T06:00:00.000Z",
+    "nodeOutputs": {
+      "Config": [
+        {
+          "matter_id": "MAT-QA-CLEAN",
+          "route_group": "APPROVAL",
+          "approval_id": "APR-QACLEAN"
+        }
+      ],
+      "Load Actions": [
+        {
+          "action_id": "ACT-QA-CLEAN-001",
+          "matter_id": "MAT-QA-CLEAN",
+          "action_type": "CONTACT_INSURER",
+          "status": "AWAITING_APPROVAL",
+          "priority": "HIGH",
+          "depends_on_json": "[]",
+          "recipient": "claims@insurer.example",
+          "channel": "GMAIL",
+          "requires_approval": "TRUE",
+          "draft_id": "DRF-QA-CLEAN-001-v1",
+          "approval_id": "APR-QACLEAN",
+          "due_at": "",
+          "deadline_basis": "",
+          "blocked_reason": "",
+          "idempotency_key": "MAT-QA-CLEAN|PQA|001",
+          "created_at": "2026-08-21T00:00:00Z",
+          "updated_at": "2026-08-21T00:00:00Z"
+        }
+      ],
+      "Load Approvals": [
+        {
+          "approval_id": "APR-QACLEAN",
+          "matter_id": "MAT-QA-CLEAN",
+          "action_id": "ACT-QA-CLEAN-001",
+          "draft_id": "DRF-QA-CLEAN-001-v1",
+          "status": "PENDING"
+        }
+      ]
+    }
+  },
+  "expect": {
+    "verify_integrity_ok": false,
+    "integrity_code": "FINGERPRINT_CHANGED",
+    "reaches": "Halt - Data Integrity Conflict"
+  },
+  "assertions": [
+    "integrity_code is FINGERPRINT_CHANGED",
+    "integrity_detail names both the expected fingerprint (computed over AWAITING_APPROVAL) and the actual (re-derived over CANCELLED)",
+    "without D-STATUS-01 the old code would have returned integrity_ok: true on this case",
+    "no writer sink is reached"
+  ],
+  "target": {
+    "workflow": "wf4",
+    "unit_file": "harness/units/wf4/verify-selected-row.js"
+  },
+  "harness": {
+    "adapter": "verify-selected-row"
+  }
+}
