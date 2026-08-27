@@ -30,7 +30,13 @@ fi
 
 EXCLUDES=(--exclude-dir=.git --exclude-dir=node_modules --exclude-dir=__pycache__
           --exclude-dir=.venv --exclude-dir=coverage
-          --exclude=leak-check.sh --exclude=scrub-map.json --exclude=.gitignore)
+          --exclude=leak-check.sh --exclude=scrub-map.json --exclude=.gitignore
+          # .mcp.json is the local n8n MCP config: it deliberately holds the live
+          # n8n API key, is gitignored by design (.gitignore), and therefore can
+          # never be committed or pushed. Scanning it in working-tree mode makes
+          # the gate fail on a file that cannot leak through git. --staged mode
+          # never sees it (it is never staged). See docs/orca-setup.md Step 1.
+          --exclude=.mcp.json)
 
 # Line-level allowances: strings that MATCH a pattern below but are provably
 # not secrets. sha256OfJsCode / sha256(jsCode) are digests of the node code

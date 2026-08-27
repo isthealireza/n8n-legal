@@ -60,3 +60,10 @@ coverage/
 # Orca / local dev — never commit these
 *.bundle
 .mcp.json
+
+# Orca task loop — transient trigger files. The automation lives in tools/orca/
+# (committed); the task cards and journal are local scratch.
+tasks/inbox/
+tasks/queued/
+tasks/done/
+tasks/journal.txt
