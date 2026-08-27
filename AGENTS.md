@@ -74,7 +74,7 @@ If a task seems to require crossing these limits, stop and say so.
 ## 3. The loop
 
 ```
-node harness/run.js                 # must stay green (2 known failures, see below)
+node harness/run.js                 # must stay green (3 known failures, see below)
 node harness/run.js --workflow wf4  # narrow
 node harness/run.js --filter delivery-key --verbose
 ```
