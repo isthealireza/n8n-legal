@@ -13,13 +13,30 @@ Read `AGENTS.md` first. This README is the operation manual for the loop.
 Owner drops task card in tasks/inbox/  (or runs kickoff.ps1 manually)
   → watch.ps1 dispatches it to a fresh Orca worktree
   → Orca launches the Claude agent (Orchestrator) in that worktree
-  → Agent reads AGENTS.md, shows a plan in its worktree comment
-  → Agent implements (harness units / scenarios / n8n DRAFT via MCP)
-  → Agent runs node harness/run.js        (baseline 81/3/60, no new failures)
+  → Agent reads AGENTS.md + .specify/memory/constitution.md
+  → Agent runs the Spec Kit SDD loop (specify → plan → tasks → implement → converge)
+  → Agent proves it: node harness/run.js  (baseline 81/3/60, no new failures)
   → Agent runs tools/orca/gate.ps1   (MUST exit 0 before every commit)
   → Agent commits on a branch, pushes, opens a PR
   → Owner reviews the PR, merges, publishes to n8n manually
 ```
+
+## Spec Kit (Spec-Driven Development)
+
+This repo is a [GitHub Spec Kit](https://github.com/github/spec-kit) project
+(`.specify/` + `.claude/skills/speckit-*`). Every Orca worktree inherits the 10
+`/speckit-*` skills because they are committed to `dev/orca-setup`.
+
+- `.specify/memory/constitution.md` — the project constitution: the spec-kit
+  encoding of AGENTS.md (live system, approval gate, no production writes,
+  secrets, draft-vs-active, PR-only, harness floor, gate.ps1, incident comments).
+  Amend it only through the owner's review, mirroring AGENTS.md governance.
+- Flow for substantive work: `/speckit-specify` → `/speckit-plan` →
+  `/speckit-tasks` → `/speckit-implement` → `/speckit-converge` (repeat until
+  Converged). Optional quality skills: `/speckit-clarify`,
+  `/speckit-analyze`, `/speckit-checklist`.
+- The gate is the SDD "definition of done": a converged spec that fails
+  `gate.ps1` is not done.
 
 ## Files
 

@@ -31,28 +31,41 @@ contract and overrides anything this prompt does not cover.
 
 ## The loop — follow it exactly
 
+This repo is a **Spec Kit** project (`.specify/`). Run the spec-driven loop for
+substantive work, then the gates below:
+
 1. Read `AGENTS.md`. Read `docs/orca-setup.md` and `docs/draft-vs-active.md`
-   before touching any export.
-2. Show a short plan in your worktree comment (Orca: `orca worktree set
-   --worktree active --comment "<plan>"`), then implement.
-3. Edit **harness units** (`harness/units/`) and/or `fixtures/scenarios/` —
+   before touching any export. Read `.specify/memory/constitution.md` — it is
+   the spec-kit encoding of AGENTS.md.
+2. **Specify** what to build (`/speckit-specify`) — the *what* and *why*, not
+   the stack. If the task is a bug fix, use the bug extension flow instead
+   (assess → fix → test) if installed.
+3. **Plan** the technical approach (`/speckit-plan`) — name the workflow(s)
+   touched, the unit(s) in `harness/units/`, and any n8n draft changes.
+4. **Break down** into tasks (`/speckit-tasks`).
+5. Show a short plan in your worktree comment (Orca: `orca worktree set
+   --worktree active --comment "<plan>"`), then **implement**
+   (`/speckit-implement`).
+6. **Converge** (`/speckit-converge`) — assess the implementation against spec,
+   plan, and tasks; repeat implement/converge until Converged.
+7. Edit **harness units** (`harness/units/`) and/or `fixtures/scenarios/` —
    never edit `exports/wfN.active.json` (that changes only when the owner
    publishes). Draft changes go to `exports/wfN.draft.json`.
-4. Prove the change: `node harness/run.js`. Baseline is **81 passed, 3 failed,
+8. Prove the change: `node harness/run.js`. Baseline is **81 passed, 3 failed,
    60 skipped** — the 3 failures are real production defects in
    `harness/FINDINGS.md`. Never weaken an assertion to make them pass, and never
    introduce new failures.
-5. If the task requires n8n changes: port to the n8n **draft** via MCP
+9. If the task requires n8n changes: port to the n8n **draft** via MCP
    (`mcp__n8n__*` tools, draft-only — never `update_workflow` on an active
    workflow's live version).
-6. **Run the gate before every commit:**
-   `powershell -NoProfile -ExecutionPolicy Bypass -File tools/orca/gate.ps1`
-   (or `pwsh -NoProfile -File tools/orca/gate.ps1`) — it enforces harness
-   baseline, scrub, leak-check, branch, active-export, and secrets rules. It
-   must exit 0.
-7. Commit on a branch, push, and open a PR. Update your worktree comment with
-   the PR link and a one-line summary of what changed and which execution proved
-   it.
+10. **Run the gate before every commit:**
+    `powershell -NoProfile -ExecutionPolicy Bypass -File tools/orca/gate.ps1`
+    (or `pwsh -NoProfile -File tools/orca/gate.ps1`) — it enforces harness
+    baseline, scrub, leak-check, branch, active-export, and secrets rules. It
+    must exit 0.
+11. Commit on a branch, push, and open a PR. Update your worktree comment with
+    the PR link and a one-line summary of what changed and which execution proved
+    it.
 
 ## Reporting
 
