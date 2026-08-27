@@ -1,6 +1,6 @@
 <!--
 Sync Impact Report
-- Version change: 1.0.0 → 1.1.0
+- Version change: 1.0.0 → 1.1.0 → 1.1.1
 - Modified principles:
   - III. No Production Writes → III. No Production Writes Without Approval
     (added the owner-approval carve-out from AGENTS.md §1 hard limit 2)
@@ -13,6 +13,11 @@ Sync Impact Report
   explicitly overridden by the owner (AGENTS.md §4)
 - Removed sections: none
 - Deferred TODOs: none
+- v1.1.1 (P1 review fix): Development Workflow restated as three explicit phases
+  — (1) prepare a read-only plan, (2) STOP and wait for explicit owner approval
+  before executing ANY part of the task (no n8n inspection, file/workflow
+  changes, task-performing tests, publishing, or production side effects), then
+  (3) execute. One-plan/one-approval model and the III/VI carve-outs preserved.
 - Note for the owner (not a constitution change): AGENTS.md §3 line 77 comments
   "2 known failures" while §3 line 86 states the baseline as 81/3/60. The
   constitution follows the 3-failure baseline. AGENTS.md needs the stale
@@ -95,12 +100,30 @@ before and which execution proved the change.
 
 ## Development Workflow
 
-### One plan, one approval
+### Three phases — prepare, wait, execute
 
-Show one short plan before starting a task. One owner approval covers the
-complete approved task — n8n inspection, code or workflow changes, tests, export
-and backup, Git branch, commit, pull request, and publishing where publishing is
-part of the approved task. Do not ask for separate approval for every step.
+Every task runs in exactly three phases, in order. The agent MUST NOT skip or
+merge phases 1 and 2.
+
+**Phase 1 — Prepare (read-only).** Read `AGENTS.md` and this constitution, then
+show one short plan for the task. This phase performs no task actions: no n8n
+inspection, no file or workflow changes, no tests that perform task actions, no
+publishing, and no production side effects.
+
+**Phase 2 — Wait for explicit owner approval.** After showing the plan, the
+agent MUST STOP and wait. Nothing in the task is executed — not n8n inspection,
+not file or workflow changes, not tests that perform task actions, not
+publishing, and not any production side effect — until the owner explicitly
+approves the plan. One owner approval covers the complete approved task — n8n
+inspection, code or workflow changes, tests, export and backup, Git branch,
+commit, pull request, and publishing where publishing is part of the approved
+task — so the agent does not ask for separate approval for every step. The
+approval gate in Principle II has no exception and no approval can waive it.
+
+**Phase 3 — Execute.** Only after explicit owner approval, carry out the
+approved plan completely. Live writes and publishing remain subject to the
+carve-outs in Principles III and VI: they are permitted only when the owner
+explicitly included them in the approval.
 
 ### When to ask again
 
@@ -130,4 +153,4 @@ review.
 - Every scenario must pass `python3 .tooling/scrub.py --check` with 0
   replacements.
 
-**Version**: 1.1.0 | **Ratified**: 2026-08-27 | **Last Amended**: 2026-08-27
+**Version**: 1.1.1 | **Ratified**: 2026-08-27 | **Last Amended**: 2026-08-27
