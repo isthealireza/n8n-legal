@@ -7,16 +7,7 @@ in `exports/last-run.json`, which is untracked.
 
 ## Changed since last sync
 
-- WF1: active body changed
-- WF1: draft body changed
-- WF2: active body changed
-- WF2: draft body changed
-- WF3: active body changed
-- WF3: draft body changed
-- WF4: active body changed
-- WF4: draft body changed
-- WF5: active body changed
-- WF5: draft body disappeared (draft caught up to published?)
+- Nothing. Every captured body hashes identically to the previous sync.
 
 ## Per-workflow state
 
