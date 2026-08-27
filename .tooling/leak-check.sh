@@ -30,12 +30,22 @@ fi
 
 EXCLUDES=(--exclude-dir=.git --exclude-dir=node_modules --exclude-dir=__pycache__
           --exclude-dir=.venv --exclude-dir=coverage
-          --exclude=leak-check.sh --exclude=scrub-map.json --exclude=.gitignore)
+          --exclude=leak-check.sh --exclude=scrub-map.json --exclude=.gitignore
+          # .mcp.json is the local n8n MCP config: it deliberately holds the live
+          # n8n API key, is gitignored by design (.gitignore), and therefore can
+          # never be committed or pushed. Scanning it in working-tree mode makes
+          # the gate fail on a file that cannot leak through git. --staged mode
+          # never sees it (it is never staged). See docs/orca-setup.md Step 1.
+          --exclude=.mcp.json)
 
 # Line-level allowances: strings that MATCH a pattern below but are provably
 # not secrets. sha256OfJsCode / sha256(jsCode) are digests of the node code
 # itself; 0x01000193 / 0x811c9dc5 are the FNV-1a prime and offset basis; the
 # *_PLACEHOLDER and CRED_* words are the scrubbed replacements.
+# 9223372036854775808 is [long]::MaxValue + 1, the overflow sentinel used in
+# .specify/scripts/powershell/create-new-feature.ps1's feature-number range
+# check (a boundary-test constant, not an identifier). It is the ONLY
+# 9+ digit run spec-kit ships, so this allowance is specific, not a wildcard.
 allow_filter() {
   grep -vE \
     -e 'sha256OfJsCode|sha256\(jsCode\)' \
@@ -44,6 +54,7 @@ allow_filter() {
     -e 'CRED_(GSHEETS|TELEGRAM|DEEPSEEK|GDRIVE|GMAIL|ANTHROPIC)' \
     -e 'APR-(A1B2C3D4E5F60718|A1B2C3D4000000[0-9]{2})' \
     -e '(MAT|ACT|DRF|COM|EVD)-20260101' \
+    -e '9223372036854775808' \
     -e '^(\./)?exports/wf[0-9]+\.(active|draft)\.json:[0-9]+: *"id": "[0-9]+",?$'
 }
 
