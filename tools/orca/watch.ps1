@@ -17,6 +17,12 @@
 #   Only the first claimant wins the move; every later claimant sees the source
 #   gone and skips. The claim is the mechanism -- there is no debounce timer.
 #
+#   A Created event can fire while the task file is still being written.
+#   Before claiming, Wait-Until-Ready requires the file's size and LastWriteTime
+#   to remain unchanged across two samples (retrying up to 5s). A file that
+#   never settles is NOT claimed or dispatched: it stays in inbox, is journaled
+#   as UNREADY, and a later event (or sweep) retries it.
+#
 #   On success the claimed file is renamed to tasks/queued/<name>.dispatched-<HHmmss>.md.
 #   On kickoff failure it is moved to tasks/done/<name>.FAILED and the failure
 #   is appended to tasks/journal.txt. Task files are never deleted.
@@ -38,6 +44,34 @@ $queued = Join-Path $root 'tasks\queued'
 $done = Join-Path $root 'tasks\done'
 $journal = Join-Path $root 'tasks\journal.txt'
 foreach ($d in @($inbox, $queued, $done)) { New-Item -ItemType Directory -Force -Path $d | Out-Null }
+
+# ---------------------------------------------------------------------------
+# Wait-Until-Ready: wait for a task file to finish being written before it is
+# claimed. A Created event can fire while the file is still being created, so
+# claiming immediately risks dispatching partial task content to kickoff.
+# The file is considered ready when its size AND LastWriteTime are unchanged
+# across two consecutive samples. Returns $true when ready, $false when the
+# file never settles within $timeoutMs (or disappears).
+# ---------------------------------------------------------------------------
+function Wait-Until-Ready([string]$path, [int]$timeoutMs = 5000) {
+  $deadline = (Get-Date).AddMilliseconds($timeoutMs)
+  $prev = $null
+  while ((Get-Date) -lt $deadline) {
+    if (-not (Test-Path -LiteralPath $path)) { return $false }
+    try {
+      $item = Get-Item -LiteralPath $path -ErrorAction Stop
+    } catch {
+      return $false
+    }
+    $now = @{ size = $item.Length; write = $item.LastWriteTime }
+    if ($null -ne $prev -and $now.size -eq $prev.size -and $now.write -eq $prev.write) {
+      return $true
+    }
+    $prev = $now
+    Start-Sleep -Milliseconds 250
+  }
+  return $false
+}
 
 # ---------------------------------------------------------------------------
 # Claim-Task: atomically move the source file to tasks/queued/<base>.processing-<guid>.md.
@@ -73,6 +107,16 @@ function Dispatch-One([string]$path) {
   $base = [System.IO.Path]::GetFileNameWithoutExtension($path)       # e.g. task1
   Write-Host "`n[watch] dispatching: $name"
   $ts = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
+
+  # 0. Wait for the file to finish being written BEFORE claiming, so kickoff
+  #    never receives partial content. If it never settles, do NOT claim or
+  #    dispatch it: record the failure, leave the file in inbox for a later
+  #    event/sweep to retry.
+  if (-not (Wait-Until-Ready $path)) {
+    Write-Host "[watch] UNREADY $name : task file never became stable within 5s; left in inbox for retry" -ForegroundColor Yellow
+    Add-Content $journal "$ts UNREADY $name :: task file never became stable (size/LastWriteTime kept changing); not dispatched, left in inbox" -Encoding utf8
+    return
+  }
 
   # 1. Claim BEFORE kickoff. If another event/process already claimed this
   #    file, skip it -- do NOT create a FAILED task for a duplicate event.
