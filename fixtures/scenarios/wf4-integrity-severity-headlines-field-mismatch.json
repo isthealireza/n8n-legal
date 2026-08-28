@@ -1,0 +1,145 @@
+{
+  "workflow": "wf4",
+  "unit": "WF4 Integrity Guard conflict severity ranking",
+  "kind": "pure",
+  "id": "wf4-integrity-severity-headlines-field-mismatch",
+  "description": "A DRAFT route whose lower-severity conflict is pushed FIRST and whose DUPLICATE_ACTION_ID_FIELD_MISMATCH is pushed later must headline DUPLICATE_ACTION_ID_FIELD_MISMATCH, not the first-pushed idempotency duplicate.",
+  "why_it_exists": "harness/FINDINGS.md section 1: the guard used to take conflicts[0] as 'worst'. Push order is fixed (blank action_id, blank idempotency_key, duplicate idempotency_key, then per-action_id mismatch), so on a snapshot where a duplicated action_id ALSO shares its idempotency_key, the owner saw DUPLICATE_IDEMPOTENCY_KEY — the milder truth — instead of DUPLICATE_ACTION_ID_FIELD_MISMATCH, which is the condition that could put a letter in front of the wrong party and the entire reason the node exists. commit 49dd413 ranked conflicts by a declared CONFLICT_SEVERITY order so the worst is named. This scenario pushes the idempotency duplicate first (the old headline) while the field mismatch lands later, and asserts the declared order wins.",
+  "input": {
+    "case_id": "C1",
+    "config": {
+      "matter_id": "MAT-20260101-007",
+      "route_group": "DRAFT",
+      "dry_run": "true"
+    },
+    "actions": [
+      {
+        "action_id": "ACT-20260101-007-001",
+        "matter_id": "MAT-20260101-007",
+        "action_type": "COLLECT_FACTS",
+        "status": "READY",
+        "priority": "HIGH",
+        "depends_on_json": "[]",
+        "recipient": "owner (Alex)",
+        "channel": "MANUAL",
+        "requires_approval": "TRUE",
+        "draft_id": "",
+        "approval_id": "",
+        "due_at": "",
+        "deadline_basis": "",
+        "blocked_reason": "",
+        "idempotency_key": "MAT-20260101-007|001",
+        "created_at": "2026-08-19T17:15:07.880Z",
+        "updated_at": "2026-08-19T17:15:07.880Z"
+      },
+      {
+        "action_id": "ACT-20260101-007-001",
+        "matter_id": "MAT-20260101-007",
+        "action_type": "CONTACT_INSURER",
+        "status": "READY",
+        "priority": "HIGH",
+        "depends_on_json": "[]",
+        "recipient": "owner (Alex)",
+        "channel": "GMAIL",
+        "requires_approval": "TRUE",
+        "draft_id": "",
+        "approval_id": "",
+        "due_at": "",
+        "deadline_basis": "",
+        "blocked_reason": "",
+        "idempotency_key": "MAT-20260101-007|001",
+        "created_at": "2026-08-19T17:54:35.511Z",
+        "updated_at": "2026-08-19T17:54:35.511Z"
+      }
+    ],
+    "approvals": [],
+    "passthrough": {
+      "route": "QA",
+      "chat_id": "QA-CHAT",
+      "dry_run": "true",
+      "passthrough_marker": "PASSTHROUGH-OK"
+    },
+    "now": "2026-08-23T06:00:00.000Z",
+    "items": [
+      {
+        "route": "QA",
+        "chat_id": "QA-CHAT",
+        "dry_run": "true",
+        "passthrough_marker": "PASSTHROUGH-OK"
+      }
+    ],
+    "nodeOutputs": {
+      "Config": [
+        {
+          "matter_id": "MAT-20260101-007",
+          "route_group": "DRAFT",
+          "dry_run": "true"
+        }
+      ],
+      "Load Actions": [
+        {
+          "action_id": "ACT-20260101-007-001",
+          "matter_id": "MAT-20260101-007",
+          "action_type": "COLLECT_FACTS",
+          "status": "READY",
+          "priority": "HIGH",
+          "depends_on_json": "[]",
+          "recipient": "owner (Alex)",
+          "channel": "MANUAL",
+          "requires_approval": "TRUE",
+          "draft_id": "",
+          "approval_id": "",
+          "due_at": "",
+          "deadline_basis": "",
+          "blocked_reason": "",
+          "idempotency_key": "MAT-20260101-007|001",
+          "created_at": "2026-08-19T17:15:07.880Z",
+          "updated_at": "2026-08-19T17:15:07.880Z"
+        },
+        {
+          "action_id": "ACT-20260101-007-001",
+          "matter_id": "MAT-20260101-007",
+          "action_type": "CONTACT_INSURER",
+          "status": "READY",
+          "priority": "HIGH",
+          "depends_on_json": "[]",
+          "recipient": "owner (Alex)",
+          "channel": "GMAIL",
+          "requires_approval": "TRUE",
+          "draft_id": "",
+          "approval_id": "",
+          "due_at": "",
+          "deadline_basis": "",
+          "blocked_reason": "",
+          "idempotency_key": "MAT-20260101-007|001",
+          "created_at": "2026-08-19T17:54:35.511Z",
+          "updated_at": "2026-08-19T17:54:35.511Z"
+        }
+      ],
+      "Load Approvals": []
+    }
+  },
+  "expect": {
+    "integrity_ok": false,
+    "gate": "DATA_INTEGRITY_CONFLICT",
+    "integrity_code": "DUPLICATE_ACTION_ID_FIELD_MISMATCH",
+    "reaches": "Halt - Data Integrity Conflict",
+    "reaches_drafting": false,
+    "conflict_count": 1
+  },
+  "assertions": [
+    "DUPLICATE_IDEMPOTENCY_KEY is the FIRST conflict pushed and was, pre-fix, the headline",
+    "DUPLICATE_ACTION_ID_FIELD_MISMATCH is pushed LATER yet still becomes integrity_code: declared severity beats push order",
+    "integrity_code is DUPLICATE_ACTION_ID_FIELD_MISMATCH, not DUPLICATE_IDEMPOTENCY_KEY",
+    "the disposition of one action id authors one ambiguous action, so conflict_count is 1 not 2",
+    "the Build Draft Context branch is never reached",
+    "the passthrough fields (route, chat_id, dry_run, passthrough_marker) survive onto the halt item"
+  ],
+  "target": {
+    "workflow": "wf4",
+    "unit_file": "harness/units/wf4/integrity-guard.js"
+  },
+  "harness": {
+    "adapter": "integrity-guard"
+  }
+}
