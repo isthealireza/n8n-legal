@@ -150,14 +150,56 @@ without also publishing SPEC-2 Rev B in full** (79 new nodes, the Config passthr
 Approval Gate kill switch). That is a much larger review than the fix itself, and it is the
 reason the port is gated rather than assumed.
 
-## 5. The port-and-publish path — NOT taken, gated
+## 5. The port — GATE-APPROVED AND TAKEN (draft only)
 
-The change is prepared in the repository only. Porting it requires the owner's decision:
+Decision gate `gate_0d2012146a1b` on the Fast Lane `owner-gate` task was resolved
+**`approve`** by Ali at 2026-08-28 17:59:03. The port below was then performed. Publishing
+was NOT approved and was NOT done.
 
-1. `update_workflow` on `zKr24IThF30e6jXw` — **draft only** — replacing the `jsCode` of
-   `7bee0e49` (`Integrity Guard`) and `7fd2f6ec` (`Build Integrity Halt Notice`) with the
-   bodies between the `BEGIN/END VERBATIM n8n jsCode` markers of the two units. No other
-   node, no connection, no parameter.
+| field | before the port | after the port |
+|---|---|---|
+| draft `versionId` | `8107c96f-57cd-4b77-a9bb-638a676d7926` | **`470120af-9909-4760-89d9-fc78e4074d75`** |
+| `activeVersionId` | `902130f4-58d0-4189-bf80-273c753c9c34` | `902130f4-58d0-4189-bf80-273c753c9c34` (**unchanged**) |
+| node count | 181 | 181 |
+
+One `update_workflow` call, two `setNodeParameter` operations on `/jsCode`, applied
+atomically: `Integrity Guard` (`7bee0e49`) and `Build Integrity Halt Notice` (`7fd2f6ec`).
+Verified afterwards by `get_workflow_versions_diff(8107c96f -> 470120af)`: **2 nodes
+modified, 0 added, 0 removed, 0 connections added, 0 connections removed.** No publish, no
+activation, no execution, no credential change. **Production is still running `902130f4` and
+still carries both defects.**
+
+### Verification, and one deviation I introduced
+
+The port bodies were built by un-scrubbing the repository units, with the round trip proved
+before the write: re-scrubbing the port body reproduced the unit byte-for-byte. After the
+write, both live draft nodes were re-read and compared against those staged bodies:
+
+- `Build Integrity Halt Notice` — **byte-exact**, 10,369 characters.
+- `Integrity Guard` — 12,893 characters, **one token different from the staged body**: a
+  single matter id inside the new incident comment. The staged body carried the scrubbed
+  placeholder for that matter; what I actually typed into the live draft was the real id
+  behind it. Both literals are the two sides of one existing `.tooling/scrub-map.json` entry,
+  and neither is reproduced here because this file is itself a scrub target. It was my
+  substitution during transcription and it was not in the body the gate question pointed at.
+
+It is left in place, and flagged here rather than silently corrected, for two reasons. The
+node is on the unscrubbed side of the line and already names the real action id and the real
+centre two comment blocks above, so the placeholder would have put a matter id that does not
+exist into a live node. And because the pair is a registered scrub entry, the contract still
+closes: **re-scrubbing what actually landed reproduces both units byte-for-byte**, confirmed
+after the fact for `Integrity Guard` and `Build Integrity Halt Notice` alike, so
+`extract-units.py` will regenerate the current units unchanged. Reverting it would need a
+second draft write, which is itself a protected action. If Ali wants the placeholder in the
+live node instead, that is a one-token gated change.
+
+## 5a. The publish path — NOT taken, still the owner's
+
+
+
+The draft now carries the fix. What remains is the owner's:
+
+1. ~~`update_workflow`, draft only~~ — **done**, see §5.
 2. The owner reviews the draft diff in the n8n UI and presses **Publish**. Only the owner
    publishes (AGENTS.md §1, `docs/draft-vs-active.md` §6.5).
 3. Re-export the new published version to `exports/wf4.active.json`, then
@@ -166,16 +208,17 @@ The change is prepared in the repository only. Porting it requires the owner's d
    "deliberately ahead" headers come out and FINDINGS §1 closes.
 4. Re-run `node harness/run.js` and confirm no scenario moved.
 
-**Rollback.** Before any port, the pre-port draft is `8107c96f-57cd-4b77-a9bb-638a676d7926`
-and the published version is `902130f4-58d0-4189-bf80-273c753c9c34`. A bad port is undone
-with `restore_workflow_version` to `8107c96f`; a bad publish is undone by publishing
-`902130f4` again. Both are owner actions and both are protected under the Fast Lane approval
-model.
+**Rollback.** The pre-port draft is `8107c96f-57cd-4b77-a9bb-638a676d7926` and the published
+version is `902130f4-58d0-4189-bf80-273c753c9c34`. The port is undone with
+`restore_workflow_version` to `8107c96f` — nothing else has to be touched, because the port
+changed two `jsCode` values and nothing else. A bad publish would be undone by publishing
+`902130f4` again. Both are protected actions under the Fast Lane approval model.
 
 ## 6. Unresolved after this inspection
 
-- **FINDINGS §1 is still live in production.** `902130f4` still takes `conflicts[0]` as the
-  headline and still echoes `conflicts.length`. The owner is still shown
+- **FINDINGS §1 is still live in production.** The fix is now in the draft (`470120af`) but
+  `902130f4` is still what executes: it still takes `conflicts[0]` as the headline and still
+  echoes `conflicts.length`. The owner is still shown
   `DUPLICATE_IDEMPOTENCY_KEY` where the truth is `DUPLICATE_ACTION_ID_FIELD_MISMATCH`, and
   still shown double the number of ambiguous actions. The harness no longer fails on it only
   because the units are ahead.
@@ -186,3 +229,5 @@ model.
   AGENTS.md §6 says each of these deserves its own change and the owner's eyes.
 - `docs/draft-vs-active.md` §3's state table was dated 2026-08-25 and said wf4 was not
   diverged. It is now; §7 of that document records the correction.
+- **No `wf4.draft.json` has been captured**, for `8107c96f` or for `470120af`. The draft is a
+  181-node body that also carries SPEC-2 Rev B; capturing it is its own change.
