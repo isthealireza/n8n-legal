@@ -56,6 +56,11 @@ id is reported twice, once per class. Nothing is lost (`integrity_detail` carrie
 list) but the count in the notice is double the number of ambiguous actions.
 
 **Status — fixed in the repo, NOT ported to n8n, NOT published (2026-08-28).**
+**Re-verified against the live instance 2026-08-29** by read-only MCP inspection: WF4's
+published version is `902130f4`, its `Integrity Guard` jsCode still hashes to
+`0950131e99ab…` — the pre-fix body — and its `Build Integrity Halt Notice` still hashes to
+`baabf88da65e…`. Both defects are in production today. Full record, including the port and
+rollback path, in `docs/wf4-live-inspection-2026-08-29.md`.
 Production still has this defect today; the harness no longer fails on it because the
 unit is ahead of the live node. The fix: rank `conflicts` by a declared severity order
 before taking the headline, with `DUPLICATE_ACTION_ID_FIELD_MISMATCH` above
