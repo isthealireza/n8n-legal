@@ -1,0 +1,38 @@
+{
+  "workflow": "wf4",
+  "unit": "WF4 Approval Gate delivery-key derivation",
+  "kind": "pure",
+  "id": "wf4-delivery-key-channel-case-fold",
+  "description": "The same first-send approval with the channel written lowercase (\"gmail\") collapses to the same delivery key as the uppercase-channel first send.",
+  "why_it_exists": "The delivery-key basis trims and uppercases the channel before hashing, but until this case nothing pinned that fold on its own: every other delivery-key scenario writes the channel already uppercased (\"GMAIL\"), and wf4-delivery-key-recipient-normalisation varies the recipient and the channel together, so its assertion stays green on the recipient fold alone. A regression that dropped only the channel uppercasing would therefore have passed the whole suite, and a retry of an approved send whose action row carried \"gmail\" instead of \"GMAIL\" would have hashed to a second send_key and a second communication_id -- the same duplicate-send failure mode that F-02 widened the key to close. This case holds the recipient and every other basis field byte-identical to wf4-delivery-key-first-send so the channel fold is the only thing under test.",
+  "input": {
+    "approval": {
+      "approval_id": "APR-001"
+    },
+    "action": {
+      "action_id": "ACT-001",
+      "channel": "gmail",
+      "recipient": "insurerclaims01@example.com"
+    },
+    "draft": {
+      "draft_id": "DFT-001"
+    },
+    "compare_against": "wf4-delivery-key-first-send",
+    "now": "2026-08-23T06:00:00.000Z"
+  },
+  "expect": {
+    "send_key_equals_first_send": true
+  },
+  "assertions": [
+    "send_key is identical to the uppercase-channel first-send key",
+    "the channel is uppercased before entering the basis, so \"gmail\" and \"GMAIL\" hash alike",
+    "no other basis field differs from wf4-delivery-key-first-send"
+  ],
+  "target": {
+    "workflow": "wf4",
+    "unit_file": "harness/units/wf4/approval-gate.js"
+  },
+  "harness": {
+    "adapter": "delivery-key"
+  }
+}
