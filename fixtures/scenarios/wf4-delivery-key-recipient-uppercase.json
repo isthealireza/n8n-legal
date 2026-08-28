@@ -1,0 +1,43 @@
+{
+  "workflow": "wf4",
+  "unit": "WF4 Approval Gate delivery-key derivation",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "Rgw4AH2dwwatNfWS",
+    "name": "QA - WF4 Outbound Delivery Key"
+  },
+  "id": "wf4-delivery-key-recipient-uppercase",
+  "description": "The same recipient typed entirely in capitals, with no display name and no angle brackets, collapses to the plain-lowercase first-send delivery key.",
+  "why_it_exists": "wf4-delivery-key-recipient-normalisation pins the display-name/angle-bracket variant, which exercises the angle-bracket extraction in normEmail() and only incidentally its toLowerCase(). The bare ALL CAPS form is the one a practitioner produces by copying an address out of a scanned insurer letterhead or a caps-locked field, and until now nothing pinned it. If the lowercasing were ever dropped while the angle-bracket extraction stayed, that existing scenario would still pass and this delivery would look new - the same letter sent to the same insurer twice, with no duplicate detectable in the register.",
+  "input": {
+    "approval": {
+      "approval_id": "APR-001"
+    },
+    "action": {
+      "action_id": "ACT-001",
+      "channel": "gmail",
+      "recipient": "INSURERCLAIMS01@EXAMPLE.COM"
+    },
+    "draft": {
+      "draft_id": "DFT-001"
+    },
+    "compare_against": "wf4-delivery-key-first-send",
+    "sanitisation_note": "The address is the same 27-character synthetic address used by wf4-delivery-key-first-send and wf4-delivery-key-recipient-normalisation, written in upper case. No real recipient appears here.",
+    "now": "2026-08-23T06:00:00.000Z"
+  },
+  "expect": {
+    "send_key_equals_first_send": true
+  },
+  "assertions": [
+    "send_key is identical to the plain-lowercase first-send key",
+    "normEmail() lowercases an address that carries no display name and no angle brackets",
+    "the channel is uppercased before entering the basis"
+  ],
+  "target": {
+    "workflow": "wf4",
+    "unit_file": "harness/units/wf4/approval-gate.js"
+  },
+  "harness": {
+    "adapter": "delivery-key"
+  }
+}
