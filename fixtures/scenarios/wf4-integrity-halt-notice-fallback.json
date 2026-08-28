@@ -22,7 +22,7 @@
         "matter_id": "MAT-20260101-002",
         "action_id": "ACT-20260101-002-001",
         "route_group": "APPROVAL",
-        "approval_id": "APR-20260101-002-001",
+        "approval_id": "",
         "passthrough_marker": "PASSTHROUGH-OK"
       }
     ],
@@ -30,7 +30,7 @@
       "Config": [
         {
           "matter_id": "MAT-20260101-002",
-          "approval_id": "APR-20260101-002-001",
+          "approval_id": "",
           "route_group": "APPROVAL",
           "dry_run": "true"
         }

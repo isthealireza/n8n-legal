@@ -67,3 +67,9 @@ tasks/inbox/
 tasks/queued/
 tasks/done/
 tasks/journal.txt
+
+# Orca Fast Lane — the coordinator's control files, written into the worktree
+# root by tools/orca/fastlane.ps1 and by the agents it starts. Local scratch for
+# one run: the orchestrator prompt file, the DeepSeek test-leg result, the
+# orchestrator DONE file. Never committed.
+.fastlane-*

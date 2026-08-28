@@ -66,8 +66,23 @@ pwsh -File tools/orca/watch.ps1
 ```
 
 Dropping a file in `tasks/inbox/` **is** the owner's approval to carry out the
-task — the agent does not re-ask. The task file itself is moved to
-`tasks/queued/` on dispatch.
+task — the agent does not re-ask during repository-only work. The task file
+itself is moved to `tasks/queued/` on dispatch.
+
+**Live n8n tasks:** a card that needs the live instance carries the marker line
+`N8N-ACCESS: REQUIRED`. `fastlane.ps1` then copies the primary checkout's
+`.mcp.json` into the worktree (gitignored, never committed, never printed) so
+the Orchestrator can inspect the named workflow read-only with the full existing
+connection.
+
+**Protected actions stop on a decision gate.** Before any protected action
+(publish, activate/deactivate, execute with side effects, external sends,
+production writes, irreversible actions, active-export change, scope change)
+the Orchestrator creates a gate with `orca orchestration gate-create --task
+<owner-gate> --question <action>` and waits; Ali resolves it in the Orca UI and
+the flow resumes. `orca orchestration ask` is worker-to-coordinator only and is
+NOT used for owner approval (it fails from the coordinator with
+`dispatch_inactive`, proven 2026-08-28).
 
 ## Gates (enforced by gate.ps1)
 
