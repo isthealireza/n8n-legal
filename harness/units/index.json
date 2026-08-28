@@ -347,8 +347,8 @@
     "nodeId": "7bee0e49-ab5e-471d-9a88-4da7d736e459",
     "mode": "runOnceForAllItems",
     "file": "wf4/integrity-guard.js",
-    "bytes": 8212,
-    "sha256OfJsCode": "039f3be3be2522fd5f38a3941912231cab0f9a348b0ba6a020bac34a374bbe22"
+    "bytes": 8584,
+    "sha256OfJsCode": "0950131e99ab5fea8b69a879700c3fefd0c9d335a998dc4517b66ba0dd853011"
   },
   {
     "workflow": "wf4",
@@ -356,8 +356,8 @@
     "nodeId": "9943a62a-bd82-49e3-9433-1fac628837fa",
     "mode": "runOnceForAllItems",
     "file": "wf4/verify-selected-row.js",
-    "bytes": 7003,
-    "sha256OfJsCode": "b3565238c23540a86d5ab503f8d5478cf8f9f805fd475af40905103c184a5049"
+    "bytes": 8015,
+    "sha256OfJsCode": "8a1f1acd786c88a5cd5b685484b10b48584e747ae46d0b846c4161da3122d309"
   },
   {
     "workflow": "wf4",
