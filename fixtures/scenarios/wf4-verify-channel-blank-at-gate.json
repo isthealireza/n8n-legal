@@ -1,0 +1,112 @@
+{
+  "workflow": "wf4",
+  "unit": "WF4 Integrity Guard and Verify Selected Row fail-closed gates",
+  "kind": "pure",
+  "source_qa_workflow": {
+    "id": "hTz7VbLHENx8ZB1N",
+    "name": "QA - WF4 Integrity Guard Runtime"
+  },
+  "id": "wf4-verify-channel-blank-at-gate",
+  "description": "If the Approval Gate emits a blank channel (empty string or whitespace), the branch halts with CHANNEL_UNRESOLVED before any send.",
+  "why_it_exists": "D-CHANNEL-01 (2026-08-25). A blank channel is treated identically to NONE: the gate has no resolved channel to act on, so the branch must not continue. The old guard only checked for the literal string 'NONE' — a blank would have evaluated as U('') = '' which is neither equal to the row's channel nor equal to 'NONE', making the second term true and triggering CHANNEL_MISMATCH instead of CHANNEL_UNRESOLVED. The new guard treats blank (falsy after toUpperCase/trim) as unresolved.",
+  "input": {
+    "case_id": "C5E",
+    "config": {
+      "matter_id": "MAT-QA-CLEAN",
+      "route_group": "APPROVAL",
+      "approval_id": "APR-QACLEAN"
+    },
+    "actions": [
+      {
+        "action_id": "ACT-QA-CLEAN-001",
+        "matter_id": "MAT-QA-CLEAN",
+        "action_type": "CONTACT_INSURER",
+        "status": "AWAITING_APPROVAL",
+        "priority": "HIGH",
+        "depends_on_json": "[]",
+        "recipient": "claims@insurer.example",
+        "channel": "GMAIL",
+        "requires_approval": "TRUE",
+        "draft_id": "DRF-QA-CLEAN-001-v1",
+        "approval_id": "APR-QACLEAN",
+        "due_at": "",
+        "deadline_basis": "",
+        "blocked_reason": "",
+        "idempotency_key": "MAT-QA-CLEAN|PQA|001",
+        "created_at": "2026-08-21T00:00:00Z",
+        "updated_at": "2026-08-21T00:00:00Z"
+      }
+    ],
+    "approvals": [
+      {
+        "approval_id": "APR-QACLEAN",
+        "matter_id": "MAT-QA-CLEAN",
+        "action_id": "ACT-QA-CLEAN-001",
+        "draft_id": "DRF-QA-CLEAN-001-v1",
+        "status": "PENDING"
+      }
+    ],
+    "injected_fault": {
+      "where": "between Approval Gate and Verify Selected Row",
+      "channel": ""
+    },
+    "register_row_channel": "GMAIL",
+    "now": "2026-08-23T06:00:00.000Z",
+    "nodeOutputs": {
+      "Config": [
+        {
+          "matter_id": "MAT-QA-CLEAN",
+          "route_group": "APPROVAL",
+          "approval_id": "APR-QACLEAN"
+        }
+      ],
+      "Load Actions": [
+        {
+          "action_id": "ACT-QA-CLEAN-001",
+          "matter_id": "MAT-QA-CLEAN",
+          "action_type": "CONTACT_INSURER",
+          "status": "AWAITING_APPROVAL",
+          "priority": "HIGH",
+          "depends_on_json": "[]",
+          "recipient": "claims@insurer.example",
+          "channel": "GMAIL",
+          "requires_approval": "TRUE",
+          "draft_id": "DRF-QA-CLEAN-001-v1",
+          "approval_id": "APR-QACLEAN",
+          "due_at": "",
+          "deadline_basis": "",
+          "blocked_reason": "",
+          "idempotency_key": "MAT-QA-CLEAN|PQA|001",
+          "created_at": "2026-08-21T00:00:00Z",
+          "updated_at": "2026-08-21T00:00:00Z"
+        }
+      ],
+      "Load Approvals": [
+        {
+          "approval_id": "APR-QACLEAN",
+          "matter_id": "MAT-QA-CLEAN",
+          "action_id": "ACT-QA-CLEAN-001",
+          "draft_id": "DRF-QA-CLEAN-001-v1",
+          "status": "PENDING"
+        }
+      ]
+    }
+  },
+  "expect": {
+    "verify_integrity_ok": false,
+    "integrity_code": "CHANNEL_UNRESOLVED",
+    "reaches": "Halt - Data Integrity Conflict"
+  },
+  "assertions": [
+    "integrity_code is CHANNEL_UNRESOLVED — not CHANNEL_MISMATCH",
+    "integrity_detail carries both the gate channel ('') and the row channel",
+    "no Gmail node is reachable past this point"
+  ],
+  "target": {
+    "workflow": "wf4",
+    "unit_file": "harness/units/wf4/verify-selected-row.js"
+  },
+  "harness": {
+    "adapter": "verify-selected-row"
+  }
+}

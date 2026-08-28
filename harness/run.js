@@ -136,7 +136,13 @@ async function runVerify(scn, guardOut) {
     recipient: String(fault.recipient !== undefined ? fault.recipient : row.recipient),
     channel: String(fault.channel !== undefined ? fault.channel : row.channel),
   };
-  const actions = inp.actions;
+  // load_actions_at_verify lets a scenario simulate the register changing between
+  // the Integrity Guard read (snapshot 1) and the Verify Selected Row read (snapshot 2).
+  // When present, the verify step sees this array instead of inp.actions, proving
+  // FINGERPRINT_CHANGED fires on a status or field change that occurred in the TOCTOU window.
+  const actions = fault.load_actions_at_verify !== undefined
+    ? fault.load_actions_at_verify
+    : inp.actions;
   let guard = guardOut;
   if (fault.selected_rows_fingerprint) {
     guard = JSON.parse(JSON.stringify(guardOut));

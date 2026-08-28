@@ -191,7 +191,7 @@
     "Verify Selected Row returns integrity_code FINGERPRINT_CHANGED",
     "integrity_detail names both the expected (carried) and the actual (re-derived) fingerprint",
     "no writer sink is reached",
-    "FP_FIELDS are action_id, matter_id, action_type, priority, depends_on_json, recipient, channel, requires_approval, idempotency_key, created_at - note that status and updated_at are NOT in the basis"
+    "FP_FIELDS are action_id, matter_id, action_type, priority, depends_on_json, recipient, channel, requires_approval, idempotency_key, created_at, status (D-STATUS-01 added status; updated_at is still excluded as it changes on any write and would make every verify fail)"
   ],
   "target": {
     "workflow": "wf4",
