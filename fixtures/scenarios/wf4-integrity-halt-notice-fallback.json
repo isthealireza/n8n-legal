@@ -1,0 +1,62 @@
+{
+  "workflow": "wf4",
+  "unit": "WF4 Build Integrity Halt Notice count fallback without a guard count",
+  "kind": "pure",
+  "id": "wf4-integrity-halt-notice-fallback",
+  "description": "When the arriving item carries no integrity_conflict_count (every containment shape except the Integrity Guard halt), the notice must fall back to integrity_detail.length exactly as before — the D-COUNT-01 fix must not change non-guard shapes.",
+  "why_it_exists": "harness/FINDINGS.md section 1 close-out (D-COUNT-01, 2026-08-28). The Build Integrity Halt Notice fix reads integrity_conflict_count only when the guard supplies it. A Verify Selected Row halt (FINGERPRINT_CHANGED) carries integrity_detail but no guard count, so the heading and halt_conflict_count must fall back to detail.length (1), and halt_conflict_record_count must equal the same raw list length. This pins the fallback path so the fix cannot silently break the five other shapes that reach this node.",
+  "input": {
+    "now": "2026-08-23T06:00:00.000Z",
+    "items": [
+      {
+        "integrity_ok": false,
+        "gate": "DATA_INTEGRITY_CONFLICT",
+        "integrity_code": "FINGERPRINT_CHANGED",
+        "integrity_reason": "The Action row for ACT-20260101-002-001 changed between the guard and the writer.",
+        "integrity_detail": [
+          {
+            "expected": "FP-3f4b2c91a0d7e652",
+            "actual": "FP-9c14d0e8b2f6a375"
+          }
+        ],
+        "matter_id": "MAT-20260101-002",
+        "action_id": "ACT-20260101-002-001",
+        "route_group": "APPROVAL",
+        "approval_id": "APR-20260101-002-001",
+        "passthrough_marker": "PASSTHROUGH-OK"
+      }
+    ],
+    "nodeOutputs": {
+      "Config": [
+        {
+          "matter_id": "MAT-20260101-002",
+          "approval_id": "APR-20260101-002-001",
+          "route_group": "APPROVAL",
+          "dry_run": "true"
+        }
+      ]
+    }
+  },
+  "expect": {
+    "reaches": "Halt - Data Integrity Conflict",
+    "halt_code": "FINGERPRINT_CHANGED",
+    "halt_stage": "APPROVAL_ROW_VERIFICATION",
+    "halt_conflict_count": 1,
+    "halt_conflict_record_count": 1,
+    "reply_contains": "Conflicting records (1):",
+    "event_type": "DATA_INTEGRITY_HALT"
+  },
+  "assertions": [
+    "without a guard-supplied integrity_conflict_count, halt_conflict_count falls back to integrity_detail.length (1)",
+    "halt_conflict_record_count equals the raw detail length (1) — the fallback path is byte-for-byte what it was before the fix",
+    "the heading reads 'Conflicting records (1):' for the verify-shaped halt",
+    "halt_code and halt_stage classify the item as an approval-row verification halt"
+  ],
+  "target": {
+    "workflow": "wf4",
+    "unit_file": "harness/units/wf4/build-integrity-halt-notice.js"
+  },
+  "harness": {
+    "adapter": "integrity-halt-notice"
+  }
+}

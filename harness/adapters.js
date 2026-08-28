@@ -422,6 +422,20 @@ const verifySelectedRow = {
   },
 };
 
+const integrityHaltNotice = {
+  units: ['wf4/build-integrity-halt-notice.js'],
+  async run(scn, ctx) {
+    const out = (await ctx.runUnit(scn.target.unit_file, scn.input))[0].json;
+    const e = scn.expect;
+    const custom = {};
+    if ('reply_contains' in e) {
+      custom.reply_contains = () => mk('reply_contains', e.reply_contains,
+        out.reply, String(out.reply || '').indexOf(String(e.reply_contains)) !== -1);
+    }
+    return flat(e, out, { informational: ['reaches'], custom });
+  },
+};
+
 /* ================================================================== WF2 Finalise Plan */
 
 const finalisePlan = {
@@ -526,5 +540,6 @@ module.exports = {
   'delivery-key-no-clock': deliveryKeyNoClock,
   'integrity-guard': integrityGuard,
   'verify-selected-row': verifySelectedRow,
+  'integrity-halt-notice': integrityHaltNotice,
   'finalise-plan': finalisePlan,
 };

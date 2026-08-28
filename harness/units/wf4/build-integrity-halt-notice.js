@@ -4,9 +4,24 @@
 // Node id         : 7fd2f6ec-ab2d-4afa-940a-1def80c503fe
 // Node mode       : runOnceForAllItems
 // sha256(jsCode)  : baabf88da65ed5bce10c3d0142837cbe10c98f11d6809bcd5e045a11930a7ffe
+//                   ^ the sha of the PUBLISHED node, as captured in
+//                     exports/wf4.active.json and harness/units/index.json.
+//                     Left untouched on purpose: it is the record of what is
+//                     running in n8n right now.
 //
-// The code between the BEGIN/END markers below is byte-identical to the
-// node's parameters.jsCode in the workflow export. Everything outside the
+// 2026-08-28 -- THIS FILE NOW DIVERGES FROM THAT SHA, DELIBERATELY.
+// The block between the BEGIN/END markers carries the FINDINGS.md section 1
+// close-out (D-COUNT-01): the owner-facing heading and the audit row now use the
+// guard's DISTINCT ambiguous-action count (integrity_conflict_count) when the
+// guard supplies it, instead of re-introducing the double count via
+// integrity_detail.length. It has NOT been ported to the n8n draft and has NOT
+// been published, so the live node still echoes detail.length. Re-running
+// .tooling/extract-units.py against the current exports/wf4.active.json WILL
+// overwrite this fix -- port it to the draft and have the owner publish first,
+// then re-extract.
+//
+// The code between the BEGIN/END markers below is otherwise byte-identical to
+// the node's parameters.jsCode in the workflow export. Everything outside the
 // markers is harness scaffolding.
 //
 // Usage:
@@ -150,6 +165,21 @@ const MAX_DETAIL = 5;
 const shown = detail.slice(0, MAX_DETAIL).map(detailLine);
 const hidden = Math.max(0, detail.length - shown.length);
 
+// D-COUNT-01 (2026-08-28). The Integrity Guard (FINDINGS.md section 1 fix) now
+// publishes integrity_conflict_count -- the number of DISTINCT in-scope
+// action_ids that are ambiguous -- next to integrity_conflict_record_count (raw
+// conflict entries, one per class per id). The owner-facing heading and the
+// audit row must agree with the guard's reason string ("3 ambiguous action(s)
+// found, reported as 5 conflict record(s).") instead of re-introducing the
+// double count by echoing detail.length. Every other shape that reaches this
+// node (verify halts, node errors, the conflict-notice chain, unclassified
+// items) carries no guard count, so it falls back to detail.length exactly as
+// before. The full record list is still shown (MAX_DETAIL slice) and still
+// carried (integrity_detail); only the counted number changes.
+const guardConflictCount = (typeof item.integrity_conflict_count === 'number')
+  ? item.integrity_conflict_count : null;
+const headingCount = guardConflictCount !== null ? guardConflictCount : detail.length;
+
 // ---- MESSAGE ---------------------------------------------------------------
 const lines = [];
 lines.push('INTEGRITY HALT');
@@ -167,7 +197,7 @@ lines.push('Reason:');
 lines.push('  ' + (reason || 'No reason string was recorded.'));
 if (shown.length) {
   lines.push('');
-  lines.push('Conflicting records (' + detail.length + '):');
+  lines.push('Conflicting records (' + headingCount + '):');
   shown.forEach(l => lines.push(l));
   if (hidden) lines.push('  ... and ' + hidden + ' more. The full list is in the execution record.');
 }
@@ -223,7 +253,8 @@ return [{ json: {
   halt_action_id: actionId,
   halt_approval_id: approvalId,
   halt_route_group: routeGroup,
-  halt_conflict_count: detail.length,
+  halt_conflict_count: headingCount,
+  halt_conflict_record_count: detail.length,
   halt_audit_message: auditMessage,
   dry_run: dryRun,
 } }];

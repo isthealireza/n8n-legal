@@ -55,7 +55,7 @@ reason this node exists. The owner is told the milder of the two.
 id is reported twice, once per class. Nothing is lost (`integrity_detail` carries the full
 list) but the count in the notice is double the number of ambiguous actions.
 
-**Status — half fixed in the repo, NOT ported to n8n, NOT published (2026-08-28).**
+**Status — fixed in the repo, NOT ported to n8n, NOT published (2026-08-28).**
 Production still has this defect today; the harness no longer fails on it because the
 unit is ahead of the live node. The fix: rank `conflicts` by a declared severity order
 before taking the headline, with `DUPLICATE_ACTION_ID_FIELD_MISMATCH` above
@@ -67,10 +67,14 @@ before taking the headline, with `DUPLICATE_ACTION_ID_FIELD_MISMATCH` above
 Halt Notice, its MAX_DETAIL slice and its deterministic event_id seed see exactly what
 they saw before.
 
-**Open half (Build Integrity Halt Notice).** The notice node still echoes
-`detail.length` into the owner-facing heading and the audit row (`halt_conflict_count`),
-re-introducing the double count in the notice. That is the second node; it needs its own
-change and its own scenario (see the follow-up commit on this branch).
+**The notice half is fixed too (D-COUNT-01, same commit line, same caveats).**
+Build Integrity Halt Notice previously echoed `detail.length` into the owner-facing
+heading and the audit row (`halt_conflict_count`), re-introducing the double count in
+the notice. It now reads `integrity_conflict_count` when the guard supplies it and falls
+back to `integrity_detail.length` for every other containment shape; the raw record
+count is carried as `halt_conflict_record_count` so the Events audit row loses nothing.
+Both units are ahead of the published nodes — port both to the n8n draft and have the
+owner publish before re-extracting.
 
 **One caveat, stated because it changes who should fix it.** The QA workflow copied the
 guard from WF4 draft `5a2a208f`; the unit here is extracted from `exports/wf4.active.json`. If the
