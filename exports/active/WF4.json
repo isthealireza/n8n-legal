@@ -3,7 +3,7 @@
     "active_version_id": "902130f4-58d0-4189-bf80-273c753c9c34",
     "capture_time": "see exports/last-run.json (untracked, so an unchanged capture does not produce a commit)",
     "draft_active_determination": "from_active_version_object",
-    "draft_version_id": "8107c96f-57cd-4b77-a9bb-638a676d7926",
+    "draft_version_id": "470120af-9909-4760-89d9-fc78e4074d75",
     "key": "WF4",
     "kind": "active",
     "scrub_counts": {
@@ -7227,8 +7227,8 @@
     "staticData": null,
     "tags": [],
     "triggerCount": 0,
-    "updatedAt": "2026-08-27T02:33:23.567Z",
-    "versionCounter": 76,
+    "updatedAt": "2026-08-28T18:05:17.418Z",
+    "versionCounter": 77,
     "versionId": "902130f4-58d0-4189-bf80-273c753c9c34"
   }
 }

@@ -65,18 +65,18 @@
       "active": {
         "kind": "active",
         "path": "exports/active/WF4.json",
-        "sha256_body": "7cb6fb4de16b20da06461efba9c0137833135bb942ef2ed2d0c05c758e870355",
-        "sha256_canonical": "0a4f08411bde3f36252df65e5385b47a6632cfd28fed8e8b4272c0a37e204a2d"
+        "sha256_body": "8f116dde4fdebc89cbda8fec4ad1df5dbde5d2023679095a4a894a966906a6ee",
+        "sha256_canonical": "7b17c62fd22ad02cd2770600916d5e1aa6238ec5c9bd87ff6a94d5354d0e8769"
       },
       "active_version_id": "902130f4-58d0-4189-bf80-273c753c9c34",
       "determination": "from_active_version_object",
       "draft": {
         "kind": "draft",
         "path": "exports/draft/WF4.json",
-        "sha256_body": "199f8b02e793d49172b6982eb903039573258d385c146332a3e943b16c09fc00",
-        "sha256_canonical": "3a247d6610519b5236a9796fa2ee573f70a331ecf05b90512bf517d655caff54"
+        "sha256_body": "827a6c1c1be6db01ea56096a13b46afef3016d52ee872fb11eba1efeb10ef494",
+        "sha256_canonical": "6d426e2cb2211d525d0442b72644b4e0748b647b5fb1150a07f23bb36fe249c6"
       },
-      "draft_version_id": "8107c96f-57cd-4b77-a9bb-638a676d7926",
+      "draft_version_id": "470120af-9909-4760-89d9-fc78e4074d75",
       "id": "zKr24IThF30e6jXw",
       "name": "4 - Research Drafting Approval and Dispatch"
     },

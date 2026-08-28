@@ -7,7 +7,8 @@ in `exports/last-run.json`, which is untracked.
 
 ## Changed since last sync
 
-- Nothing. Every captured body hashes identically to the previous sync.
+- WF4: active body changed
+- WF4: draft body changed
 
 ## Per-workflow state
 
@@ -16,6 +17,6 @@ in `exports/last-run.json`, which is untracked.
 | WF1 | 1 - Telegram Intake and Command Router | ok | `938bc6f52c9b` | yes | `9ebbe0a3b91b` |
 | WF2 | 2 - Matter Classification and Planning | ok | `bffc63875972` | yes | `e22a203d8545` |
 | WF3 | 3 - Evidence Intake and Storage | ok | `4c3221a9fefb` | yes | `fd755d445499` |
-| WF4 | 4 - Research Drafting Approval and Dispatch | ok | `0a4f08411bde` | yes | `3a247d661051` |
+| WF4 | 4 - Research Drafting Approval and Dispatch | ok | `7b17c62fd22a` | yes | `6d426e2cb221` |
 | WF5 | 5 - Inbound Replies and Daily Supervisor | ok | `d01a86c60cec` | no | - |
 | WF9 | 9 - Error Handler | ok | `457c0d6d893f` | yes | `91e829b646dd` |
