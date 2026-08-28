@@ -36,7 +36,19 @@ EXCLUDES=(--exclude-dir=.git --exclude-dir=node_modules --exclude-dir=__pycache_
           # never be committed or pushed. Scanning it in working-tree mode makes
           # the gate fail on a file that cannot leak through git. --staged mode
           # never sees it (it is never staged). See docs/orca-setup.md Step 1.
-          --exclude=.mcp.json)
+          --exclude=.mcp.json
+          # Same reasoning, found 2026-08-28. An Orca Fast Lane worktree carries
+          # three files that git can never carry: `.git` is a FILE in a worktree
+          # (`gitdir: ...`), not a directory, so --exclude-dir=.git misses it; and
+          # the coordinator writes .fastlane-orchestrator-prompt.md,
+          # .fastlane-test-leg-result.txt and .fastlane-orchestrator-done.txt into
+          # the worktree root as local scratch (now gitignored). All three quote the
+          # worktree path, whose branch-derived suffix `-135227` reads as an
+          # Australian 13xxxx number to the pattern below, so the gate failed in
+          # working-tree mode on files that cannot leak through git. --staged mode
+          # never sees them.
+          --exclude=.git
+          --exclude=.fastlane-*)
 
 # Line-level allowances: strings that MATCH a pattern below but are provably
 # not secrets. sha256OfJsCode / sha256(jsCode) are digests of the node code

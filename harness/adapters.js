@@ -362,7 +362,19 @@ const integrityGuard = {
         case 'scope_label':
           checks.push(mk(k, e[k], out.integrity_scope
             || ((out.integrity_reason || '').match(/could be selected for (.+?)\./) || [])[1])); break;
-        case 'conflict_count': checks.push(mk(k, e[k], (out.integrity_detail || []).length)); break;
+        case 'conflict_count':
+          // BINDING, not expectation. The mined QA workflows meant "how many
+          // ambiguous ACTIONS did the guard report", but until 2026-08-28 the node
+          // published no such number, so this adapter approximated it with the
+          // length of integrity_detail. That approximation is exactly the
+          // double-count FINDINGS.md section 1 records: every duplicated action_id
+          // appears in integrity_detail once per conflict class, so 6 ambiguous
+          // actions read as 12. The guard now states the number itself. Read the
+          // real field, and keep the old approximation only for the pre-fix shape.
+          // The expected value in every scenario is unchanged.
+          checks.push(mk(k, e[k], typeof out.integrity_conflict_count === 'number'
+            ? out.integrity_conflict_count
+            : (out.integrity_detail || []).length)); break;
         case 'reaches_approval_gate': case 'reaches_drafting':
           checks.push(mk(k, e[k], out.integrity_ok === true)); break;
         case 'selected_action_id': checks.push(mk(k, e[k], out.selected_action_id)); break;

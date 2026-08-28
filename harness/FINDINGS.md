@@ -5,8 +5,10 @@ harness binding was checked and is correct, the scenario's `expect` was checked 
 source QA workflow and is not a transcription slip, and the extracted production code
 genuinely does something else. **Neither side was changed.**
 
-Reproduce with `node harness/run.js`. Three scenarios fail: two on the same WF4 defect (§1),
-one on a WF5 scenario that was written against unpublished code (§3).
+Reproduce with `node harness/run.js`. **Status 2026-08-28:** §1 is now FIXED IN THE REPO
+(`harness/units/wf4/integrity-guard.js`) and its two scenarios pass; the fix has **not** been
+ported to the n8n draft and has **not** been published, so the live node still has the defect.
+One scenario still fails: the WF5 one written against unpublished code (§3).
 
 ---
 
@@ -55,10 +57,29 @@ reason this node exists. The owner is told the milder of the two.
 id is reported twice, once per class. Nothing is lost (`integrity_detail` carries the full
 list) but the count in the notice is double the number of ambiguous actions.
 
-**What a fix would look like** (not applied): rank `conflicts` by a declared severity order
-before taking the headline, with `DUPLICATE_ACTION_ID_FIELD_MISMATCH` above
-`DUPLICATE_IDEMPOTENCY_KEY` above `DUPLICATE_ACTION_ID`, and count distinct in-scope
-`action_id`s rather than conflict entries.
+**The fix, applied to the repo unit on 2026-08-28** (branch
+the current Fast Lane branch; **not** ported to n8n, **not**
+published, so production still behaves as described above):
+
+- `conflicts` is ranked by a declared `CONFLICT_SEVERITY` order before the headline is taken —
+  `DUPLICATE_ACTION_ID_FIELD_MISMATCH` > `DUPLICATE_IDEMPOTENCY_KEY` > `DUPLICATE_ACTION_ID` >
+  `BLANK_ACTION_ID` > `BLANK_IDEMPOTENCY_KEY` > `ACTION_NOT_FOUND`, ties broken by push order so
+  a rerun of the same snapshot always names the same conflict.
+- the guard now publishes `integrity_conflict_count` — distinct in-scope `action_id`s implicated,
+  6 on the `MAT-20260101-002` snapshot — alongside `integrity_conflict_record_count` (12), and
+  says both in `integrity_reason`.
+- `integrity_detail` is **unchanged**: same 12 entries, same register order. Nothing is dropped
+  and `Build Integrity Halt Notice` sees exactly what it saw before, including its deterministic
+  `event_id` seed.
+- `harness/adapters.js` now binds the scenarios' `conflict_count` key to
+  `integrity_conflict_count` when the node publishes it, falling back to `integrity_detail.length`
+  for the pre-fix shape. The scenarios' expected values were not touched.
+
+**Still open, deliberately out of scope of that change.** `Build Integrity Halt Notice`
+(`harness/units/wf4/build-integrity-halt-notice.js`) computes `halt_conflict_count` as
+`detail.length`, so the audit row and the "Conflicting records (N)" heading still say 12 where
+the guard now says 6 ambiguous actions. Fixing that means editing a second node and deserves its
+own change and its own scenario — see AGENTS.md §6.
 
 **One caveat, stated because it changes who should fix it.** The QA workflow copied the
 guard from WF4 draft `5a2a208f`; the unit here is extracted from `exports/wf4.active.json`. If the

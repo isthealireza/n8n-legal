@@ -4,10 +4,19 @@
 // Node id         : 7bee0e49-ab5e-471d-9a88-4da7d736e459
 // Node mode       : runOnceForAllItems
 // sha256(jsCode)  : 039f3be3be2522fd5f38a3941912231cab0f9a348b0ba6a020bac34a374bbe22
+//                   ^ the sha of the PUBLISHED node, as captured in
+//                     exports/wf4.active.json and harness/units/index.json.
+//                     Left untouched on purpose: it is the record of what is
+//                     running in n8n right now.
 //
-// The code between the BEGIN/END markers below is byte-identical to the
-// node's parameters.jsCode in the workflow export. Everything outside the
-// markers is harness scaffolding.
+// 2026-08-28 -- THIS FILE NOW DIVERGES FROM THAT SHA, DELIBERATELY.
+// The block between the BEGIN/END markers carries the FINDINGS.md section 1 fix
+// (conflict severity ranking + distinct in-scope action_id count). It has NOT
+// been ported to the n8n draft and has NOT been published, so the live node
+// still headlines DUPLICATE_IDEMPOTENCY_KEY. Re-running
+// .tooling/extract-units.py against the current exports/wf4.active.json WILL
+// overwrite this fix -- port it to the draft and have the owner publish first,
+// then re-extract. Everything outside the markers is still harness scaffolding.
 //
 // Usage:
 //   const { makeContext } = require('../../n8n-shim');
@@ -183,13 +192,87 @@ scopeIds.forEach(id => {
   selected[id] = rows[0].ref;   // exactly one row: first === last, unambiguous
 });
 
+// ---- 6. Headline the WORST conflict, and count AMBIGUOUS ACTIONS. ----------
+// INCIDENT (harness/FINDINGS.md section 1, reproduced 2026-08-25 by
+// node harness/run.js, scenarios wf4-guard-conflicted-action-approval-route (C2)
+// and wf4-guard-conflicted-matter-draft-route (C1), both mined from
+// hTz7VbLHENx8ZB1N "QA - WF4 Integrity Guard Runtime").
+//
+// WHAT THE OLD CODE DID.  `const worst = conflicts[0];` -- it took the FIRST
+// element of the accumulator and called it the worst. The pushes above happen in
+// a fixed statement order (blank action_id, blank idempotency_key, duplicate
+// idempotency_key, then per-action_id duplicate / field mismatch), so `worst`
+// held whichever class the code happened to push first, not the most serious one.
+//
+// WHY THAT IS DANGEROUS.  On the real MAT-20260101-002 snapshot every duplicated
+// action_id ALSO shares its idempotency_key, so both classes fire. The owner was
+// therefore told `DUPLICATE_IDEMPOTENCY_KEY` ("two writes share a key") when the
+// truth was `DUPLICATE_ACTION_ID_FIELD_MISMATCH` ("two rows under one action id
+// disagree about recipient and channel") -- the condition that could put a
+// CONTACT_INSURER letter in front of a car park manager, and the entire reason
+// this node exists. integrity_code is carried into Build Integrity Halt Notice
+// and shown to the owner verbatim, so the owner was handed the milder of the two.
+//
+// AND THE COUNT.  The reason string said `conflicts.length` -- 12 on that
+// snapshot, against 6 genuinely ambiguous action_ids, because every duplicated id
+// is reported once per class. Double the real number of things to fix.
+//
+// THE FIX. (a) rank by a DECLARED severity order and headline the worst;
+// (b) count DISTINCT in-scope action_ids that are implicated, not accumulator
+// entries. integrity_detail is still the complete, unreordered list -- nothing is
+// dropped, nothing is arbitrated, and Build Integrity Halt Notice sees exactly
+// what it saw before. This node still refuses to choose a row; ranking decides
+// only which sentence the owner reads first.
+
+// Declared severity, worst first. Ordered by how badly the ambiguity could
+// misdirect a real send, NOT by push order and NOT by how many rows it touches.
+const CONFLICT_SEVERITY = [
+  'DUPLICATE_ACTION_ID_FIELD_MISMATCH', // rows disagree on recipient/channel: wrong party
+  'DUPLICATE_IDEMPOTENCY_KEY',          // two writes share a key: wrong row updated
+  'DUPLICATE_ACTION_ID',                // same id, same content: still unaddressable
+  'BLANK_ACTION_ID',                    // row cannot be addressed at all
+  'BLANK_IDEMPOTENCY_KEY',
+  'ACTION_NOT_FOUND',
+];
+function severityRank(code) {
+  const i = CONFLICT_SEVERITY.indexOf(String(code));
+  return i === -1 ? CONFLICT_SEVERITY.length : i;   // unknown codes rank last
+}
+
 if (conflicts.length) {
-  const worst = conflicts[0];
-  return halt(worst.code,
+  // Rank a COPY. conflicts (and therefore integrity_detail) keeps register order,
+  // so the halt notice, its MAX_DETAIL slice and its deterministic event_id seed
+  // are all byte-for-byte what they were before this fix.
+  let worst = conflicts[0];
+  for (let i = 1; i < conflicts.length; i++) {
+    // Strictly-less-than keeps the earlier push on a tie: stable, so a rerun of
+    // the same snapshot always names the same conflict.
+    if (severityRank(conflicts[i].code) < severityRank(worst.code)) worst = conflicts[i];
+  }
+
+  // Distinct ambiguous action_ids. A DUPLICATE_IDEMPOTENCY_KEY entry can span two
+  // different ids, so read its rows too. A BLANK_ACTION_ID entry has no id to
+  // count by definition -- it gets a synthetic key so one blank row counts once.
+  const ambiguousIds = {};
+  conflicts.forEach(c => {
+    const id = S(c.action_id);
+    if (id) ambiguousIds[id] = true;
+    (c.rows || []).forEach(r => { if (S(r.action_id)) ambiguousIds[S(r.action_id)] = true; });
+    if (c.code === 'BLANK_ACTION_ID') ambiguousIds['#blank@' + c.snapshot_index] = true;
+  });
+  const conflictCount = Object.keys(ambiguousIds).length;
+
+  const out = halt(worst.code,
     'More than one Action row could be selected for ' + scopeLabel
     + '. I will not choose between them, and I will not draft, approve, write state or send'
-    + ' until a human decides which row is the action. ' + conflicts.length + ' conflict(s) found.',
+    + ' until a human decides which row is the action. ' + conflictCount
+    + ' ambiguous action(s) found, reported as ' + conflicts.length + ' conflict record(s).',
     conflicts);
+  // Explicit, so nothing downstream has to infer the number from the length of a
+  // list that deliberately reports the same action under more than one class.
+  out[0].json.integrity_conflict_count = conflictCount;
+  out[0].json.integrity_conflict_record_count = conflicts.length;
+  return out;
 }
 
 // ---- Unambiguous. Carry the selection forward. ------------------------------
