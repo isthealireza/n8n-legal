@@ -1,0 +1,81 @@
+{
+  "workflow": "wf4",
+  "unit": "WF4 Integrity Guard detail order preserved across ranking",
+  "kind": "pure",
+  "id": "wf4-integrity-detail-order-preserved-by-ranking",
+  "description": "The ranking fix must change the HEADLINE, never the LIST: even though integrity_code names the LATER-pushed, higher-severity conflict (DUPLICATE_ACTION_ID_FIELD_MISMATCH, rank 0), the emitted integrity_detail array stays in the guard's push order — the EARLIER-pushed DUPLICATE_IDEMPOTENCY_KEY (rank 1) is still detail[0]. That order is what protects Build Integrity Halt Notice's MAX_DETAIL slice and its deterministic event_id seed, both of which hash and render the exact sequence. This scenario feeds the halt notice the exact halt item a DRAFT-route guard would emit after the fix and pins the order with a byte-exact event_id plus the two rendered detail lines in that order.",
+  "why_it_exists": "harness/FINDINGS.md section 1 fix explicitly contracts the list: 'Rank a COPY. conflicts (and therefore integrity_detail) keeps register order, so the halt notice, its MAX_DETAIL slice and its deterministic event_id seed are all byte-for-byte what they were before this fix.' No existing scenario checks that property: the two guard scenarios (wf4-integrity-severity-headlines-field-mismatch, wf4-integrity-conflict-count-distinct-ids) assert only the headline code and the count — the integrity-guard adapter has no detail keys — and the two notice scenarios (wf4-integrity-halt-notice-counts, wf4-integrity-halt-notice-fallback) assert counts but never pin an event_id or the order of the rendered detail lines. A future change that sorted integrity_detail by severity would keep all those checks green while silently re-ordering the owner-facing slice and the Events row id. This scenario closes that gap by pinning event_id = EVT-INTEGRITY-fnv1a exactly over [DIK, FIELD_MISMATCH] and asserting the reply shows the DIK line before the FIELD_MISMATCH line.",
+  "input": {
+    "now": "2026-08-23T06:00:00.000Z",
+    "items": [
+      {
+        "integrity_ok": false,
+        "gate": "DATA_INTEGRITY_CONFLICT",
+        "integrity_code": "DUPLICATE_ACTION_ID_FIELD_MISMATCH",
+        "integrity_reason": "More than one Action row could be selected for matter MAT-20260101-002. I will not choose between them, and I will not draft, approve, write state or send until a human decides which row is the action. 1 ambiguous action(s) found, reported as 2 conflict record(s).",
+        "integrity_conflict_count": 1,
+        "integrity_conflict_record_count": 2,
+        "integrity_detail": [
+          {
+            "code": "DUPLICATE_IDEMPOTENCY_KEY",
+            "idempotency_key": "MAT-20260101-002|001",
+            "rows": [
+              { "snapshot_index": 0, "fingerprint": "FP-11111111aaaaaaaa", "action_id": "ACT-20260101-002-001", "idempotency_key": "MAT-20260101-002|001", "action_type": "OBTAIN_REPAIR_QUOTE", "created_at": "2026-08-19T17:15:07.880Z" },
+              { "snapshot_index": 1, "fingerprint": "FP-22222222bbbbbbbb", "action_id": "ACT-20260101-002-001", "idempotency_key": "MAT-20260101-002|001", "action_type": "FOLLOW_UP", "created_at": "2026-08-19T17:54:35.511Z" }
+            ]
+          },
+          {
+            "code": "DUPLICATE_ACTION_ID_FIELD_MISMATCH",
+            "action_id": "ACT-20260101-002-001",
+            "row_count": 2,
+            "differing_fields": ["recipient", "channel"],
+            "candidates": [
+              { "snapshot_index": 0, "fingerprint": "FP-11111111aaaaaaaa", "action_id": "ACT-20260101-002-001", "idempotency_key": "MAT-20260101-002|001", "action_type": "OBTAIN_REPAIR_QUOTE", "created_at": "2026-08-19T17:15:07.880Z" },
+              { "snapshot_index": 1, "fingerprint": "FP-22222222bbbbbbbb", "action_id": "ACT-20260101-002-001", "idempotency_key": "MAT-20260101-002|001", "action_type": "FOLLOW_UP", "created_at": "2026-08-19T17:54:35.511Z" }
+            ]
+          }
+        ],
+        "matter_id": "MAT-20260101-002",
+        "action_id": "ACT-20260101-002-001",
+        "route_group": "DRAFT",
+        "passthrough_marker": "PASSTHROUGH-OK"
+      }
+    ],
+    "nodeOutputs": {
+      "Config": [
+        {
+          "matter_id": "MAT-20260101-002",
+          "approval_id": "",
+          "route_group": "DRAFT",
+          "dry_run": "true"
+        }
+      ]
+    }
+  },
+  "expect": {
+    "reaches": "Halt - Data Integrity Conflict",
+    "halt_code": "DUPLICATE_ACTION_ID_FIELD_MISMATCH",
+    "halt_stage": "PRE_DRAFT_INTEGRITY_GUARD",
+    "halt_conflict_count": 1,
+    "halt_conflict_record_count": 2,
+    "event_id": "EVT-INTEGRITY-09B3CF38",
+    "reply_contains": "Conflicting records (1):\n  DUPLICATE_IDEMPOTENCY_KEY  key MAT-20260101-002|001\n  DUPLICATE_ACTION_ID_FIELD_MISMATCH  action ACT-20260101-002-001",
+    "event_type": "DATA_INTEGRITY_HALT"
+  },
+  "assertions": [
+    "integrity_code names the LATER-pushed, higher-severity conflict (DUPLICATE_ACTION_ID_FIELD_MISMATCH, rank 0) while integrity_detail still leads with the EARLIER-pushed DUPLICATE_IDEMPOTENCY_KEY (rank 1): ranking changed the headline only, never the list",
+    "the integrity_detail array is exactly [DUPLICATE_IDEMPOTENCY_KEY, DUPLICATE_ACTION_ID_FIELD_MISMATCH] — the guard's push order, which is the register order",
+    "the deterministic event_id is pinned byte-for-byte to the seed over that exact sequence: any reordering of integrity_detail changes seed['detail-code:action_id chain'] and fails",
+    "the MAX_DETAIL slice renders the two detail lines in that same order inside the reply, DIK first, FIELD_MISMATCH second",
+    "halt_conflict_count is the guard's distinct count (1) and halt_conflict_record_count carries the raw records (2), so the notice still agrees with the reason string",
+    "halt_code and halt_stage classify the item as a pre-draft Integrity Guard halt",
+    "the passthrough fields survive onto the notice item"
+  ],
+  "target": {
+    "workflow": "wf4",
+    "unit_file": "harness/units/wf4/build-integrity-halt-notice.js"
+  },
+  "harness": {
+    "adapter": "integrity-halt-notice"
+  }
+}

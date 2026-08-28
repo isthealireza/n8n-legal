@@ -1,0 +1,261 @@
+{
+  "workflow": "wf4",
+  "unit": "WF4 Integrity Guard severity tie keeps the earlier push",
+  "kind": "pure",
+  "id": "wf4-integrity-severity-tie-keeps-earlier-push",
+  "description": "Two conflicts that carry the SAME severity code — two DUPLICATE_IDEMPOTENCY_KEY entries, one per duplicated key — must leave the EARLIER-pushed one as the headline: the ranking scan is strictly-less-than, so a tie never replaces `worst` and a rerun of the same snapshot names the same conflict. The reason string must still separate DISTINCT ambiguous actions (5 action_ids, read across both keys' rows) from conflict records (2).",
+  "why_it_exists": "harness/FINDINGS.md section 1 fix: `if (severityRank(conflicts[i].code) < severityRank(worst.code)) worst = conflicts[i];` is deliberately strict so equal ranks keep the earlier push. Every other ranking scenario in the suite compares DIFFERENT ranks — wf4-integrity-severity-headlines-field-mismatch ranks DUPLICATE_IDEMPOTENCY_KEY (1) against DUPLICATE_ACTION_ID_FIELD_MISMATCH (0) and wf4-integrity-conflict-count-distinct-ids does the same pair — so none of them can prove what a same-rank tie does. This fixture pushes key 'MAT-20260101-010|004' first (spanning ids 004 and 005) and key 'MAT-20260101-010|006' second (spanning ids 006, 007 and 008): both rank 1, the first stays the headline, and the count reads five distinct ids reported as two records — a stricter distinct-vs-record split than any existing scenario.",
+  "input": {
+    "case_id": "C1",
+    "config": {
+      "matter_id": "MAT-20260101-010",
+      "route_group": "DRAFT",
+      "dry_run": "true"
+    },
+    "actions": [
+      {
+        "action_id": "ACT-20260101-010-004",
+        "matter_id": "MAT-20260101-010",
+        "action_type": "COLLECT_FACTS",
+        "status": "READY",
+        "priority": "HIGH",
+        "depends_on_json": "[]",
+        "recipient": "owner (Alex)",
+        "channel": "MANUAL",
+        "requires_approval": "TRUE",
+        "draft_id": "",
+        "approval_id": "",
+        "due_at": "",
+        "deadline_basis": "",
+        "blocked_reason": "",
+        "idempotency_key": "MAT-20260101-010|004",
+        "created_at": "2026-08-19T17:15:07.880Z",
+        "updated_at": "2026-08-19T17:15:07.880Z"
+      },
+      {
+        "action_id": "ACT-20260101-010-005",
+        "matter_id": "MAT-20260101-010",
+        "action_type": "RESEARCH_SOURCES",
+        "status": "READY",
+        "priority": "LOW",
+        "depends_on_json": "[]",
+        "recipient": "",
+        "channel": "NONE",
+        "requires_approval": "FALSE",
+        "draft_id": "",
+        "approval_id": "",
+        "due_at": "",
+        "deadline_basis": "",
+        "blocked_reason": "",
+        "idempotency_key": "MAT-20260101-010|004",
+        "created_at": "2026-08-19T17:30:00.000Z",
+        "updated_at": "2026-08-19T17:30:00.000Z"
+      },
+      {
+        "action_id": "ACT-20260101-010-006",
+        "matter_id": "MAT-20260101-010",
+        "action_type": "COLLECT_EVIDENCE",
+        "status": "READY",
+        "priority": "HIGH",
+        "depends_on_json": "[]",
+        "recipient": "owner (Alex)",
+        "channel": "MANUAL",
+        "requires_approval": "TRUE",
+        "draft_id": "",
+        "approval_id": "",
+        "due_at": "",
+        "deadline_basis": "",
+        "blocked_reason": "",
+        "idempotency_key": "MAT-20260101-010|006",
+        "created_at": "2026-08-19T17:22:07.880Z",
+        "updated_at": "2026-08-19T17:22:07.880Z"
+      },
+      {
+        "action_id": "ACT-20260101-010-007",
+        "matter_id": "MAT-20260101-010",
+        "action_type": "DRAFT_LETTER",
+        "status": "READY",
+        "priority": "LOW",
+        "depends_on_json": "[]",
+        "recipient": "",
+        "channel": "NONE",
+        "requires_approval": "FALSE",
+        "draft_id": "",
+        "approval_id": "",
+        "due_at": "",
+        "deadline_basis": "",
+        "blocked_reason": "",
+        "idempotency_key": "MAT-20260101-010|006",
+        "created_at": "2026-08-19T17:35:00.000Z",
+        "updated_at": "2026-08-19T17:35:00.000Z"
+      },
+      {
+        "action_id": "ACT-20260101-010-008",
+        "matter_id": "MAT-20260101-010",
+        "action_type": "SUBMIT_CLAIM",
+        "status": "READY",
+        "priority": "LOW",
+        "depends_on_json": "[]",
+        "recipient": "",
+        "channel": "NONE",
+        "requires_approval": "FALSE",
+        "draft_id": "",
+        "approval_id": "",
+        "due_at": "",
+        "deadline_basis": "",
+        "blocked_reason": "",
+        "idempotency_key": "MAT-20260101-010|006",
+        "created_at": "2026-08-19T17:45:00.000Z",
+        "updated_at": "2026-08-19T17:45:00.000Z"
+      }
+    ],
+    "approvals": [],
+    "passthrough": {
+      "route": "QA",
+      "chat_id": "QA-CHAT",
+      "dry_run": "true",
+      "passthrough_marker": "PASSTHROUGH-OK"
+    },
+    "now": "2026-08-23T06:00:00.000Z",
+    "items": [
+      {
+        "route": "QA",
+        "chat_id": "QA-CHAT",
+        "dry_run": "true",
+        "passthrough_marker": "PASSTHROUGH-OK"
+      }
+    ],
+    "nodeOutputs": {
+      "Config": [
+        {
+          "matter_id": "MAT-20260101-010",
+          "route_group": "DRAFT",
+          "dry_run": "true"
+        }
+      ],
+      "Load Actions": [
+        {
+          "action_id": "ACT-20260101-010-004",
+          "matter_id": "MAT-20260101-010",
+          "action_type": "COLLECT_FACTS",
+          "status": "READY",
+          "priority": "HIGH",
+          "depends_on_json": "[]",
+          "recipient": "owner (Alex)",
+          "channel": "MANUAL",
+          "requires_approval": "TRUE",
+          "draft_id": "",
+          "approval_id": "",
+          "due_at": "",
+          "deadline_basis": "",
+          "blocked_reason": "",
+          "idempotency_key": "MAT-20260101-010|004",
+          "created_at": "2026-08-19T17:15:07.880Z",
+          "updated_at": "2026-08-19T17:15:07.880Z"
+        },
+        {
+          "action_id": "ACT-20260101-010-005",
+          "matter_id": "MAT-20260101-010",
+          "action_type": "RESEARCH_SOURCES",
+          "status": "READY",
+          "priority": "LOW",
+          "depends_on_json": "[]",
+          "recipient": "",
+          "channel": "NONE",
+          "requires_approval": "FALSE",
+          "draft_id": "",
+          "approval_id": "",
+          "due_at": "",
+          "deadline_basis": "",
+          "blocked_reason": "",
+          "idempotency_key": "MAT-20260101-010|004",
+          "created_at": "2026-08-19T17:30:00.000Z",
+          "updated_at": "2026-08-19T17:30:00.000Z"
+        },
+        {
+          "action_id": "ACT-20260101-010-006",
+          "matter_id": "MAT-20260101-010",
+          "action_type": "COLLECT_EVIDENCE",
+          "status": "READY",
+          "priority": "HIGH",
+          "depends_on_json": "[]",
+          "recipient": "owner (Alex)",
+          "channel": "MANUAL",
+          "requires_approval": "TRUE",
+          "draft_id": "",
+          "approval_id": "",
+          "due_at": "",
+          "deadline_basis": "",
+          "blocked_reason": "",
+          "idempotency_key": "MAT-20260101-010|006",
+          "created_at": "2026-08-19T17:22:07.880Z",
+          "updated_at": "2026-08-19T17:22:07.880Z"
+        },
+        {
+          "action_id": "ACT-20260101-010-007",
+          "matter_id": "MAT-20260101-010",
+          "action_type": "DRAFT_LETTER",
+          "status": "READY",
+          "priority": "LOW",
+          "depends_on_json": "[]",
+          "recipient": "",
+          "channel": "NONE",
+          "requires_approval": "FALSE",
+          "draft_id": "",
+          "approval_id": "",
+          "due_at": "",
+          "deadline_basis": "",
+          "blocked_reason": "",
+          "idempotency_key": "MAT-20260101-010|006",
+          "created_at": "2026-08-19T17:35:00.000Z",
+          "updated_at": "2026-08-19T17:35:00.000Z"
+        },
+        {
+          "action_id": "ACT-20260101-010-008",
+          "matter_id": "MAT-20260101-010",
+          "action_type": "SUBMIT_CLAIM",
+          "status": "READY",
+          "priority": "LOW",
+          "depends_on_json": "[]",
+          "recipient": "",
+          "channel": "NONE",
+          "requires_approval": "FALSE",
+          "draft_id": "",
+          "approval_id": "",
+          "due_at": "",
+          "deadline_basis": "",
+          "blocked_reason": "",
+          "idempotency_key": "MAT-20260101-010|006",
+          "created_at": "2026-08-19T17:45:00.000Z",
+          "updated_at": "2026-08-19T17:45:00.000Z"
+        }
+      ],
+      "Load Approvals": []
+    }
+  },
+  "expect": {
+    "integrity_ok": false,
+    "gate": "DATA_INTEGRITY_CONFLICT",
+    "integrity_code": "DUPLICATE_IDEMPOTENCY_KEY",
+    "reaches": "Halt - Data Integrity Conflict",
+    "reaches_drafting": false,
+    "conflict_count": 5
+  },
+  "assertions": [
+    "two conflict records share the SAME severity code — DUPLICATE_IDEMPOTENCY_KEY (rank 1), one per duplicated key — which no existing scenario pins",
+    "the scan is strictly-less-than, so the EARLIER-pushed key ('MAT-20260101-010|004', the first duplicated key encountered in Load Actions order) stays the headline and the later-pushed key never replaces it",
+    "a rerun of the same snapshot names the same conflict: the tie is stable by construction, not by luck",
+    "conflict_count is 5 — the five DISTINCT action_ids read across both keys' rows (004, 005 and 006, 007, 008) — NOT 2, the number of conflict records",
+    "the reason string reads '5 ambiguous action(s) found, reported as 2 conflict record(s).'",
+    "integrity_detail still lists the two DUPLICATE_IDEMPOTENCY_KEY records in push (register) order — ranking happened on a copy",
+    "the Build Draft Context branch is never reached",
+    "the passthrough fields (route, chat_id, dry_run, passthrough_marker) survive onto the halt item"
+  ],
+  "target": {
+    "workflow": "wf4",
+    "unit_file": "harness/units/wf4/integrity-guard.js"
+  },
+  "harness": {
+    "adapter": "integrity-guard"
+  }
+}
