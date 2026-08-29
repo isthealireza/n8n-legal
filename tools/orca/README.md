@@ -84,6 +84,17 @@ the flow resumes. `orca orchestration ask` is worker-to-coordinator only and is
 NOT used for owner approval (it fails from the coordinator with
 `dispatch_inactive`, proven 2026-08-28).
 
+**Coordinator timeout is collect-pending, not task failure.** `fastlane.ps1`
+waits `-LegTimeoutSec` (default 1800) for the orchestrator's DONE file, then
+extends by `-LegTimeoutExtensionSec` (default 3600) before failing. Live n8n
+runs routinely take 30–90 minutes (opencode/DeepSeek TUI + live MCP inspection
++ owner decision-gate waits), so pass a larger `-LegTimeoutSec` (e.g. 5400) for
+live tasks. If the timeout still fires, the orchestrator terminal stays live and
+a late DONE file can still be collected manually: push the worktree branch and
+create the ONE PR with the DONE report as the body (incident 2026-08-29,
+`retry-live-wf4-inspection` — DONE file arrived 30 minutes after the timeout;
+the run was wrongly marked FAILED and PR #14 was collected manually).
+
 ## Gates (enforced by gate.ps1)
 
 1. **Harness**: `node harness/run.js` → passed ≥ 81 and failed ≤ 3. The 3
