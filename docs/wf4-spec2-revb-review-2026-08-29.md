@@ -523,3 +523,12 @@ refused was the *framing*: §3.7 answered "can the draft be considered for publi
 "yes, as a candidate", which reads as a qualified go when the honest answer is a no-go with a
 route to yes. §3.7 and §5.3 were rewritten to say that plainly. No finding, no test and no
 assertion was changed, because none was disputed.
+
+**Round 2 — APPROVE, "round-1 framing fix is complete".** Codex re-read the document and
+`c056bc5` and found no remaining defect: the qualified-GO ambiguity is gone, §7 accurately
+records the prior REFUTE and that the drafted gate was read rather than run, and no n8n change
+occurred. Its seven answers are unchanged from round 1, with (5) restated as *"the draft is
+not safe to publish today"* and (6) as the four §5.3 conditions.
+
+**Two REFUTE rounds were available; one was used.** The final verdict is APPROVE — of *this
+review record*, not of the draft. The draft's verdict is §3.7: NO-GO.
