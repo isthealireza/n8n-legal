@@ -1,0 +1,87 @@
+{
+  "workflow": "wf4",
+  "unit": "WF4 Approval Gate marks a draft STALE when its content_hash no longer matches the approval token",
+  "kind": "pure",
+  "id": "wf4-gate-draft-content-hash-mismatch-stale",
+  "description": "A decision that names an approval whose token_hash_or_reference no longer matches the draft's current content_hash must return gate STALE: the draft changed after the approval was raised, so the approval is void and a new one is required. No delivery identity is emitted.",
+  "why_it_exists": "Gate check step 4 of wf4/approval-gate.js is the hash tie between the approval raised at decision time and the draft as it stands now. A draft edited after approval is exactly the incident the guard exists for, and the delivery-key families never exercised it because they always kept the hashes in agreement. This pins that a content change invalidates the standing approval as STALE and never sends.",
+  "input": {
+    "now": "2026-08-23T07:00:00.000Z",
+    "config": {
+      "matter_id": "MAT-20260101-005",
+      "approval_id": "APR-A1B2C3D400000062",
+      "decision": "APPROVE",
+      "chat_id": "OWNER_CHAT_ID",
+      "owner_chat_id": "OWNER_CHAT_ID",
+      "dry_run": "true",
+      "route_group": "APPROVAL"
+    },
+    "approvals": [
+      {
+        "approval_id": "APR-A1B2C3D400000062",
+        "action_id": "ACT-20260101-005-001",
+        "matter_id": "MAT-20260101-005",
+        "draft_id": "DFT-20260101-005-001",
+        "status": "PENDING",
+        "delivery_mode": "EMAIL_BODY",
+        "token_hash_or_reference": "CH-0f1e2d3c4b5a6978"
+      }
+    ],
+    "actions": [
+      {
+        "action_id": "ACT-20260101-005-001",
+        "matter_id": "MAT-20260101-005",
+        "channel": "GMAIL",
+        "recipient": "claims.intake@insurer-notices.invalid",
+        "status": "PENDING",
+        "idempotency_key": "ACT-20260101-005-001|CH-0f1e2d3c4b5a6978"
+      }
+    ],
+    "drafts": [
+      {
+        "draft_id": "DFT-20260101-005-001",
+        "action_id": "ACT-20260101-005-001",
+        "version": 1,
+        "content_hash": "CH-9b8a7c6d5e4f3210",
+        "content": "Our client requires the vehicle inspection report referred to in your letter dated 14 January.",
+        "draft_type": "LETTER",
+        "review_status": "READY",
+        "source_refs_json": "[]"
+      }
+    ],
+    "communications": [],
+    "matters": [
+      {
+        "matter_id": "MAT-20260101-005",
+        "title": "Vehicle damage recovery",
+        "owner_chat_id": "OWNER_CHAT_ID"
+      }
+    ]
+  },
+  "expect": {
+    "gate": "STALE",
+    "gate_reason_contains": ["changed after I raised this approval", "void"],
+    "dry_run": true,
+    "config_passthrough": {
+      "matter_id": "MAT-20260101-005",
+      "approval_id": "APR-A1B2C3D400000062",
+      "route_group": "APPROVAL"
+    },
+    "fields_absent": ["send_key", "dry_key", "communication_id_send", "communication_id_dry", "delivery_hash", "recipient"],
+    "note": "The approval token records the draft as it was when raised (CH-0f...); the draft now carries CH-9b..., so the content changed after the approval and the standing approval is void."
+  },
+  "assertions": [
+    "a draft whose content_hash differs from the approval token returns gate STALE",
+    "the refusal explicitly voids the approval and demands a new one, so the owner is not invited to send",
+    "dry_run is normalised to the boolean true and passed through on the refusal",
+    "Config keys survive the refusal untouched",
+    "no delivery identity is emitted on a refusal path that stopped before the derivation block"
+  ],
+  "target": {
+    "workflow": "wf4",
+    "unit_file": "harness/units/wf4/approval-gate.js"
+  },
+  "harness": {
+    "adapter": "approval-gate"
+  }
+}

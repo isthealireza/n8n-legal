@@ -5,8 +5,12 @@ harness binding was checked and is correct, the scenario's `expect` was checked 
 source QA workflow and is not a transcription slip, and the extracted production code
 genuinely does something else. **Neither side was changed.**
 
-Reproduce with `node harness/run.js`. Three scenarios fail: two on the same WF4 defect (§1),
-one on a WF5 scenario that was written against unpublished code (§3).
+Reproduce with `node harness/run.js`. As written on 2026-08-25, three scenarios failed: two
+on the same WF4 defect (§1), one on a WF5 scenario written against unpublished code (§3).
+**Since 2026-08-28 only §3 fails.** The two §1 scenarios pass because the units were fixed
+(§1 status block below); the defect itself is still live in production, which still runs
+`902130f4`. A green harness here means the repo is ahead of production, not that production
+is fixed.
 
 ---
 

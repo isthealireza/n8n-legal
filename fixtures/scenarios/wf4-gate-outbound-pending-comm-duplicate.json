@@ -1,0 +1,94 @@
+{
+  "workflow": "wf4",
+  "unit": "WF4 Approval Gate blocks a send as DUPLICATE when an OUTBOUND_PENDING Communications row exists on the same send_key",
+  "kind": "pure",
+  "id": "wf4-gate-outbound-pending-comm-duplicate",
+  "description": "An APPROVE whose send_key already has an OUTBOUND_PENDING Communications row on the same action must return gate DUPLICATE and must not send again, because an unconfirmed prior attempt leaves delivery ambiguous and that ambiguity fails closed.",
+  "why_it_exists": "Gate check 7b of wf4/approval-gate.js blocks a retry of the exact same draft when an earlier run reached the send step but never confirmed. Ambiguity about whether a legal communication was delivered must fail closed. The delivery-key families never supplied a pending row, so this block was unasserted. This pins that a pending row on the same idempotency key is a DUPLICATE, not a fresh send.",
+  "input": {
+    "now": "2026-08-23T07:00:00.000Z",
+    "config": {
+      "matter_id": "MAT-20260101-009",
+      "approval_id": "APR-A1B2C3D400000066",
+      "decision": "APPROVE",
+      "chat_id": "OWNER_CHAT_ID",
+      "owner_chat_id": "OWNER_CHAT_ID",
+      "dry_run": "true",
+      "route_group": "APPROVAL"
+    },
+    "approvals": [
+      {
+        "approval_id": "APR-A1B2C3D400000066",
+        "action_id": "ACT-20260101-009-001",
+        "matter_id": "MAT-20260101-009",
+        "draft_id": "DFT-20260101-009-001",
+        "status": "PENDING",
+        "delivery_mode": "EMAIL_BODY",
+        "token_hash_or_reference": "CH-0f1e2d3c4b5a6978"
+      }
+    ],
+    "actions": [
+      {
+        "action_id": "ACT-20260101-009-001",
+        "matter_id": "MAT-20260101-009",
+        "channel": "GMAIL",
+        "recipient": "claims.intake@insurer-notices.invalid",
+        "status": "PENDING",
+        "idempotency_key": "ACT-20260101-009-001|CH-0f1e2d3c4b5a6978"
+      }
+    ],
+    "drafts": [
+      {
+        "draft_id": "DFT-20260101-009-001",
+        "action_id": "ACT-20260101-009-001",
+        "version": 1,
+        "content_hash": "CH-0f1e2d3c4b5a6978",
+        "content": "Our client requires the vehicle inspection report referred to in your letter of 14 January.",
+        "draft_type": "LETTER",
+        "review_status": "READY",
+        "source_refs_json": "[]"
+      }
+    ],
+    "communications": [
+      {
+        "communication_id": "COM-f483403b2e5e83b1",
+        "action_id": "ACT-20260101-009-001",
+        "direction": "OUTBOUND_PENDING",
+        "idempotency_key": "SND-f483403b2e5e83b1",
+        "received_at": "2026-08-23T06:45:00.000Z"
+      }
+    ],
+    "matters": [
+      {
+        "matter_id": "MAT-20260101-009",
+        "title": "Vehicle damage recovery",
+        "owner_chat_id": "OWNER_CHAT_ID"
+      }
+    ]
+  },
+  "expect": {
+    "gate": "DUPLICATE",
+    "gate_reason_contains": ["I tried to send this exact draft"],
+    "dry_run": true,
+    "config_passthrough": {
+      "matter_id": "MAT-20260101-009",
+      "approval_id": "APR-A1B2C3D400000066",
+      "route_group": "APPROVAL"
+    },
+    "note": "The pre-image of the send key is approval APR-A1B2C3D400000066 / action ACT-20260101-009-001 / draft DFT-20260101-009-001 / chan GMAIL / to claims.intake@insurer-notices.invalid, so send_key is SND-f483403b2e5e83b1. An OUTBOUND_PENDING row carrying that exact idempotency_key blocks the retry as DUPLICATE."
+  },
+  "assertions": [
+    "an APPROVE whose send_key already has an OUTBOUND_PENDING row returns gate DUPLICATE",
+    "the refusal tells the owner to check the sent mail, failing closed on the ambiguity",
+    "dry_run is normalised to the boolean true and passed through on the refusal",
+    "Config keys survive the refusal untouched",
+    "the gate is DUPLICATE, never SEND"
+  ],
+  "target": {
+    "workflow": "wf4",
+    "unit_file": "harness/units/wf4/approval-gate.js"
+  },
+  "harness": {
+    "adapter": "approval-gate"
+  }
+}

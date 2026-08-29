@@ -1,0 +1,87 @@
+{
+  "workflow": "wf4",
+  "unit": "WF4 Approval Gate yields DRY_RUN after all checks pass when Config dry_run is the string true",
+  "kind": "pure",
+  "id": "wf4-gate-dry-run-true-yields-dry-run",
+  "description": "A fully valid APPROVE whose Config dry_run is the string \"true\" must pass every check and then return gate DRY_RUN, never SEND, carrying the normalised boolean dry_run and the full delivery identity.",
+  "why_it_exists": "AGENTS.md section 5 records that dry_run is hardcoded to the STRING \"true\" in WF4's Config and that much of the observed safety comes from that one literal. The delivery-key families and the decision families never asserted that a passing dry run resolves to gate DRY_RUN rather than SEND. This pins the DRY_RUN terminal, that the string literal normalises to the boolean true, and that Config keys pass through unchanged.",
+  "input": {
+    "now": "2026-08-23T08:00:00.000Z",
+    "config": {
+      "matter_id": "MAT-20260101-011",
+      "approval_id": "APR-A1B2C3D400000068",
+      "decision": "APPROVE",
+      "chat_id": "OWNER_CHAT_ID",
+      "owner_chat_id": "OWNER_CHAT_ID",
+      "dry_run": "true",
+      "route_group": "APPROVAL"
+    },
+    "approvals": [
+      {
+        "approval_id": "APR-A1B2C3D400000068",
+        "action_id": "ACT-20260101-011-001",
+        "matter_id": "MAT-20260101-011",
+        "draft_id": "DFT-20260101-011-001",
+        "status": "PENDING",
+        "delivery_mode": "EMAIL_BODY",
+        "token_hash_or_reference": "CH-0f1e2d3c4b5a6978"
+      }
+    ],
+    "actions": [
+      {
+        "action_id": "ACT-20260101-011-001",
+        "matter_id": "MAT-20260101-011",
+        "channel": "GMAIL",
+        "recipient": "claims.intake@insurer-notices.invalid",
+        "status": "PENDING",
+        "idempotency_key": "ACT-20260101-011-001|CH-0f1e2d3c4b5a6978"
+      }
+    ],
+    "drafts": [
+      {
+        "draft_id": "DFT-20260101-011-001",
+        "action_id": "ACT-20260101-011-001",
+        "version": 1,
+        "content_hash": "CH-0f1e2d3c4b5a6978",
+        "content": "Our client requires the vehicle inspection report referred to in your letter of 14 January.",
+        "draft_type": "LETTER",
+        "review_status": "READY",
+        "source_refs_json": "[]"
+      }
+    ],
+    "communications": [],
+    "matters": [
+      {
+        "matter_id": "MAT-20260101-011",
+        "title": "Vehicle damage recovery",
+        "owner_chat_id": "OWNER_CHAT_ID"
+      }
+    ]
+  },
+  "expect": {
+    "gate": "DRY_RUN",
+    "gate_reason_contains": "DRY_RUN is on in the Config node",
+    "dry_run": true,
+    "config_passthrough": {
+      "matter_id": "MAT-20260101-011",
+      "approval_id": "APR-A1B2C3D400000068",
+      "route_group": "APPROVAL"
+    },
+    "fields_present": ["send_key", "dry_key", "communication_id_send", "communication_id_dry", "delivery_hash", "recipient"],
+    "note": "The string dry_run \"true\" passes the normalisation check, every gate check passes, and the terminal is DRY_RUN — nothing is written and nothing leaves the account."
+  },
+  "assertions": [
+    "a fully valid APPROVE with Config dry_run \"true\" returns gate DRY_RUN, not SEND",
+    "the string literal dry_run is normalised to the boolean true on the output",
+    "the full delivery identity is present for the dry-run report",
+    "Config keys the downstream nodes read (matter_id, approval_id, route_group) pass through unchanged",
+    "all idempotency checks pass (no prior Communications row) so the only reason the gate stops short of SEND is dry_run"
+  ],
+  "target": {
+    "workflow": "wf4",
+    "unit_file": "harness/units/wf4/approval-gate.js"
+  },
+  "harness": {
+    "adapter": "approval-gate"
+  }
+}

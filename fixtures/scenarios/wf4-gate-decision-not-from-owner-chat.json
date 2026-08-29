@@ -1,0 +1,86 @@
+{
+  "workflow": "wf4",
+  "unit": "WF4 Approval Gate refuses a decision that did not come from the owner chat",
+  "kind": "pure",
+  "id": "wf4-gate-decision-not-from-owner-chat",
+  "description": "A well-formed APPROVE arriving from a chat id that is not the Config owner_chat_id must return gate INVALID and must never reach the delivery-identity block, so no send_key, dry_key or communication_id is emitted for it.",
+  "why_it_exists": "Seed case for the approval-gate adapter, added 2026-08-29 during the SPEC-2 Rev B publication-readiness review. Until then wf4/approval-gate.js was covered only by the three delivery-key families, which assert the derivation block: every gate DECISION was unasserted, so the node AGENTS.md section 1.1 calls the only thing between a model-drafted letter and a real recipient had no executable fail-closed test. Step 1 of the gate is the first refusal in the chain; this pins it, pins the Config passthrough that Verify Selected Row and Gate Result read downstream on a refusal, and pins the absence of a delivery identity on a path that never derived one.",
+  "input": {
+    "now": "2026-08-23T06:00:00.000Z",
+    "config": {
+      "matter_id": "MAT-20260101-002",
+      "approval_id": "APR-A1B2C3D400000005",
+      "decision": "APPROVE",
+      "chat_id": "NOT-THE-OWNER",
+      "owner_chat_id": "OWNER_CHAT_ID",
+      "dry_run": "true",
+      "route_group": "APPROVAL"
+    },
+    "approvals": [
+      {
+        "approval_id": "APR-A1B2C3D400000005",
+        "action_id": "ACT-20260101-002-001",
+        "matter_id": "MAT-20260101-002",
+        "draft_id": "DFT-20260101-002-001",
+        "status": "PENDING",
+        "delivery_mode": "EMAIL_BODY",
+        "token_hash_or_reference": "CH-0f1e2d3c4b5a6978"
+      }
+    ],
+    "actions": [
+      {
+        "action_id": "ACT-20260101-002-001",
+        "matter_id": "MAT-20260101-002",
+        "channel": "GMAIL",
+        "recipient": "claims.intake@insurer-notices.invalid",
+        "status": "PENDING",
+        "idempotency_key": "ACT-20260101-002-001|CH-0f1e2d3c4b5a6978"
+      }
+    ],
+    "drafts": [
+      {
+        "draft_id": "DFT-20260101-002-001",
+        "action_id": "ACT-20260101-002-001",
+        "version": 1,
+        "content_hash": "CH-0f1e2d3c4b5a6978",
+        "content": "Our client requires the vehicle inspection report referred to in your letter of 14 January.",
+        "draft_type": "LETTER",
+        "review_status": "READY",
+        "source_refs_json": "[]"
+      }
+    ],
+    "communications": [],
+    "matters": [
+      {
+        "matter_id": "MAT-20260101-002",
+        "title": "Vehicle damage recovery",
+        "owner_chat_id": "OWNER_CHAT_ID"
+      }
+    ]
+  },
+  "expect": {
+    "gate": "INVALID",
+    "gate_reason_contains": "did not come from the owner chat",
+    "dry_run": true,
+    "config_passthrough": {
+      "matter_id": "MAT-20260101-002",
+      "approval_id": "APR-A1B2C3D400000005",
+      "route_group": "APPROVAL"
+    },
+    "fields_absent": ["send_key", "dry_key", "communication_id_send", "communication_id_dry", "delivery_hash", "recipient"]
+  },
+  "assertions": [
+    "a decision from a chat id other than owner_chat_id returns gate INVALID",
+    "the refusal names the owner chat as the reason, so Log Gate Refusal and Telegram - Gate Refused carry it",
+    "dry_run is normalised to the boolean true and passed through on the refusal",
+    "Config keys the downstream nodes read (matter_id, approval_id, route_group) survive the refusal untouched",
+    "no delivery identity is emitted on a path that refused before the derivation block"
+  ],
+  "target": {
+    "workflow": "wf4",
+    "unit_file": "harness/units/wf4/approval-gate.js"
+  },
+  "harness": {
+    "adapter": "approval-gate"
+  }
+}

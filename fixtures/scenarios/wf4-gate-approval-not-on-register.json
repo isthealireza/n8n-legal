@@ -1,0 +1,87 @@
+{
+  "workflow": "wf4",
+  "unit": "WF4 Approval Gate fails closed when the referenced approval id is not on the register",
+  "kind": "pure",
+  "id": "wf4-gate-approval-not-on-register",
+  "description": "A decision that names an approval_id with no matching row in Load Approvals must return gate INVALID and must never reach the delivery-identity block, so no send_key, dry_key or communication_id is emitted for it.",
+  "why_it_exists": "Gate check step 2 of wf4/approval-gate.js is the first fail-closed test after the owner gate: no approval row, no decision. The delivery-key families only test rows that DO exist, so a decision naming an absent approval id was unasserted. This pins that the gate refuses a missing approval rather than defaulting to a send, and that Config keys downstream nodes read survive the refusal untouched.",
+  "input": {
+    "now": "2026-08-23T07:00:00.000Z",
+    "config": {
+      "matter_id": "MAT-20260101-003",
+      "approval_id": "APR-A1B2C3D400000060",
+      "decision": "APPROVE",
+      "chat_id": "OWNER_CHAT_ID",
+      "owner_chat_id": "OWNER_CHAT_ID",
+      "dry_run": "true",
+      "route_group": "APPROVAL"
+    },
+    "approvals": [
+      {
+        "approval_id": "APR-A1B2C3D400000050",
+        "action_id": "ACT-20260101-003-001",
+        "matter_id": "MAT-20260101-003",
+        "draft_id": "DFT-20260101-003-001",
+        "status": "PENDING",
+        "delivery_mode": "EMAIL_BODY",
+        "token_hash_or_reference": "CH-0f1e2d3c4b5a6978"
+      }
+    ],
+    "actions": [
+      {
+        "action_id": "ACT-20260101-003-001",
+        "matter_id": "MAT-20260101-003",
+        "channel": "GMAIL",
+        "recipient": "claims.intake@insurer-notices.invalid",
+        "status": "PENDING",
+        "idempotency_key": "ACT-20260101-003-001|CH-0f1e2d3c4b5a6978"
+      }
+    ],
+    "drafts": [
+      {
+        "draft_id": "DFT-20260101-003-001",
+        "action_id": "ACT-20260101-003-001",
+        "version": 1,
+        "content_hash": "CH-0f1e2d3c4b5a6978",
+        "content": "Our client requires the vehicle inspection report referred to in your letter of 14 January.",
+        "draft_type": "LETTER",
+        "review_status": "READY",
+        "source_refs_json": "[]"
+      }
+    ],
+    "communications": [],
+    "matters": [
+      {
+        "matter_id": "MAT-20260101-003",
+        "title": "Vehicle damage recovery",
+        "owner_chat_id": "OWNER_CHAT_ID"
+      }
+    ]
+  },
+  "expect": {
+    "gate": "INVALID",
+    "gate_reason_contains": "not on the register",
+    "dry_run": true,
+    "config_passthrough": {
+      "matter_id": "MAT-20260101-003",
+      "approval_id": "APR-A1B2C3D400000060",
+      "route_group": "APPROVAL"
+    },
+    "fields_absent": ["send_key", "dry_key", "communication_id_send", "communication_id_dry", "delivery_hash", "recipient"],
+    "note": "The register row for a DIFFERENT approval id exists; the referenced id does not. A missing approval must fail closed, not fall through to a send."
+  },
+  "assertions": [
+    "a decision naming an approval_id with no register row returns gate INVALID",
+    "the refusal names the missing approval as the reason, so Log Gate Refusal and Telegram - Gate Refused carry it",
+    "dry_run is normalised to the boolean true and passed through on the refusal",
+    "Config keys the downstream nodes read (matter_id, approval_id, route_group) survive the refusal untouched",
+    "no delivery identity or recipient is emitted on a path that refused before the derivation block"
+  ],
+  "target": {
+    "workflow": "wf4",
+    "unit_file": "harness/units/wf4/approval-gate.js"
+  },
+  "harness": {
+    "adapter": "approval-gate"
+  }
+}

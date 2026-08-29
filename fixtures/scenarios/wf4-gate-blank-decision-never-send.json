@@ -1,0 +1,87 @@
+{
+  "workflow": "wf4",
+  "unit": "WF4 Approval Gate returns INVALID for a blank decision string and never SENDs",
+  "kind": "pure",
+  "id": "wf4-gate-blank-decision-never-send",
+  "description": "A context that passes every structural and content check but carries an empty decision string must return gate INVALID, because the gate only ever SENDs on the explicit whitelisted verbs.",
+  "why_it_exists": "Gate check step 6 of wf4/approval-gate.js refuses anything that is not an explicit whitelisted verb. The empty string is the sharpest instance of that whitelist: every other check has passed, yet a blank decision must not be coerced into an APPROVE-style send. This pins that a missing or blank decision fails closed as INVALID.",
+  "input": {
+    "now": "2026-08-23T08:00:00.000Z",
+    "config": {
+      "matter_id": "MAT-20260101-012",
+      "approval_id": "APR-A1B2C3D400000069",
+      "decision": "",
+      "chat_id": "OWNER_CHAT_ID",
+      "owner_chat_id": "OWNER_CHAT_ID",
+      "dry_run": "true",
+      "route_group": "APPROVAL"
+    },
+    "approvals": [
+      {
+        "approval_id": "APR-A1B2C3D400000069",
+        "action_id": "ACT-20260101-012-001",
+        "matter_id": "MAT-20260101-012",
+        "draft_id": "DFT-20260101-012-001",
+        "status": "PENDING",
+        "delivery_mode": "EMAIL_BODY",
+        "token_hash_or_reference": "CH-0f1e2d3c4b5a6978"
+      }
+    ],
+    "actions": [
+      {
+        "action_id": "ACT-20260101-012-001",
+        "matter_id": "MAT-20260101-012",
+        "channel": "GMAIL",
+        "recipient": "claims.intake@insurer-notices.invalid",
+        "status": "PENDING",
+        "idempotency_key": "ACT-20260101-012-001|CH-0f1e2d3c4b5a6978"
+      }
+    ],
+    "drafts": [
+      {
+        "draft_id": "DFT-20260101-012-001",
+        "action_id": "ACT-20260101-012-001",
+        "version": 1,
+        "content_hash": "CH-0f1e2d3c4b5a6978",
+        "content": "Our client requires the vehicle inspection report referred to in your letter of 14 January.",
+        "draft_type": "LETTER",
+        "review_status": "READY",
+        "source_refs_json": "[]"
+      }
+    ],
+    "communications": [],
+    "matters": [
+      {
+        "matter_id": "MAT-20260101-012",
+        "title": "Vehicle damage recovery",
+        "owner_chat_id": "OWNER_CHAT_ID"
+      }
+    ]
+  },
+  "expect": {
+    "gate": "INVALID",
+    "gate_reason_contains": "Unrecognised decision",
+    "dry_run": true,
+    "config_passthrough": {
+      "matter_id": "MAT-20260101-012",
+      "approval_id": "APR-A1B2C3D400000069",
+      "route_group": "APPROVAL"
+    },
+    "fields_present": ["send_key", "dry_key", "communication_id_send", "communication_id_dry"],
+    "note": "Every structural check passes and the delivery identity IS derived, but the decision is blank, so the gate is INVALID, never SEND."
+  },
+  "assertions": [
+    "a blank decision string returns gate INVALID, never SEND",
+    "the refusal reads as Unrecognised decision, keeping the whitelist explicit",
+    "the delivery identity is derived (fields present) but is never turned into a SEND",
+    "dry_run is normalised to the boolean true and passed through on the refusal",
+    "Config keys survive the refusal untouched"
+  ],
+  "target": {
+    "workflow": "wf4",
+    "unit_file": "harness/units/wf4/approval-gate.js"
+  },
+  "harness": {
+    "adapter": "approval-gate"
+  }
+}

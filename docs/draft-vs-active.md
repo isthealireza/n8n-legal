@@ -271,3 +271,30 @@ section is the record that the divergence exists.
 Both entries are `(via MCP)` with `autosaved: false`, so neither is the UI-autosave trap of
 §1. Full account — including the `Approval Gate` kill-switch edit that the draft's own
 version description calls "unchanged" — is in `docs/wf4-live-inspection-2026-08-29.md`.
+
+## 8. wf4 moved again — the draft named in §7 no longer exists (2026-08-29, later)
+
+§7 was written before the owner-gated two-node integrity port. Read live, read-only, during
+Fast Lane run `run_bfa3412dc1f8`:
+
+| wf | id | draft (`versionId`) | active (`activeVersionId`) | `sameAsDraft` | diverged | files |
+|---|---|---|---|---|---|---|
+| wf4 | `zKr24IThF30e6jXw` | `470120af` (181 nodes) | `902130f4` (102 nodes) | `false` | **yes** | `wf4.active.json` |
+
+`8107c96f` — the draft §7 names — **is gone from the version history**. The port
+(`docs/wf4-live-inspection-2026-08-29.md` §5) replaced it with `470120af`, and the history
+now holds two entries, not three. Two consequences worth writing down:
+
+1. `get_workflow_versions_diff` can no longer be run against `8107c96f`. The whole SPEC-2
+   Rev B delta must be read as `902130f4 -> 470120af`, which carries SPEC-2 Rev B **and** the
+   two integrity fixes in one diff.
+2. `restore_workflow_version` to `8107c96f` — the rollback named in the gate question that
+   authorised the port — is **no longer available**. Restoring the draft to its pre-port state
+   would now mean writing the published bodies of `Integrity Guard` and
+   `Build Integrity Halt Notice` back into it, which is itself a protected action.
+
+`exports/wf4.active.json` was re-verified against a fresh `get_workflow_version(902130f4)` on
+2026-08-29: 102/102 nodes, 0 differing after the scrub map, connections byte-identical. Still
+**no `wf4.draft.json`** for either draft id — and that gap is now also why WF4's drafted
+`Approval Gate` kill switch has no harness coverage. Full review of the 181-node draft:
+`docs/wf4-spec2-revb-review-2026-08-29.md`.
