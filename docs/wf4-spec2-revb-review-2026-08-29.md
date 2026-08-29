@@ -357,11 +357,18 @@ landed matches what the question described (§3.3).
 
 ### 3.7 Can the draft be safely considered for publication?
 
-**Yes, as a candidate — but not without the four conditions in §5.3.** Nothing in the 79-node
-delta weakens the approval gate, bypasses human approval, or creates a new external effect.
-The one genuine loosening (`Config.dry_run`) is compensated twice over by the kill switch and
-the guards. The blockers are not defects in the change; they are gaps in what has been
-*proved* about it, and one operational consequence the owner has to want (§5.2).
+**No — not today. This review's verdict is NO-GO, and it is not close to a GO.** The draft may
+be *considered* — it is a coherent candidate, and nothing in the 79-node delta weakens the
+approval gate, bypasses human approval, or creates a new external effect; the one genuine
+loosening (`Config.dry_run`) is compensated twice over by the kill switch and the guards. But
+"considered" is not "ready", and the distinction is the whole point of this section. Every one
+of the four conditions in §5.3 is unmet as of today, and two of them (the untested drafted
+gate body, the unverified `crypto.subtle` dependency) mean the safety behaviour that makes
+this draft attractive **has been read and not run**. A change to the one node standing between
+a model-drafted letter and a real recipient does not get published on a reading.
+
+Publication readiness is therefore **not proven**, and nothing in this document should be
+cited as proving it.
 
 ---
 
@@ -428,6 +435,8 @@ author and sign a valid LIVE context **and** WF4's `expected_environment` must b
 
 ### 5.3 What must be fixed before publication
 
+Until all four are done, the answer to "may we publish?" is **no**.
+
 1. **Capture `exports/wf4.draft.json` and extract draft units for `Approval Gate`,
    `Evaluate Safety` and one `Guard -` node, then cover the kill switch with scenarios**
    against the drafted body: `dry_run: 'false'` alone must stay `DRY_RUN`; all three
@@ -476,3 +485,41 @@ now only be reversed by writing the published bodies back into the draft.
   list (`Verify Selected Row` treating a gate channel of `NONE` as a free pass; the row
   fingerprint omitting `status`) were closed in `902130f4` by D-CHANNEL-01 / D-STATUS-01;
   the rest stand.
+
+---
+
+## 7. Adversarial review of this document (Codex, run `run_bfa3412dc1f8`)
+
+Codex reviewed the three commits on this branch, this document, the `approval-gate` adapter,
+the eleven `wf4-gate-*` scenarios, and the DeepSeek test evidence. It has no n8n credentials
+and did not re-fetch the live readings; it checked them for internal consistency and against
+the repository. Its verdict is advisory (AGENTS.md §4).
+
+**Round 1 — REFUTE, "WF4 publication readiness not yet proven".** Its seven answers:
+
+1. *Is the Approval Gate fail-closed?* The **published** gate's exercised paths are, but the
+   **drafted** gate cannot be certified fail-closed while its kill-switch body is not
+   harness-executed and `Evaluate Safety`'s `crypto.subtle` dependency is unverified.
+2. *Can any route bypass human approval?* No bypass route was found in the documented draft
+   graph.
+3. *Is the kill switch correctly implemented?* Correctly expressed as an
+   all-three-conditions-required fail-closed check **by inspection**, but untested.
+4. *Are the 79 nodes understood and documented?* Internally consistent and extensively
+   documented.
+5. *Is the draft safe to consider for publication?* Not yet safe to publish.
+6. *What must be fixed first?* Capture and test the draft units, verify `crypto.subtle`,
+   verify WF1's signed caller contract, and explicitly decide and document the
+   `expected_environment: 'test'` suppression consequence.
+7. *Is another decision gate required?* Yes — a separate owner decision gate before any
+   publish or live-environment change; none is needed for this read-only review.
+
+Evidence it cites: harness 109/1/60 with the sole pre-existing WF5 failure, `scrub.py --check`
+0 replacements, and all eleven new fixtures pure, unique, and adapter-validated with unknown
+`expect` keys failing rather than being silently dropped.
+
+**What was changed in response.** Codex named no factual error — its six conditions are
+§5.3's four conditions, and its answers 1–4 and 7 restate §§2.2, 2.4, 4.2 and 5.3. What it
+refused was the *framing*: §3.7 answered "can the draft be considered for publication?" with
+"yes, as a candidate", which reads as a qualified go when the honest answer is a no-go with a
+route to yes. §3.7 and §5.3 were rewritten to say that plainly. No finding, no test and no
+assertion was changed, because none was disputed.
