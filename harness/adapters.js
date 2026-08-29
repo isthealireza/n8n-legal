@@ -422,6 +422,98 @@ const verifySelectedRow = {
   },
 };
 
+/* ================================================== WF4 Approval Gate (decisions) */
+
+// Added 2026-08-29 during the SPEC-2 Rev B publication-readiness review (Fast Lane run
+// run_bfa3412dc1f8). Before this adapter the ONLY coverage of wf4/approval-gate.js was the
+// three delivery-key families, which assert the derivation block and nothing else: every
+// gate DECISION -- INVALID, DUPLICATE, STALE, REJECTED, EDIT, DRY_RUN, SEND -- was
+// unasserted, and the `default:` arm of the delivery-key adapter fails any scenario that
+// tries to assert `gate`. So the one node AGENTS.md section 1.1 calls "the only thing
+// between a model-drafted letter and a real recipient" had no executable fail-closed test.
+// This adapter runs the real extracted node against a full five-register context and
+// asserts the decision it returns.
+//
+// It exercises the PUBLISHED body (harness/units/ is extracted from wfN.active.json only,
+// AGENTS.md section 5). The draft 470120af Approval Gate carries STEP1-KILLSWITCH-20260826
+// and is NOT under test here -- no wf4.draft.json has been captured, so no draft unit
+// exists. That gap is recorded in docs/wf4-spec2-revb-review-2026-08-29.md.
+const approvalGate = {
+  units: ['wf4/approval-gate.js'],
+  async run(scn, ctx) {
+    const inp = scn.input;
+    const out = (await ctx.runUnit(scn.target.unit_file, {
+      now: inp.now,
+      items: [{}],
+      nodeOutputs: {
+        'Config': [inp.config || {}],
+        'Load Approvals': inp.approvals || [],
+        'Load Actions': inp.actions || [],
+        'Load Drafts': inp.drafts || [],
+        'Load Communications': inp.communications || [],
+        'Load Matters': inp.matters || [],
+      },
+    }))[0].json;
+    const e = scn.expect;
+    const checks = [];
+    const contains = (hay, needle) =>
+      String(hay == null ? '' : hay).indexOf(String(needle)) !== -1;
+    for (const k of Object.keys(e)) {
+      switch (k) {
+        case 'note': break;
+        case 'gate': checks.push(mk('gate', e.gate, out.gate)); break;
+        case 'dry_run': checks.push(mk('dry_run', e.dry_run, out.dry_run)); break;
+        case 'gate_reason_contains': {
+          const wanted = [].concat(e.gate_reason_contains);
+          for (const w of wanted) {
+            checks.push(mk('gate_reason contains ' + JSON.stringify(w), true,
+              contains(out.gate_reason, w), contains(out.gate_reason, w)));
+          }
+          break;
+        }
+        case 'config_passthrough': {
+          // Config is spread into every gate return (`{ ...cfg, dry_run, ...o }`), so a
+          // key the Config node sets must survive the gate untouched -- including on a
+          // refusal, because Verify Selected Row and Gate Result read it downstream.
+          for (const ck of Object.keys(e.config_passthrough)) {
+            checks.push(mk('config_passthrough.' + ck, e.config_passthrough[ck], out[ck]));
+          }
+          break;
+        }
+        case 'fields_absent': {
+          // A refusal that never reached the derivation block must not emit a delivery
+          // identity: an INVALID carrying a send_key would let a downstream node key a
+          // Communications write off a decision the gate refused.
+          for (const fk of [].concat(e.fields_absent)) {
+            checks.push(mk('fields_absent.' + fk, true, !(fk in out), !(fk in out)));
+          }
+          break;
+        }
+        case 'fields_present': {
+          for (const fk of [].concat(e.fields_present)) {
+            checks.push(mk('fields_present.' + fk, true, fk in out, fk in out));
+          }
+          break;
+        }
+        case 'send_key_matches_oracle': {
+          // Independently computed -- never the value the unit produced.
+          const oracle = 'SND-' + O.fnv1aHex16(O.deliveryIdentity(
+            Object.assign({}, e.oracle_basis && e.oracle_basis.approval),
+            Object.assign({}, e.oracle_basis && e.oracle_basis.action),
+            Object.assign({}, e.oracle_basis && e.oracle_basis.draft)));
+          checks.push(mk('send_key === independent FNV-1a', oracle, out.send_key));
+          break;
+        }
+        case 'oracle_basis': break;
+        default:
+          checks.push(mk(k, e[k], '(adapter has no rule for this key)', false));
+      }
+    }
+    return { checks, informational: ['note', 'oracle_basis'], consumed: Object.keys(e),
+      detail: { gate: out.gate, gate_reason: out.gate_reason } };
+  },
+};
+
 const integrityHaltNotice = {
   units: ['wf4/build-integrity-halt-notice.js'],
   async run(scn, ctx) {
@@ -541,5 +633,6 @@ module.exports = {
   'integrity-guard': integrityGuard,
   'verify-selected-row': verifySelectedRow,
   'integrity-halt-notice': integrityHaltNotice,
+  'approval-gate': approvalGate,
   'finalise-plan': finalisePlan,
 };
