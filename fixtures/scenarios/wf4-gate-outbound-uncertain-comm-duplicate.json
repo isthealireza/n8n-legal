@@ -1,0 +1,95 @@
+{
+  "workflow": "wf4",
+  "unit": "WF4 Approval Gate blocks a send as DUPLICATE when an OUTBOUND_UNCERTAIN Communications row exists on the same send_key",
+  "kind": "pure",
+  "id": "wf4-gate-outbound-uncertain-comm-duplicate",
+  "description": "An APPROVE whose send_key already has an OUTBOUND_UNCERTAIN Communications row on the same action must return gate DUPLICATE and must not send again, because an earlier attempt whose outcome could not be established leaves delivery unknown and that unknown fails closed.",
+  "why_it_exists": "Gate check 7b-2 (F-04) of wf4/approval-gate.js was introduced after Mark Send Failed used to stamp every error as OUTBOUND_FAILED, turning an uncertain outcome into permission to resend the same legal communication. An OUTBOUND_UNCERTAIN row must block exactly like a pending one. The delivery-key families never supplied an uncertain row, so this block was unasserted. This pins that an uncertain row on the same idempotency key is a DUPLICATE, not a fresh send.",
+  "input": {
+    "now": "2026-08-23T07:00:00.000Z",
+    "config": {
+      "matter_id": "MAT-20260101-010",
+      "approval_id": "APR-A1B2C3D400000067",
+      "decision": "APPROVE",
+      "chat_id": "OWNER_CHAT_ID",
+      "owner_chat_id": "OWNER_CHAT_ID",
+      "dry_run": "true",
+      "route_group": "APPROVAL"
+    },
+    "approvals": [
+      {
+        "approval_id": "APR-A1B2C3D400000067",
+        "action_id": "ACT-20260101-010-001",
+        "matter_id": "MAT-20260101-010",
+        "draft_id": "DFT-20260101-010-001",
+        "status": "PENDING",
+        "delivery_mode": "EMAIL_BODY",
+        "token_hash_or_reference": "CH-0f1e2d3c4b5a6978"
+      }
+    ],
+    "actions": [
+      {
+        "action_id": "ACT-20260101-010-001",
+        "matter_id": "MAT-20260101-010",
+        "channel": "GMAIL",
+        "recipient": "claims.intake@insurer-notices.invalid",
+        "status": "PENDING",
+        "idempotency_key": "ACT-20260101-010-001|CH-0f1e2d3c4b5a6978"
+      }
+    ],
+    "drafts": [
+      {
+        "draft_id": "DFT-20260101-010-001",
+        "action_id": "ACT-20260101-010-001",
+        "version": 1,
+        "content_hash": "CH-0f1e2d3c4b5a6978",
+        "content": "Our client requires the vehicle inspection report referred to in your letter of 14 January.",
+        "draft_type": "LETTER",
+        "review_status": "READY",
+        "source_refs_json": "[]"
+      }
+    ],
+    "communications": [
+      {
+        "communication_id": "COM-db24b570c7f2a96c",
+        "action_id": "ACT-20260101-010-001",
+        "direction": "OUTBOUND_UNCERTAIN",
+        "idempotency_key": "SND-db24b570c7f2a96c",
+        "received_at": "2026-08-23T06:45:00.000Z",
+        "summary": "network timeout before outcome could be established"
+      }
+    ],
+    "matters": [
+      {
+        "matter_id": "MAT-20260101-010",
+        "title": "Vehicle damage recovery",
+        "owner_chat_id": "OWNER_CHAT_ID"
+      }
+    ]
+  },
+  "expect": {
+    "gate": "DUPLICATE",
+    "gate_reason_contains": ["did not report a usable outcome"],
+    "dry_run": true,
+    "config_passthrough": {
+      "matter_id": "MAT-20260101-010",
+      "approval_id": "APR-A1B2C3D400000067",
+      "route_group": "APPROVAL"
+    },
+    "note": "The pre-image of the send key is approval APR-A1B2C3D400000067 / action ACT-20260101-010-001 / draft DFT-20260101-010-001 / chan GMAIL / to claims.intake@insurer-notices.invalid, so send_key is SND-db24b570c7f2a96c. An OUTBOUND_UNCERTAIN row carrying that exact idempotency_key blocks the retry as DUPLICATE."
+  },
+  "assertions": [
+    "an APPROVE whose send_key already has an OUTBOUND_UNCERTAIN row returns gate DUPLICATE",
+    "the refusal reports the unusable outcome and tells the owner to check the sent mail, failing closed",
+    "dry_run is normalised to the boolean true and passed through on the refusal",
+    "Config keys survive the refusal untouched",
+    "the gate is DUPLICATE, never SEND"
+  ],
+  "target": {
+    "workflow": "wf4",
+    "unit_file": "harness/units/wf4/approval-gate.js"
+  },
+  "harness": {
+    "adapter": "approval-gate"
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "workflow": "wf4",
+  "unit": "WF4 Approval Gate treats an approval that is no longer PENDING as a DUPLICATE, not a fresh decision",
+  "kind": "pure",
+  "id": "wf4-gate-approval-not-pending-is-duplicate",
+  "description": "A decision that names an approval row whose status is not PENDING must return gate DUPLICATE, because a second decision on an already-decided approval is a duplicate, never a new decision. It must not reach the derivation block, so no send identity is emitted.",
+  "why_it_exists": "Gate check step 3 of wf4/approval-gate.js converts an approval already acted on into a DUPLICATE refusal. The delivery-key families only ever supplied PENDING approvals, so the not-PENDING path was unasserted. This pins that a decided approval cannot be re-decided into a send, and that the decision and decided_at facts are carried in the refusal reason.",
+  "input": {
+    "now": "2026-08-23T07:00:00.000Z",
+    "config": {
+      "matter_id": "MAT-20260101-004",
+      "approval_id": "APR-A1B2C3D400000061",
+      "decision": "APPROVE",
+      "chat_id": "OWNER_CHAT_ID",
+      "owner_chat_id": "OWNER_CHAT_ID",
+      "dry_run": "true",
+      "route_group": "APPROVAL"
+    },
+    "approvals": [
+      {
+        "approval_id": "APR-A1B2C3D400000061",
+        "action_id": "ACT-20260101-004-001",
+        "matter_id": "MAT-20260101-004",
+        "draft_id": "DFT-20260101-004-001",
+        "status": "APPROVED",
+        "decision": "APPROVE",
+        "decided_at": "2026-08-22T09:00:00.000Z",
+        "delivery_mode": "EMAIL_BODY",
+        "token_hash_or_reference": "CH-0f1e2d3c4b5a6978"
+      }
+    ],
+    "actions": [
+      {
+        "action_id": "ACT-20260101-004-001",
+        "matter_id": "MAT-20260101-004",
+        "channel": "GMAIL",
+        "recipient": "claims.intake@insurer-notices.invalid",
+        "status": "PENDING",
+        "idempotency_key": "ACT-20260101-004-001|CH-0f1e2d3c4b5a6978"
+      }
+    ],
+    "drafts": [
+      {
+        "draft_id": "DFT-20260101-004-001",
+        "action_id": "ACT-20260101-004-001",
+        "version": 1,
+        "content_hash": "CH-0f1e2d3c4b5a6978",
+        "content": "Our client requires the vehicle inspection report referred to in your letter of 14 January.",
+        "draft_type": "LETTER",
+        "review_status": "READY",
+        "source_refs_json": "[]"
+      }
+    ],
+    "communications": [],
+    "matters": [
+      {
+        "matter_id": "MAT-20260101-004",
+        "title": "Vehicle damage recovery",
+        "owner_chat_id": "OWNER_CHAT_ID"
+      }
+    ]
+  },
+  "expect": {
+    "gate": "DUPLICATE",
+    "gate_reason_contains": ["already decided as", "APPROVE"],
+    "dry_run": true,
+    "config_passthrough": {
+      "matter_id": "MAT-20260101-004",
+      "approval_id": "APR-A1B2C3D400000061",
+      "route_group": "APPROVAL"
+    },
+    "fields_absent": ["send_key", "dry_key", "communication_id_send", "communication_id_dry", "delivery_hash", "recipient"],
+    "note": "The approval row was decided the previous day; a second decision on it is a duplicate, not a fresh APPROVE."
+  },
+  "assertions": [
+    "an approval whose status is APPROVED (not PENDING) returns gate DUPLICATE",
+    "the refusal records the prior decision and its decided_at so the reason is self-explanatory to the owner",
+    "dry_run is normalised to the boolean true and passed through on the refusal",
+    "Config keys survive the refusal untouched",
+    "no delivery identity is emitted on a refusals path that stopped before the derivation block"
+  ],
+  "target": {
+    "workflow": "wf4",
+    "unit_file": "harness/units/wf4/approval-gate.js"
+  },
+  "harness": {
+    "adapter": "approval-gate"
+  }
+}

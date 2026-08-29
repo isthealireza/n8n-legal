@@ -1,0 +1,97 @@
+{
+  "workflow": "wf4",
+  "unit": "WF4 Approval Gate marks a superseded draft version STALE on the same action",
+  "kind": "pure",
+  "id": "wf4-gate-superseded-draft-version-stale",
+  "description": "A decision that names a draft that is not the latest version for its action must return gate STALE with the newer draft id named, because approving an older draft would send superseded content. No delivery identity is emitted.",
+  "why_it_exists": "Gate check step 5 of wf4/approval-gate.js sorts the draft chain by version and refuses any draft that is not the newest. A later draft for the same action supersedes the one named in the approval, and the delivery-key families never supplied a second draft, so this path was unasserted. This pins that approving an old version fails closed as STALE.",
+  "input": {
+    "now": "2026-08-23T07:00:00.000Z",
+    "config": {
+      "matter_id": "MAT-20260101-006",
+      "approval_id": "APR-A1B2C3D400000063",
+      "decision": "APPROVE",
+      "chat_id": "OWNER_CHAT_ID",
+      "owner_chat_id": "OWNER_CHAT_ID",
+      "dry_run": "true",
+      "route_group": "APPROVAL"
+    },
+    "approvals": [
+      {
+        "approval_id": "APR-A1B2C3D400000063",
+        "action_id": "ACT-20260101-006-001",
+        "matter_id": "MAT-20260101-006",
+        "draft_id": "DFT-20260101-006-001",
+        "status": "PENDING",
+        "delivery_mode": "EMAIL_BODY",
+        "token_hash_or_reference": "CH-0f1e2d3c4b5a6978"
+      }
+    ],
+    "actions": [
+      {
+        "action_id": "ACT-20260101-006-001",
+        "matter_id": "MAT-20260101-006",
+        "channel": "GMAIL",
+        "recipient": "claims.intake@insurer-notices.invalid",
+        "status": "PENDING",
+        "idempotency_key": "ACT-20260101-006-001|CH-0f1e2d3c4b5a6978"
+      }
+    ],
+    "drafts": [
+      {
+        "draft_id": "DFT-20260101-006-001",
+        "action_id": "ACT-20260101-006-001",
+        "version": 1,
+        "content_hash": "CH-0f1e2d3c4b5a6978",
+        "content": "Our client requires the vehicle inspection report referred to in your letter of 14 January.",
+        "draft_type": "LETTER",
+        "review_status": "READY",
+        "source_refs_json": "[]"
+      },
+      {
+        "draft_id": "DFT-20260101-006-002",
+        "action_id": "ACT-20260101-006-001",
+        "version": 2,
+        "content_hash": "CH-1122334455667788",
+        "content": "Our client requires the vehicle inspection report referred to in your letter dated 14 January, together with the photographs.",
+        "draft_type": "LETTER",
+        "review_status": "READY",
+        "source_refs_json": "[]"
+      }
+    ],
+    "communications": [],
+    "matters": [
+      {
+        "matter_id": "MAT-20260101-006",
+        "title": "Vehicle damage recovery",
+        "owner_chat_id": "OWNER_CHAT_ID"
+      }
+    ]
+  },
+  "expect": {
+    "gate": "STALE",
+    "gate_reason_contains": ["newer draft", "DFT-20260101-006-002"],
+    "dry_run": true,
+    "config_passthrough": {
+      "matter_id": "MAT-20260101-006",
+      "approval_id": "APR-A1B2C3D400000063",
+      "route_group": "APPROVAL"
+    },
+    "fields_absent": ["send_key", "dry_key", "communication_id_send", "communication_id_dry", "delivery_hash", "recipient"],
+    "note": "The approval names DFT-...-001 (version 1) but a version 2 draft for the same action exists; the approval must ride version 2, so version 1 is refused as STALE."
+  },
+  "assertions": [
+    "approving a draft that is not the latest version for its action returns gate STALE",
+    "the refusal names the newer draft id so the owner is pointed to what to approve instead",
+    "dry_run is normalised to the boolean true and passed through on the refusal",
+    "Config keys survive the refusal untouched",
+    "no delivery identity is emitted on a refusal path that stopped before the derivation block"
+  ],
+  "target": {
+    "workflow": "wf4",
+    "unit_file": "harness/units/wf4/approval-gate.js"
+  },
+  "harness": {
+    "adapter": "approval-gate"
+  }
+}

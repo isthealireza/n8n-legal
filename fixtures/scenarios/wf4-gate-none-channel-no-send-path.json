@@ -1,0 +1,87 @@
+{
+  "workflow": "wf4",
+  "unit": "WF4 Approval Gate refuses a NONE channel as INVALID with no send path",
+  "kind": "pure",
+  "id": "wf4-gate-none-channel-no-send-path",
+  "description": "An APPROVE decision whose action channel is NONE must return gate INVALID with a reason that names the channel, because only GMAIL has a send path and NONE must never be turned into one.",
+  "why_it_exists": "Gate check 6 (send preconditions) of wf4/approval-gate.js requires common.channel to be GMAIL. AGENTS.md section 6 records a live defect: WF4 Verify Selected Row passed a gate channel of NONE against a register row saying GMAIL. The delivery-key families only supplied GMAIL actions, so the NONE channel path was unasserted. This pins that a NONE channel fails closed as INVALID and is never sent.",
+  "input": {
+    "now": "2026-08-23T07:00:00.000Z",
+    "config": {
+      "matter_id": "MAT-20260101-008",
+      "approval_id": "APR-A1B2C3D400000065",
+      "decision": "APPROVE",
+      "chat_id": "OWNER_CHAT_ID",
+      "owner_chat_id": "OWNER_CHAT_ID",
+      "dry_run": "true",
+      "route_group": "APPROVAL"
+    },
+    "approvals": [
+      {
+        "approval_id": "APR-A1B2C3D400000065",
+        "action_id": "ACT-20260101-008-001",
+        "matter_id": "MAT-20260101-008",
+        "draft_id": "DFT-20260101-008-001",
+        "status": "PENDING",
+        "delivery_mode": "EMAIL_BODY",
+        "token_hash_or_reference": "CH-0f1e2d3c4b5a6978"
+      }
+    ],
+    "actions": [
+      {
+        "action_id": "ACT-20260101-008-001",
+        "matter_id": "MAT-20260101-008",
+        "channel": "NONE",
+        "recipient": "claims.intake@insurer-notices.invalid",
+        "status": "PENDING",
+        "idempotency_key": "ACT-20260101-008-001|CH-0f1e2d3c4b5a6978"
+      }
+    ],
+    "drafts": [
+      {
+        "draft_id": "DFT-20260101-008-001",
+        "action_id": "ACT-20260101-008-001",
+        "version": 1,
+        "content_hash": "CH-0f1e2d3c4b5a6978",
+        "content": "Our client requires the vehicle inspection report referred to in your letter of 14 January.",
+        "draft_type": "LETTER",
+        "review_status": "READY",
+        "source_refs_json": "[]"
+      }
+    ],
+    "communications": [],
+    "matters": [
+      {
+        "matter_id": "MAT-20260101-008",
+        "title": "Vehicle damage recovery",
+        "owner_chat_id": "OWNER_CHAT_ID"
+      }
+    ]
+  },
+  "expect": {
+    "gate": "INVALID",
+    "gate_reason_contains": ["NONE", "not GMAIL", "No send path"],
+    "dry_run": true,
+    "config_passthrough": {
+      "matter_id": "MAT-20260101-008",
+      "approval_id": "APR-A1B2C3D400000065",
+      "route_group": "APPROVAL"
+    },
+    "fields_present": ["send_key", "dry_key", "communication_id_send", "communication_id_dry"],
+    "note": "Even in dry_run the gate must be INVALID: a NONE channel has no send path and the refusal must carry that fact. The delivery identity is derived but never sent."
+  },
+  "assertions": [
+    "an APPROVE whose action channel is NONE returns gate INVALID",
+    "the refusal names the channel and states that no send path exists",
+    "the delivery identity is derived for reporting but the gate is INVALID, never SEND",
+    "dry_run is normalised to the boolean true and passed through on the refusal",
+    "Config keys survive the refusal untouched"
+  ],
+  "target": {
+    "workflow": "wf4",
+    "unit_file": "harness/units/wf4/approval-gate.js"
+  },
+  "harness": {
+    "adapter": "approval-gate"
+  }
+}
