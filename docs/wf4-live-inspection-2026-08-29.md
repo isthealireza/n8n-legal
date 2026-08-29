@@ -1,12 +1,24 @@
-# WF4 — live read-only inspection, 2026-08-29
+# WF4 — live inspection and gate-approved draft port, 2026-08-29
 
 Written 2026-08-29 during the Orca Fast Lane run `run_fe5d400247aa` (retry of the first
 controlled live-n8n task, with the coordinator repairs from PR #13 in place).
 
-**This inspection was read-only.** No `update_workflow`, no draft write, no publish, no
-activation, no execution. Everything below came from four MCP reads:
-`get_workflow_details`, `get_workflow_history`, `get_workflow_version` and
-`get_workflow_versions_diff`. The workflow was not modified.
+This document records TWO separate phases of the same run, and they must not be conflated:
+
+- **PHASE A — READ-ONLY INSPECTION (Sections 1–3).** The live inspection was read-only and
+  used exactly four MCP reads: `get_workflow_details`, `get_workflow_history`,
+  `get_workflow_version` and `get_workflow_versions_diff`. This phase performed no
+  `update_workflow`, no `setNodeParameter`, no draft write, no publish, no activation, no
+  execution, and no external side effect. The workflow was not modified by the inspection.
+- **PHASE B — GATE-APPROVED DRAFT PORT (Section 5).** Separately and later, after the owner
+  resolved a decision gate, the Orchestrator performed the approved draft port using one
+  `update_workflow` call with two `setNodeParameter` operations. This phase changed only the
+  `jsCode` values of `Integrity Guard` and `Build Integrity Halt Notice` in the WF4 draft. It
+  did not publish, activate, execute, send external messages, or modify unrelated nodes.
+
+In short: the live inspection in Sections 1–3 was read-only and used four MCP reads. Section
+5 separately records the later owner-gated draft port, which used one `update_workflow` call
+with two `setNodeParameter` operations.
 
 ---
 
@@ -150,11 +162,57 @@ without also publishing SPEC-2 Rev B in full** (79 new nodes, the Config passthr
 Approval Gate kill switch). That is a much larger review than the fix itself, and it is the
 reason the port is gated rather than assumed.
 
-## 5. The port — GATE-APPROVED AND TAKEN (draft only)
+## 5. The port — PHASE B: GATE-APPROVED AND TAKEN (draft only)
 
-Decision gate `gate_0d2012146a1b` on the Fast Lane `owner-gate` task was resolved
-**`approve`** by Ali at 2026-08-28 17:59:03. The port below was then performed. Publishing
-was NOT approved and was NOT done.
+**PHASE A (Sections 1–3) was read-only.** Everything below in this section is PHASE B: the
+owner-gated draft write that followed it.
+
+### The decision gate that authorised the port
+
+The port was authorised by Orca decision gate `gate_0d2012146a1b` on the Fast Lane
+`owner-gate` task (`task_867338791f4c`) of run `run_fe5d400247aa`:
+
+| gate field | value |
+|---|---|
+| gate id | `gate_0d2012146a1b` |
+| gate task | `task_867338791f4c` (`owner-gate`) |
+| run | `run_fe5d400247aa` |
+| status | **resolved** |
+| resolution | **`approve`** |
+| approved by | **Ali** |
+| resolved at | **2026-08-28 17:59:03** |
+
+The approved question and scope, COMPLETE and verbatim from the gate artefact
+(`orca orchestration gate-list --run run_fe5d400247aa` — gate `gate_0d2012146a1b`):
+
+> PROTECTED ACTION - n8n draft write on WF4. May I port the two prepared node fixes into the
+> WF4 DRAFT via mcp update_workflow? Workflow: 4 - Research Drafting Approval and Dispatch,
+> id zKr24IThF30e6jXw. Affected version: the DRAFT 8107c96f-57cd-4b77-a9bb-638a676d7926
+> (SPEC-2 Rev B, 181 nodes). The PUBLISHED version 902130f4 would NOT change - I would not
+> publish, activate or execute anything. EXACTLY what I would do: replace the jsCode of two
+> Code nodes and nothing else - Integrity Guard (7bee0e49-ab5e-471d-9a88-4da7d736e459) with
+> the body of harness/units/wf4/integrity-guard.js between its BEGIN/END VERBATIM markers
+> (declared CONFLICT_SEVERITY ranking so the owner is shown DUPLICATE_ACTION_ID_FIELD_MISMATCH
+> instead of the milder DUPLICATE_IDEMPOTENCY_KEY, plus integrity_conflict_count as distinct
+> ambiguous action_ids next to integrity_conflict_record_count), and Build Integrity Halt
+> Notice (7fd2f6ec-ab2d-4afa-940a-1def80c503fe) with the body of
+> harness/units/wf4/build-integrity-halt-notice.js (heading and halt_conflict_count use the
+> guard distinct count, raw count carried as halt_conflict_record_count). No other node, no
+> connection, no parameter, no credential. THINGS YOU SHOULD WEIGH BEFORE APPROVING: (a) the
+> draft 8107c96f is already 79 nodes ahead of published and also changes Config and the
+> Approval Gate jsCode, so you could not publish my two-node fix without also publishing
+> SPEC-2 Rev B in full; (b) that Approval Gate change is a fail-closed kill switch, but the
+> draft version description wrongly says the approval gate is unchanged, and nobody has
+> reviewed it. ROLLBACK if you approve and it goes wrong: restore_workflow_version to
+> 8107c96f-57cd-4b77-a9bb-638a676d7926. If you DENY, I change nothing in n8n, the fixes stay
+> repository-only, FINDINGS section 1 stays live in production, and I record the denial in
+> the run report.
+
+The gate therefore permitted **only** the two-node `jsCode`-only write to the WF4 draft. It
+did **not** permit publish, activation, execution, external messages, or any unrelated
+change. Publishing was NOT approved and was NOT done.
+
+The port below was then performed.
 
 | field | before the port | after the port |
 |---|---|---|
