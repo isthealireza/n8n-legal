@@ -1,12 +1,24 @@
-# WF4 — live read-only inspection, 2026-08-29
+# WF4 — live inspection and gate-approved draft port, 2026-08-29
 
 Written 2026-08-29 during the Orca Fast Lane run `run_fe5d400247aa` (retry of the first
 controlled live-n8n task, with the coordinator repairs from PR #13 in place).
 
-**This inspection was read-only.** No `update_workflow`, no draft write, no publish, no
-activation, no execution. Everything below came from four MCP reads:
-`get_workflow_details`, `get_workflow_history`, `get_workflow_version` and
-`get_workflow_versions_diff`. The workflow was not modified.
+This document records TWO separate phases of the same run, and they must not be conflated:
+
+- **PHASE A — READ-ONLY INSPECTION (Sections 1–3).** The live inspection was read-only and
+  used exactly four MCP reads: `get_workflow_details`, `get_workflow_history`,
+  `get_workflow_version` and `get_workflow_versions_diff`. This phase performed no
+  `update_workflow`, no `setNodeParameter`, no draft write, no publish, no activation, no
+  execution, and no external side effect. The workflow was not modified by the inspection.
+- **PHASE B — GATE-APPROVED DRAFT PORT (Section 5).** Separately and later, after the owner
+  resolved a decision gate, the Orchestrator performed the approved draft port using one
+  `update_workflow` call with two `setNodeParameter` operations. This phase changed only the
+  `jsCode` values of `Integrity Guard` and `Build Integrity Halt Notice` in the WF4 draft. It
+  did not publish, activate, execute, send external messages, or modify unrelated nodes.
+
+In short: the live inspection in Sections 1–3 was read-only and used four MCP reads. Section
+5 separately records the later owner-gated draft port, which used one `update_workflow` call
+with two `setNodeParameter` operations.
 
 ---
 
@@ -150,11 +162,45 @@ without also publishing SPEC-2 Rev B in full** (79 new nodes, the Config passthr
 Approval Gate kill switch). That is a much larger review than the fix itself, and it is the
 reason the port is gated rather than assumed.
 
-## 5. The port — GATE-APPROVED AND TAKEN (draft only)
+## 5. The port — PHASE B: GATE-APPROVED AND TAKEN (draft only)
 
-Decision gate `gate_0d2012146a1b` on the Fast Lane `owner-gate` task was resolved
-**`approve`** by Ali at 2026-08-28 17:59:03. The port below was then performed. Publishing
-was NOT approved and was NOT done.
+**PHASE A (Sections 1–3) was read-only.** Everything below in this section is PHASE B: the
+owner-gated draft write that followed it.
+
+### The decision gate that authorised the port
+
+The port was authorised by Orca decision gate `gate_0d2012146a1b` on the Fast Lane
+`owner-gate` task (`task_867338791f4c`) of run `run_fe5d400247aa`:
+
+| gate field | value |
+|---|---|
+| gate id | `gate_0d2012146a1b` |
+| gate task | `task_867338791f4c` (`owner-gate`) |
+| run | `run_fe5d400247aa` |
+| status | **resolved** |
+| resolution | **`approve`** |
+| approved by | **Ali** |
+| resolved at | **2026-08-28 17:59:03** |
+
+The approved question and scope (verbatim from the gate question):
+
+> "may the two prepared node fixes be ported into the WF4 DRAFT (8107c96f, SPEC-2 Rev B,
+> 181 nodes) via update_workflow — Integrity Guard 7bee0e49 and Build Integrity Halt Notice
+> 7fd2f6ec, jsCode only, no other node, connection, parameter or credential,
+> no publish/activate/execute — with the caveats that the draft is already 79 nodes ahead of
+> published and separately changes Config and the Approval Gate, so the fix cannot be
+> published without also shipping SPEC-2 Rev B, and that the Approval Gate change is
+> unreviewed and is wrongly described as unchanged by its own version description."
+
+The gate therefore permitted **only** the two-node `jsCode`-only write to the WF4 draft. It
+did **not** permit publish, activation, execution, external messages, or any unrelated
+change. Publishing was NOT approved and was NOT done.
+
+Note: the full gate question additionally spelled out the weighing caveats and the rollback
+path (`restore_workflow_version` to `8107c96f`); the complete text is retrievable from the
+gate artefact (`orca orchestration gate-list --run run_fe5d400247aa`).
+
+The port below was then performed.
 
 | field | before the port | after the port |
 |---|---|---|
