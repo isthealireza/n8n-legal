@@ -52,14 +52,21 @@
 # Usage:
 #   pwsh -File tools/orca/fastlane.ps1 -TaskFile tasks/queued/<name>.processing-<guid>.md
 #   pwsh -File tools/orca/fastlane.ps1 -TaskFile tasks/inbox/example.md -RefuteRounds 2
+#   pwsh -File tools/orca/fastlane.ps1 -TaskFile tasks/queued/<name>.processing-<guid>.md -LegTimeoutSec 5400
+#   pwsh -File tools/orca/fastlane.ps1 -TaskFile tasks/queued/<name>.processing-<guid>.md -LegTimeoutExtensionSec 7200
 #
 # Exit 0 = one PR created. Exit 1 = failed (task moved to tasks/done/<name>.FAILED).
+# A coordinator timeout is COLLECT-PENDING, not a task failure: the orchestrator
+# terminal stays live, and if a DONE file appears after the timeout+extension the
+# collection step (push + ONE PR) can still be performed manually from the worktree.
+# See tools/orca/README.md, "Coordinator timeout is collect-pending".
 # Every step is journaled to tasks/journal.txt and tasks/logs/.
 # ---------------------------------------------------------------------------
 param(
   [Parameter(Mandatory = $true)][string]$TaskFile,
   [int]$RefuteRounds = 2,
-  [int]$LegTimeoutSec = 1800
+  [int]$LegTimeoutSec = 1800,
+  [int]$LegTimeoutExtensionSec = 3600
 )
 
 # NOTE: do NOT use $ErrorActionPreference = 'Stop'. On Windows PowerShell 5.1
@@ -534,7 +541,27 @@ credentials and must never request them. Your verdict is advisory.
     # gate-create is resolved by Ali in the Orca UI and the flow resumes.
     Start-Sleep -Seconds 20
   }
-  if (-not (Test-Path -LiteralPath $doneFile)) { throw "Orchestrator (Claude) timed out after ${LegTimeoutSec}s; no DONE file at $doneFile" }
+
+  # INCIDENT 2026-08-29 (retry-live-wf4-inspection): the orchestrator finished
+  # everything but wrote its DONE file ~30 minutes AFTER this timeout expired,
+  # so the run was marked FAILED and the branch was never pushed or PR'd. Live
+  # n8n runs routinely take 30-90 minutes (opencode/DeepSeek TUI + live MCP
+  # inspection + owner decision-gate waits), so a fixed 1800s budget is too
+  # tight. Instead of failing at the first deadline: extend the wait by
+  # LegTimeoutExtensionSec (bounded), and even then never close Claude's
+  # terminal on timeout -- if a DONE file appears late, the collection step
+  # (push + ONE PR) can still be performed from the live worktree.
+  if (-not (Test-Path -LiteralPath $doneFile) -and $LegTimeoutExtensionSec -gt 0) {
+    Log "[orch] no DONE file after ${LegTimeoutSec}s; extending the wait by ${LegTimeoutExtensionSec}s (the orchestrator may still be working or waiting on a decision gate)."
+    $deadline = (Get-Date).AddSeconds($LegTimeoutExtensionSec)
+    while ((Get-Date) -lt $deadline) {
+      if (Test-Path -LiteralPath $doneFile) { break }
+      Start-Sleep -Seconds 20
+    }
+  }
+  if (-not (Test-Path -LiteralPath $doneFile)) {
+    throw "Orchestrator (Claude) timed out after ${LegTimeoutSec}s (+${LegTimeoutExtensionSec}s extension); no DONE file at $doneFile. The orchestrator terminal is still live -- if a DONE file appears later, collect it manually: push the branch and create the ONE PR (see tools/orca/README.md, 'Coordinator timeout is collect-pending, not task failure')."
+  }
   $orchReport = (Get-Content -LiteralPath $doneFile -Raw).Trim()
   Log "[orch] DONE file received:"
   Log $orchReport
