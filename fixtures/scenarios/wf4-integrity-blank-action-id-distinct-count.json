@@ -1,0 +1,203 @@
+{
+  "workflow": "wf4",
+  "unit": "WF4 Integrity Guard BLANK_ACTION_ID synthetic-key distinct count",
+  "kind": "pure",
+  "id": "wf4-integrity-blank-action-id-distinct-count",
+  "description": "Two separate Action rows with a blank action_id (whitespace-only, so they survive the Load Actions truthy filter) must each contribute their OWN synthetic ambiguous-id key '#blank@<snapshot_index>', so integrity_conflict_count is 2 — not 1 (a constant '#blank@' key would collapse both blanks onto one ambiguous id) and not 3, the raw conflict-record count (the second blank row is also missing its idempotency_key, so one extra BLANK_IDEMPOTENCY_KEY record rides along). The APPROVAL route keeps the per-action_id duplicate block OFF the blank id, leaving exactly the two BLANK_ACTION_ID records and the one BLANK_IDEMPOTENCY_KEY record.",
+  "why_it_exists": "harness/FINDINGS.md section 1, closed 2026-08-28 (the syntactic count half; notice half is D-COUNT-01). The fix counts DISTINCT in-scope action_ids: `const id = S(c.action_id); if (id) ambiguousIds[id] = true; ... if (c.code === 'BLANK_ACTION_ID') ambiguousIds['#blank@' + c.snapshot_index] = true;`. A row with no id cannot be counted by id by definition, so it is counted by a synthetic key that must be unique PER ROW. If that key dropped the snapshot_index, two blank rows would collapse to one ambiguous id (count 1); if the counter reverted to conflicts.length, the extra BLANK_IDEMPOTENCY_KEY record would inflate the answer to the raw record count (3). This scenario is the only one in the suite that has blank action ids at all: every existing WF4 integrity scenario uses non-blank ids, so the synthetic-key branch is otherwise never reached.",
+  "input": {
+    "case_id": "C1",
+    "config": {
+      "matter_id": "MAT-20260101-009",
+      "route_group": "APPROVAL",
+      "approval_id": "APR-1",
+      "dry_run": "true"
+    },
+    "actions": [
+      {
+        "action_id": "ACT-20260101-009-001",
+        "matter_id": "MAT-20260101-009",
+        "action_type": "CONTACT_INSURER",
+        "status": "READY",
+        "priority": "HIGH",
+        "depends_on_json": "[]",
+        "recipient": "owner (Alex)",
+        "channel": "MANUAL",
+        "requires_approval": "TRUE",
+        "draft_id": "",
+        "approval_id": "",
+        "due_at": "",
+        "deadline_basis": "",
+        "blocked_reason": "",
+        "idempotency_key": "MAT-20260101-009|001",
+        "created_at": "2026-08-19T17:15:07.880Z",
+        "updated_at": "2026-08-19T17:15:07.880Z"
+      },
+      {
+        "action_id": "   ",
+        "matter_id": "MAT-20260101-009",
+        "action_type": "COLLECT_FACTS",
+        "status": "READY",
+        "priority": "MEDIUM",
+        "depends_on_json": "[]",
+        "recipient": "",
+        "channel": "NONE",
+        "requires_approval": "FALSE",
+        "draft_id": "",
+        "approval_id": "",
+        "due_at": "",
+        "deadline_basis": "",
+        "blocked_reason": "",
+        "idempotency_key": "MAT-20260101-009|blankb",
+        "created_at": "2026-08-19T17:30:00.000Z",
+        "updated_at": "2026-08-19T17:30:00.000Z"
+      },
+      {
+        "action_id": "    ",
+        "matter_id": "MAT-20260101-009",
+        "action_type": "COLLECT_EVIDENCE",
+        "status": "READY",
+        "priority": "LOW",
+        "depends_on_json": "[]",
+        "recipient": "",
+        "channel": "NONE",
+        "requires_approval": "FALSE",
+        "draft_id": "",
+        "approval_id": "",
+        "due_at": "",
+        "deadline_basis": "",
+        "blocked_reason": "",
+        "idempotency_key": "   ",
+        "created_at": "2026-08-19T17:45:00.000Z",
+        "updated_at": "2026-08-19T17:45:00.000Z"
+      }
+    ],
+    "approvals": [
+      {
+        "approval_id": "APR-1",
+        "matter_id": "MAT-20260101-009",
+        "action_id": "ACT-20260101-009-001",
+        "draft_id": "DFT-1",
+        "status": "PENDING"
+      }
+    ],
+    "passthrough": {
+      "route": "QA",
+      "chat_id": "QA-CHAT",
+      "dry_run": "true",
+      "passthrough_marker": "PASSTHROUGH-OK"
+    },
+    "now": "2026-08-23T06:00:00.000Z",
+    "items": [
+      {
+        "route": "QA",
+        "chat_id": "QA-CHAT",
+        "dry_run": "true",
+        "passthrough_marker": "PASSTHROUGH-OK"
+      }
+    ],
+    "nodeOutputs": {
+      "Config": [
+        {
+          "matter_id": "MAT-20260101-009",
+          "route_group": "APPROVAL",
+          "approval_id": "APR-1",
+          "dry_run": "true"
+        }
+      ],
+      "Load Actions": [
+        {
+          "action_id": "ACT-20260101-009-001",
+          "matter_id": "MAT-20260101-009",
+          "action_type": "CONTACT_INSURER",
+          "status": "READY",
+          "priority": "HIGH",
+          "depends_on_json": "[]",
+          "recipient": "owner (Alex)",
+          "channel": "MANUAL",
+          "requires_approval": "TRUE",
+          "draft_id": "",
+          "approval_id": "",
+          "due_at": "",
+          "deadline_basis": "",
+          "blocked_reason": "",
+          "idempotency_key": "MAT-20260101-009|001",
+          "created_at": "2026-08-19T17:15:07.880Z",
+          "updated_at": "2026-08-19T17:15:07.880Z"
+        },
+        {
+          "action_id": "   ",
+          "matter_id": "MAT-20260101-009",
+          "action_type": "COLLECT_FACTS",
+          "status": "READY",
+          "priority": "MEDIUM",
+          "depends_on_json": "[]",
+          "recipient": "",
+          "channel": "NONE",
+          "requires_approval": "FALSE",
+          "draft_id": "",
+          "approval_id": "",
+          "due_at": "",
+          "deadline_basis": "",
+          "blocked_reason": "",
+          "idempotency_key": "MAT-20260101-009|blankb",
+          "created_at": "2026-08-19T17:30:00.000Z",
+          "updated_at": "2026-08-19T17:30:00.000Z"
+        },
+        {
+          "action_id": "    ",
+          "matter_id": "MAT-20260101-009",
+          "action_type": "COLLECT_EVIDENCE",
+          "status": "READY",
+          "priority": "LOW",
+          "depends_on_json": "[]",
+          "recipient": "",
+          "channel": "NONE",
+          "requires_approval": "FALSE",
+          "draft_id": "",
+          "approval_id": "",
+          "due_at": "",
+          "deadline_basis": "",
+          "blocked_reason": "",
+          "idempotency_key": "   ",
+          "created_at": "2026-08-19T17:45:00.000Z",
+          "updated_at": "2026-08-19T17:45:00.000Z"
+        }
+      ],
+      "Load Approvals": [
+        {
+          "approval_id": "APR-1",
+          "matter_id": "MAT-20260101-009",
+          "action_id": "ACT-20260101-009-001",
+          "draft_id": "DFT-1",
+          "status": "PENDING"
+        }
+      ]
+    }
+  },
+  "expect": {
+    "integrity_ok": false,
+    "gate": "DATA_INTEGRITY_CONFLICT",
+    "integrity_code": "BLANK_ACTION_ID",
+    "reaches": "Halt - Data Integrity Conflict",
+    "reaches_drafting": false,
+    "conflict_count": 2
+  },
+  "assertions": [
+    "two blank action_id rows (whitespace-only, so they survive the Load Actions truthy filter) each get their own synthetic key '#blank@<snapshot_index>' — '#blank@1' and '#blank@2' — so integrity_conflict_count is 2",
+    "the count is NOT 1: a constant '#blank@' key without the snapshot_index would collapse both blanks onto one ambiguous id",
+    "the count is NOT the raw record count (3): the second blank row is also missing its idempotency_key, so a BLANK_IDEMPOTENCY_KEY conflict record is reported alongside the two BLANK_ACTION_ID records",
+    "the reason string reads '2 ambiguous action(s) found, reported as 3 conflict record(s).'",
+    "integrity_code is BLANK_ACTION_ID: the two equal-severity blanks tie and the strictly-less-than scan keeps the earlier push as the headline",
+    "the APPROVAL route scopes the per-action_id duplicate block to the approval's single action id, so the blank id never also fires DUPLICATE_ACTION_ID",
+    "the Build Draft Context branch is never reached",
+    "the passthrough fields (route, chat_id, dry_run, passthrough_marker) survive onto the halt item"
+  ],
+  "target": {
+    "workflow": "wf4",
+    "unit_file": "harness/units/wf4/integrity-guard.js"
+  },
+  "harness": {
+    "adapter": "integrity-guard"
+  }
+}

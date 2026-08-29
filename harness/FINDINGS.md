@@ -55,7 +55,19 @@ reason this node exists. The owner is told the milder of the two.
 id is reported twice, once per class. Nothing is lost (`integrity_detail` carries the full
 list) but the count in the notice is double the number of ambiguous actions.
 
-**Status — fixed in the repo, NOT ported to n8n, NOT published (2026-08-28).**
+**Status — fixed in the repo, PORTED TO THE n8n DRAFT 2026-08-29, NOT PUBLISHED.**
+**Re-verified against the live instance 2026-08-29** by read-only MCP inspection: WF4's
+published version is `902130f4`, its `Integrity Guard` jsCode still hashes to
+`0950131e99ab…` — the pre-fix body — and its `Build Integrity Halt Notice` still hashes to
+`baabf88da65e…`. Both defects are in production today.
+
+**Ported to the draft 2026-08-29** under Orca decision gate `gate_0d2012146a1b` (resolved
+`approve` by Ali). One `update_workflow`, two `setNodeParameter` operations, draft
+`8107c96f` -> `470120af-9909-4760-89d9-fc78e4074d75`; 2 nodes modified, 0 added, 0 removed,
+0 connection changes. `activeVersionId` is still `902130f4`, so **production is unchanged and
+this section stays open.** It closes when the owner publishes and the units are re-extracted.
+Rollback for the port is `restore_workflow_version` to `8107c96f`. Full record, including one
+comment-token deviation from the staged body, in `docs/wf4-live-inspection-2026-08-29.md` §5.
 Production still has this defect today; the harness no longer fails on it because the
 unit is ahead of the live node. The fix: rank `conflicts` by a declared severity order
 before taking the headline, with `DUPLICATE_ACTION_ID_FIELD_MISMATCH` above

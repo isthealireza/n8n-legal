@@ -241,3 +241,33 @@ a truncation risk.
 4. Diff the two and write down what the difference is and who authored it. Check the author
    string for `(via MCP)`.
 5. Hand the owner the diff. They publish.
+
+## 7. wf4 moved — correction to the §3 table (2026-08-29)
+
+§3 is a snapshot of 2026-08-25T02:15Z and it says wf4 is not diverged, draft and active both
+`8f6b3704`. **Both halves of that row are now stale.** Read today, live, read-only:
+
+| wf | id | draft (`versionId`) | active (`activeVersionId`) | diverged | files |
+|---|---|---|---|---|---|
+| wf4 | `zKr24IThF30e6jXw` | `8107c96f` (181 nodes) | `902130f4` (102 nodes) | **yes** | `wf4.active.json` |
+
+Two moves happened between the two reads:
+
+1. **`8f6b3704` was superseded by a publish.** `902130f4` — *"D-CHANNEL-01 + D-STATUS-01:
+   fail-closed channel guard and status fingerprint"*, `Owner (via MCP)`,
+   2026-08-25T07:36:57Z — became active. `exports/wf4.active.json` was re-captured from it
+   on 2026-08-27 and today's re-read confirms the capture is exact (0 residual diffs after
+   the scrub map, 102/102 nodes, connections byte-identical).
+2. **A new draft went in front of it.** `8107c96f` — *"SPEC-2 Rev B: verify inherited safety
+   contract"*, `Owner (via MCP)`, 2026-08-27T02:33:23Z — adds 79 nodes and modifies `Config`
+   and `Approval Gate`.
+
+**No `wf4.draft.json` has been captured for `8107c96f`.** Per §2 the absence of a draft file
+is the claim that draft == active, and for wf4 that claim is now false. Capturing it is its
+own change (the draft is a 181-node body and touches the Approval Gate, so it needs the
+owner's eyes, not an opportunistic export inside another task). Until it is captured, this
+section is the record that the divergence exists.
+
+Both entries are `(via MCP)` with `autosaved: false`, so neither is the UI-autosave trap of
+§1. Full account — including the `Approval Gate` kill-switch edit that the draft's own
+version description calls "unchanged" — is in `docs/wf4-live-inspection-2026-08-29.md`.
