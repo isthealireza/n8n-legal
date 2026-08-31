@@ -8,18 +8,13 @@
       "active": {
         "kind": "active",
         "path": "exports/active/WF1.json",
-        "sha256_body": "054ae8d671a89871f81a06f60b273792217e63067b4a1fcabca33f7bfbc673e0",
-        "sha256_canonical": "938bc6f52c9bee2af7e4508a144d77140b2d8ee5d5a5fb248d0599e956641400"
+        "sha256_body": "3f58fde4ccdaef80c3a30547d766622536a81a6c4b2092a0632e30d6d2842bf2",
+        "sha256_canonical": "16f1d37eb044bca672597c4ff891fddbdc9dd196f80df06674c6cf54f797987c"
       },
-      "active_version_id": "b1c425bf-5830-4e3c-a6f7-bcf2c02ef593",
+      "active_version_id": "1dfe5c75-9155-43db-9256-93d385faf6bd",
       "determination": "from_active_version_object",
-      "draft": {
-        "kind": "draft",
-        "path": "exports/draft/WF1.json",
-        "sha256_body": "5b21777926b3c0bbfa95431868b7e006f95dbf5a9e90afb179f8e84b9c6f1989",
-        "sha256_canonical": "9ebbe0a3b91ba743495f2b69ce03f273537b134c594f939fadb13a45061a99ad"
-      },
-      "draft_version_id": "fa5f21c3-d745-42cc-a76c-e863b03dfe85",
+      "draft": null,
+      "draft_version_id": "1dfe5c75-9155-43db-9256-93d385faf6bd",
       "id": "xUcAXTgocHPsHy5Y",
       "name": "1 - Telegram Intake and Command Router"
     },
@@ -27,18 +22,13 @@
       "active": {
         "kind": "active",
         "path": "exports/active/WF2.json",
-        "sha256_body": "7b6ae1769697c17507fe063a5b795547bde8b177bc66a24bc9f678d1fd9ca377",
-        "sha256_canonical": "bffc63875972327988266430cb1e4f7398db1c878f7d007a0907e41b86b41fb4"
+        "sha256_body": "4a4906f2094cadcedeb08ba7a2e96e32ae5f796071018dc2a3dfaed388853422",
+        "sha256_canonical": "6596d22ccb9940615f51288016310c1d3e04c96581239d43475353fb9d67a865"
       },
-      "active_version_id": "f2a5156f-7183-4117-aa98-74b07734a773",
+      "active_version_id": "918f34c7-0ed7-4007-af56-6aaa4cdab8c0",
       "determination": "from_active_version_object",
-      "draft": {
-        "kind": "draft",
-        "path": "exports/draft/WF2.json",
-        "sha256_body": "c3d1414a5f1abaa703ff6690b1bcd9bb8197e0d5614b76713fbbb643ecbcbaca",
-        "sha256_canonical": "e22a203d8545ae181ecb14247eb8eb70681b997672dbe6a0ab87e1a1648bf34b"
-      },
-      "draft_version_id": "12cebd41-bc4b-43eb-b0f6-8aefd0ce7202",
+      "draft": null,
+      "draft_version_id": "918f34c7-0ed7-4007-af56-6aaa4cdab8c0",
       "id": "OaVCEsrt2qpo28rB",
       "name": "2 - Matter Classification and Planning"
     },
@@ -65,18 +55,13 @@
       "active": {
         "kind": "active",
         "path": "exports/active/WF4.json",
-        "sha256_body": "8f116dde4fdebc89cbda8fec4ad1df5dbde5d2023679095a4a894a966906a6ee",
-        "sha256_canonical": "7b17c62fd22ad02cd2770600916d5e1aa6238ec5c9bd87ff6a94d5354d0e8769"
+        "sha256_body": "9e4fd11c9b24c7c84fbd898ad9529592df8377b25d498a20584acc097eb9fcc6",
+        "sha256_canonical": "5d67272ea61d0f6c545184d8bc4293439a9e64a82a3d352d6e78751f2332f8c7"
       },
-      "active_version_id": "902130f4-58d0-4189-bf80-273c753c9c34",
+      "active_version_id": "01f7cdb7-5f8f-4e6a-960f-5703f1359dcf",
       "determination": "from_active_version_object",
-      "draft": {
-        "kind": "draft",
-        "path": "exports/draft/WF4.json",
-        "sha256_body": "827a6c1c1be6db01ea56096a13b46afef3016d52ee872fb11eba1efeb10ef494",
-        "sha256_canonical": "6d426e2cb2211d525d0442b72644b4e0748b647b5fb1150a07f23bb36fe249c6"
-      },
-      "draft_version_id": "470120af-9909-4760-89d9-fc78e4074d75",
+      "draft": null,
+      "draft_version_id": "01f7cdb7-5f8f-4e6a-960f-5703f1359dcf",
       "id": "zKr24IThF30e6jXw",
       "name": "4 - Research Drafting Approval and Dispatch"
     },

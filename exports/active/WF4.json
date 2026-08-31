@@ -1,9 +1,9 @@
 {
   "_capture": {
-    "active_version_id": "902130f4-58d0-4189-bf80-273c753c9c34",
+    "active_version_id": "01f7cdb7-5f8f-4e6a-960f-5703f1359dcf",
     "capture_time": "see exports/last-run.json (untracked, so an unchanged capture does not produce a commit)",
     "draft_active_determination": "from_active_version_object",
-    "draft_version_id": "470120af-9909-4760-89d9-fc78e4074d75",
+    "draft_version_id": "01f7cdb7-5f8f-4e6a-960f-5703f1359dcf",
     "key": "WF4",
     "kind": "active",
     "scrub_counts": {
@@ -20,7 +20,7 @@
   },
   "workflow": {
     "active": true,
-    "activeVersionId": "902130f4-58d0-4189-bf80-273c753c9c34",
+    "activeVersionId": "01f7cdb7-5f8f-4e6a-960f-5703f1359dcf",
     "connections": {
       "Any Evidence Text?": {
         "main": [
@@ -1289,6 +1289,7 @@
         },
         "executeOnce": true,
         "id": "c7aa4a31-4512-42e7-8521-5dc7202b1e4e",
+        "maxTries": 3,
         "name": "Load Matters",
         "parameters": {
           "documentId": {
@@ -1307,8 +1308,10 @@
           448,
           1312
         ],
+        "retryOnFail": true,
         "type": "n8n-nodes-base.googleSheets",
-        "typeVersion": 4.5
+        "typeVersion": 4.5,
+        "waitBetweenTries": 2000
       },
       {
         "alwaysOutputData": true,
@@ -1320,6 +1323,7 @@
         },
         "executeOnce": true,
         "id": "59fad2c5-7bae-4f30-978e-5b7863eb30b5",
+        "maxTries": 3,
         "name": "Load Actions",
         "parameters": {
           "documentId": {
@@ -1338,8 +1342,10 @@
           672,
           1312
         ],
+        "retryOnFail": true,
         "type": "n8n-nodes-base.googleSheets",
-        "typeVersion": 4.5
+        "typeVersion": 4.5,
+        "waitBetweenTries": 2000
       },
       {
         "alwaysOutputData": true,
@@ -1351,6 +1357,7 @@
         },
         "executeOnce": true,
         "id": "1dfd874e-77ce-4271-bd97-915d8fa94346",
+        "maxTries": 3,
         "name": "Load Drafts",
         "parameters": {
           "documentId": {
@@ -1369,8 +1376,10 @@
           880,
           1312
         ],
+        "retryOnFail": true,
         "type": "n8n-nodes-base.googleSheets",
-        "typeVersion": 4.5
+        "typeVersion": 4.5,
+        "waitBetweenTries": 2000
       },
       {
         "alwaysOutputData": true,
@@ -1382,6 +1391,7 @@
         },
         "executeOnce": true,
         "id": "c5073f0d-5dab-444c-b633-b7c2cf2a75e2",
+        "maxTries": 3,
         "name": "Load Approvals",
         "parameters": {
           "documentId": {
@@ -1400,8 +1410,10 @@
           1104,
           1312
         ],
+        "retryOnFail": true,
         "type": "n8n-nodes-base.googleSheets",
-        "typeVersion": 4.5
+        "typeVersion": 4.5,
+        "waitBetweenTries": 2000
       },
       {
         "alwaysOutputData": true,
@@ -1413,6 +1425,7 @@
         },
         "executeOnce": true,
         "id": "268651d4-d465-4356-b5f8-bb521bd66e6c",
+        "maxTries": 3,
         "name": "Load Communications",
         "parameters": {
           "documentId": {
@@ -1431,8 +1444,10 @@
           1328,
           1312
         ],
+        "retryOnFail": true,
         "type": "n8n-nodes-base.googleSheets",
-        "typeVersion": 4.5
+        "typeVersion": 4.5,
+        "waitBetweenTries": 2000
       },
       {
         "alwaysOutputData": true,
@@ -1444,6 +1459,7 @@
         },
         "executeOnce": true,
         "id": "f23af1ab-441c-441a-95f9-e14f73f05a0d",
+        "maxTries": 3,
         "name": "Load Evidence",
         "parameters": {
           "documentId": {
@@ -1462,8 +1478,10 @@
           1552,
           1312
         ],
+        "retryOnFail": true,
         "type": "n8n-nodes-base.googleSheets",
-        "typeVersion": 4.5
+        "typeVersion": 4.5,
+        "waitBetweenTries": 2000
       },
       {
         "id": "901bf1b6-6c22-42ca-85a5-3b1c12f5e418",
@@ -1741,7 +1759,7 @@
         "id": "69fe2185-9000-4718-b08a-b9905d0c9f72",
         "name": "Source Registry",
         "parameters": {
-          "jsCode": "// SOURCE REGISTRY. The only place a legal source URL is allowed to live.\n//\n// Every entry below was verified end to end by the workflow \"QA - Source Retrieval\n// Probe\" (execution 284) against this exact HTTP node configuration: it fetched, it\n// returned readable text, and the scored anchor landed on the operative provision\n// rather than on the table of contents. DO NOT ADD A URL THAT HAS NOT BEEN PROBED.\n//\n// Why the previous list always arrived empty. Build Draft Context built its host\n// allow list with new URL(), wrapped in try/catch. new URL throws in this sandbox,\n// the catch swallowed the throw, allowedHosts stayed empty, and the filter that\n// tested against it then rejected every candidate. sources_retrieved was therefore\n// structurally 0 and every legal sentence in every draft came out [UNVERIFIED].\n// Host parsing is a regex here for that reason.\n//\n// A correction to what this comment used to claim. It said \"Build Draft Context's own urls\n// field is no longer read by anything.\" That was FALSE when it was written. Distil Sources\n// still read it, as a silent positional fallback, and because that list is ordered\n// differently from this registry every Sources row in execution 329 was written with\n// another Act's URL against its own title and excerpt. The statement is true only now,\n// because the fallback has been deleted. This registry is the single source of truth for a\n// source URL, and Distil Sources reaches the entry through pairedItem provenance rather\n// than by array position. Do not reintroduce a positional join between two lists.\n//\n// Rejected on evidence, not on preference:\n//   www.fairwork.gov.au        returns 0 bytes to this node\n//   www.wa.gov.au              fetches, but carries no provision text to cite\n//   www.austlii.edu.au         403, Cloudflare challenge\n//   legislation.gov.au epub    every part serves the same table of contents\n//\n// The mrdoc id changes when an Act is reconsolidated. A dead id fetches nothing,\n// which records RETRIEVAL_FAILED and blocks the send. It cannot invent a citation.\n\nconst WA = 'https://www.legislation.wa.gov.au/legislation/statutes.nsf/RedirectURL';\nconst LAND = 'https://www.legislation.wa.gov.au/legislation/statutes.nsf/';\n\nconst LIMITATION = {\n  url: WA + '?OpenAgent&query=mrdoc_47979.htm',\n  landing: LAND + 'law_a9389.html',\n  cite: 'Limitation Act 2005 (WA) s 13',\n  want: ['General limitation period', 'An action on any cause of action cannot be commenced'],\n};\nconst ROAD_TRAFFIC = {\n  url: WA + '?OpenAgent&query=mrdoc_48198.htm',\n  landing: LAND + 'law_a703.html',\n  cite: 'Road Traffic Act 1974 (WA) ss 54-56',\n  want: ['Driver in incident occasioning property damage to stop and give information', 'report incident to police'],\n};\nconst MAGISTRATES = {\n  url: WA + '?OpenAgent&query=mrdoc_48918.htm',\n  landing: LAND + 'law_a9258.html',\n  cite: 'Magistrates Court (Civil Proceedings) Act 2004 (WA) s 4',\n  want: ['Term used: jurisdictional limit'],\n};\nconst MVTPI = {\n  url: WA + '?OpenAgent&query=mrdoc_47506.htm',\n  landing: LAND + 'law_a527.html',\n  cite: 'Motor Vehicle (Third Party Insurance) Act 1943 (WA) s 4',\n  want: ['Insurance against third party risks'],\n};\nconst MCE = {\n  url: WA + '?OpenAgent&query=mrdoc_48248.htm',\n  landing: LAND + 'law_a516.html',\n  cite: 'Minimum Conditions of Employment Act 1993 (WA) s 9A',\n  want: ['Maximum hours of work'],\n};\n\n// Commonwealth employment law has no retrievable provision text from this node, so the\n// employment and contractor playbooks can cite the WA state-system floor and nothing\n// else. Anything resting on the Fair Work Act stays [UNVERIFIED] and the gate refuses\n// to send it. That is the honest state, not a gap to paper over.\nconst REGISTRY = {\n  motor_vehicle_damage_v1: [ROAD_TRAFFIC, LIMITATION, MAGISTRATES, MVTPI],\n  employment_contract_v1: [MCE, LIMITATION],\n  contractor_agreement_v1: [MCE, LIMITATION],\n  generic_legal_research_v1: [LIMITATION, MAGISTRATES],\n};\n\nconst ctx = $('Collect Evidence Text').first().json;\nconst pb = String(ctx.playbook_id || '');\nconst list = (REGISTRY[pb] || REGISTRY.generic_legal_research_v1 || []).slice(0, 6);\n\n// Always emit one item so the chain stays alive. An empty url fetches nothing, which\n// records RETRIEVAL_FAILED and leaves research_status UNVERIFIED.\nreturn list.length\n  ? list.map(s => ({ json: { url: s.url, want: s.want, cite: s.cite, landing: s.landing } }))\n  : [{ json: { url: '', want: [], cite: '', landing: '' } }];"
+          "jsCode": "// SOURCE REGISTRY. The only place a legal source URL is allowed to live.\n//\n// Every entry below was verified end to end by the workflow \"QA - Source Retrieval\n// Probe\" (execution 284) against this exact HTTP node configuration: it fetched, it\n// returned readable text, and the scored anchor landed on the operative provision\n// rather than on the table of contents. DO NOT ADD A URL THAT HAS NOT BEEN PROBED.\n//\n// Why the previous list always arrived empty. Build Draft Context built its host\n// allow list with new URL(), wrapped in try/catch. new URL throws in this sandbox,\n// the catch swallowed the throw, allowedHosts stayed empty, and the filter that\n// tested against it then rejected every candidate. sources_retrieved was therefore\n// structurally 0 and every legal sentence in every draft came out [UNVERIFIED].\n// Host parsing is a regex here for that reason.\n//\n// A correction to what this comment used to claim. It said \"Build Draft Context's own urls\n// field is no longer read by anything.\" That was FALSE when it was written. Distil Sources\n// still read it, as a silent positional fallback, and because that list is ordered\n// differently from this registry every Sources row in execution 329 was written with\n// another Act's URL against its own title and excerpt. The statement is true only now,\n// because the fallback has been deleted. This registry is the single source of truth for a\n// source URL, and Distil Sources reaches the entry through pairedItem provenance rather\n// than by array position. Do not reintroduce a positional join between two lists.\n//\n// Rejected on evidence, not on preference:\n//   www.fairwork.gov.au        returns 0 bytes to this node\n//   www.wa.gov.au              fetches, but carries no provision text to cite\n//   www.austlii.edu.au         403, Cloudflare challenge\n//   legislation.gov.au epub    every part serves the same table of contents\n//\n// RE-PROBED 2026-09-01, because a later review wrongly assumed the Commonwealth sources\n// had simply never been wired up. They had. Both findings are negative and both are now\n// on the record so the mistake is not repeated:\n//   probe 613  www.fairwork.gov.au/leave/annual-leave\n//              timeout of 30000ms exceeded, ECONNABORTED. Not merely empty: unreachable.\n//              Note that neverError:true does NOT survive a transport timeout. Only\n//              onError does, which is why Fetch Source carries it.\n//   probe 614  legislation.gov.au, Fair Work Act 2009 (Cth) C2009A00028, three forms:\n//              /latest/text, /asmade/text and /Details/. All returned HTTP 200 with\n//              57k-130k characters of text, and the wanted phrase \"Entitlement to annual\n//              leave\" WAS present - but heading_marker was false on all three and the\n//              body opens with Federal Register site chrome. That is the contents\n//              listing, i.e. exactly the PINPOINT_ONLY_IN_CONTENTS condition Distil\n//              Sources exists to reject. Phrase presence alone is not authority.\n//\n// The mrdoc id changes when an Act is reconsolidated. A dead id fetches nothing,\n// which records RETRIEVAL_FAILED and blocks the send. It cannot invent a citation.\n\nconst WA = 'https://www.legislation.wa.gov.au/legislation/statutes.nsf/RedirectURL';\nconst LAND = 'https://www.legislation.wa.gov.au/legislation/statutes.nsf/';\n\nconst LIMITATION = {\n  url: WA + '?OpenAgent&query=mrdoc_47979.htm',\n  landing: LAND + 'law_a9389.html',\n  cite: 'Limitation Act 2005 (WA) s 13',\n  want: ['General limitation period', 'An action on any cause of action cannot be commenced'],\n};\nconst ROAD_TRAFFIC = {\n  url: WA + '?OpenAgent&query=mrdoc_48198.htm',\n  landing: LAND + 'law_a703.html',\n  cite: 'Road Traffic Act 1974 (WA) ss 54-56',\n  want: ['Driver in incident occasioning property damage to stop and give information', 'report incident to police'],\n};\nconst MAGISTRATES = {\n  url: WA + '?OpenAgent&query=mrdoc_48918.htm',\n  landing: LAND + 'law_a9258.html',\n  cite: 'Magistrates Court (Civil Proceedings) Act 2004 (WA) s 4',\n  want: ['Term used: jurisdictional limit'],\n};\nconst MVTPI = {\n  url: WA + '?OpenAgent&query=mrdoc_47506.htm',\n  landing: LAND + 'law_a527.html',\n  cite: 'Motor Vehicle (Third Party Insurance) Act 1943 (WA) s 4',\n  want: ['Insurance against third party risks'],\n};\nconst MCE = {\n  url: WA + '?OpenAgent&query=mrdoc_48248.htm',\n  landing: LAND + 'law_a516.html',\n  cite: 'Minimum Conditions of Employment Act 1993 (WA) s 9A',\n  want: ['Maximum hours of work'],\n};\n\n// Commonwealth employment law has no retrievable provision text from this node, so the\n// employment and contractor playbooks can cite the WA state-system floor and nothing\n// else. Anything resting on the Fair Work Act stays [UNVERIFIED] and the gate refuses\n// to send it. That is the honest state, not a gap to paper over.\n//\n// D1a, 2026-09-01. LIMITATION removed from the two employment playbooks. A general\n// six-year limitation period for commencing an action has nothing to do with drafting an\n// employment contract, and it was writing an irrelevant Sources row against every\n// employment draft (seen in execution 611). It also inflated source_ref_count from 1 to 2,\n// which makes Approval Gate 6.6 - refuse to send when citesLaw(content) and\n// source_ref_count is 0 - easier to satisfy on a citation unrelated to the draft's\n// content. Fewer, relevant sources is the safer posture here. LIMITATION is untouched\n// where it belongs, in motor_vehicle_damage_v1 and generic_legal_research_v1.\nconst REGISTRY = {\n  motor_vehicle_damage_v1: [ROAD_TRAFFIC, LIMITATION, MAGISTRATES, MVTPI],\n  employment_contract_v1: [MCE],\n  contractor_agreement_v1: [MCE],\n  generic_legal_research_v1: [LIMITATION, MAGISTRATES],\n};\n\nconst ctx = $('Collect Evidence Text').first().json;\nconst pb = String(ctx.playbook_id || '');\nconst list = (REGISTRY[pb] || REGISTRY.generic_legal_research_v1 || []).slice(0, 6);\n\n// Always emit one item so the chain stays alive. An empty url fetches nothing, which\n// records RETRIEVAL_FAILED and leaves research_status UNVERIFIED.\nreturn list.length\n  ? list.map(s => ({ json: { url: s.url, want: s.want, cite: s.cite, landing: s.landing } }))\n  : [{ json: { url: '', want: [], cite: '', landing: '' } }];"
         },
         "position": [
           3520,
@@ -2562,6 +2580,7 @@
           }
         },
         "id": "d7f12b7e-fb66-4e4c-88d5-5e0517234ac7",
+        "maxTries": 3,
         "name": "Set Action Awaiting Approval",
         "parameters": {
           "columns": {
@@ -2762,8 +2781,10 @@
           5520,
           704
         ],
+        "retryOnFail": true,
         "type": "n8n-nodes-base.googleSheets",
-        "typeVersion": 4.5
+        "typeVersion": 4.5,
+        "waitBetweenTries": 2000
       },
       {
         "credentials": {
@@ -2773,6 +2794,7 @@
           }
         },
         "id": "7656cc45-c200-4c11-9d78-49310417c400",
+        "maxTries": 3,
         "name": "Set Matter Awaiting Review",
         "parameters": {
           "columns": {
@@ -2925,8 +2947,10 @@
           5744,
           704
         ],
+        "retryOnFail": true,
         "type": "n8n-nodes-base.googleSheets",
-        "typeVersion": 4.5
+        "typeVersion": 4.5,
+        "waitBetweenTries": 2000
       },
       {
         "id": "13a8d0c2-653f-4ba9-b854-5351276b9fba",
@@ -7227,8 +7251,8 @@
     "staticData": null,
     "tags": [],
     "triggerCount": 0,
-    "updatedAt": "2026-08-28T18:05:17.418Z",
-    "versionCounter": 77,
-    "versionId": "902130f4-58d0-4189-bf80-273c753c9c34"
+    "updatedAt": "2026-08-31T18:05:09.837Z",
+    "versionCounter": 80,
+    "versionId": "01f7cdb7-5f8f-4e6a-960f-5703f1359dcf"
   }
 }

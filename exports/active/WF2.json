@@ -1,9 +1,9 @@
 {
   "_capture": {
-    "active_version_id": "f2a5156f-7183-4117-aa98-74b07734a773",
+    "active_version_id": "918f34c7-0ed7-4007-af56-6aaa4cdab8c0",
     "capture_time": "see exports/last-run.json (untracked, so an unchanged capture does not produce a commit)",
     "draft_active_determination": "from_active_version_object",
-    "draft_version_id": "12cebd41-bc4b-43eb-b0f6-8aefd0ce7202",
+    "draft_version_id": "918f34c7-0ed7-4007-af56-6aaa4cdab8c0",
     "key": "WF2",
     "kind": "active",
     "scrub_counts": {
@@ -20,7 +20,7 @@
   },
   "workflow": {
     "active": true,
-    "activeVersionId": "f2a5156f-7183-4117-aa98-74b07734a773",
+    "activeVersionId": "918f34c7-0ed7-4007-af56-6aaa4cdab8c0",
     "connections": {
       "Append Actions": {
         "main": [
@@ -369,6 +369,7 @@
         },
         "executeOnce": true,
         "id": "a5772069-f96f-4115-adfc-b67b5ba79840",
+        "maxTries": 3,
         "name": "Load Matters",
         "parameters": {
           "documentId": {
@@ -387,8 +388,10 @@
           672,
           528
         ],
+        "retryOnFail": true,
         "type": "n8n-nodes-base.googleSheets",
-        "typeVersion": 4.5
+        "typeVersion": 4.5,
+        "waitBetweenTries": 2000
       },
       {
         "id": "f2f9d98f-c11c-4c54-b40c-ec6f8261efab",
@@ -490,6 +493,7 @@
           }
         },
         "id": "32d0fcc6-30da-43ec-8b94-406f12005bae",
+        "maxTries": 3,
         "name": "Log Plan Failure",
         "parameters": {
           "columns": {
@@ -619,8 +623,10 @@
           1760,
           784
         ],
+        "retryOnFail": true,
         "type": "n8n-nodes-base.googleSheets",
-        "typeVersion": 4.5
+        "typeVersion": 4.5,
+        "waitBetweenTries": 2000
       },
       {
         "credentials": {
@@ -655,6 +661,7 @@
           }
         },
         "id": "6782cba3-a320-4b8f-b680-f2ed77212328",
+        "maxTries": 3,
         "name": "Upsert Matter",
         "parameters": {
           "columns": {
@@ -826,8 +833,10 @@
           1760,
           528
         ],
+        "retryOnFail": true,
         "type": "n8n-nodes-base.googleSheets",
-        "typeVersion": 4.5
+        "typeVersion": 4.5,
+        "waitBetweenTries": 2000
       },
       {
         "id": "f5639ba3-44f9-4c70-9717-462a475f7da4",
@@ -1227,6 +1236,7 @@
           }
         },
         "id": "167d78be-0c57-434c-b978-fc16e5a34b7d",
+        "maxTries": 3,
         "name": "Persist Session NI",
         "parameters": {
           "columns": {
@@ -1318,8 +1328,10 @@
           2656,
           320
         ],
+        "retryOnFail": true,
         "type": "n8n-nodes-base.googleSheets",
-        "typeVersion": 4.5
+        "typeVersion": 4.5,
+        "waitBetweenTries": 2000
       },
       {
         "id": "b51d5e8a-94a3-4e3f-b073-60be4abdf6e4",
@@ -1342,6 +1354,7 @@
           }
         },
         "id": "66cd0e7b-38b2-4bc7-8eab-4ddaa4ea6c36",
+        "maxTries": 3,
         "name": "Persist Session CL",
         "parameters": {
           "columns": {
@@ -1433,8 +1446,10 @@
           2864,
           688
         ],
+        "retryOnFail": true,
         "type": "n8n-nodes-base.googleSheets",
-        "typeVersion": 4.5
+        "typeVersion": 4.5,
+        "waitBetweenTries": 2000
       },
       {
         "id": "ed3307e4-6aa3-425c-b9bf-87eb1fc85b5e",
@@ -1498,8 +1513,8 @@
     "staticData": null,
     "tags": [],
     "triggerCount": 0,
-    "updatedAt": "2026-08-27T02:31:55.475Z",
-    "versionCounter": 41,
-    "versionId": "f2a5156f-7183-4117-aa98-74b07734a773"
+    "updatedAt": "2026-08-31T17:21:50.054Z",
+    "versionCounter": 43,
+    "versionId": "918f34c7-0ed7-4007-af56-6aaa4cdab8c0"
   }
 }

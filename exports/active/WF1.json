@@ -1,9 +1,9 @@
 {
   "_capture": {
-    "active_version_id": "b1c425bf-5830-4e3c-a6f7-bcf2c02ef593",
+    "active_version_id": "1dfe5c75-9155-43db-9256-93d385faf6bd",
     "capture_time": "see exports/last-run.json (untracked, so an unchanged capture does not produce a commit)",
     "draft_active_determination": "from_active_version_object",
-    "draft_version_id": "fa5f21c3-d745-42cc-a76c-e863b03dfe85",
+    "draft_version_id": "1dfe5c75-9155-43db-9256-93d385faf6bd",
     "key": "WF1",
     "kind": "active",
     "scrub_counts": {
@@ -21,7 +21,7 @@
   },
   "workflow": {
     "active": true,
-    "activeVersionId": "b1c425bf-5830-4e3c-a6f7-bcf2c02ef593",
+    "activeVersionId": "1dfe5c75-9155-43db-9256-93d385faf6bd",
     "connections": {
       "Authorised Owner?": {
         "main": [
@@ -529,6 +529,7 @@
           }
         },
         "id": "5f489f74-ae7a-4879-8073-d61087f65585",
+        "maxTries": 3,
         "name": "Log Security Event",
         "parameters": {
           "columns": {
@@ -658,8 +659,10 @@
           880,
           784
         ],
+        "retryOnFail": true,
         "type": "n8n-nodes-base.googleSheets",
-        "typeVersion": 4.5
+        "typeVersion": 4.5,
+        "waitBetweenTries": 2000
       },
       {
         "id": "500c017f-cea6-4911-88f3-6c5a7f085a29",
@@ -681,6 +684,7 @@
           }
         },
         "id": "37b4cf45-7502-4f4b-a648-8cd37acc3734",
+        "maxTries": 3,
         "name": "Load Session",
         "parameters": {
           "documentId": {
@@ -707,8 +711,10 @@
           880,
           448
         ],
+        "retryOnFail": true,
         "type": "n8n-nodes-base.googleSheets",
-        "typeVersion": 4.5
+        "typeVersion": 4.5,
+        "waitBetweenTries": 2000
       },
       {
         "id": "1d16630b-1467-4cef-b59b-5b0d710503fa",
@@ -1130,6 +1136,7 @@
           }
         },
         "id": "221bffd9-d3f2-4fe9-b556-124579757e56",
+        "maxTries": 3,
         "name": "Load Matters",
         "parameters": {
           "documentId": {
@@ -1148,8 +1155,10 @@
           2528,
           768
         ],
+        "retryOnFail": true,
         "type": "n8n-nodes-base.googleSheets",
-        "typeVersion": 4.5
+        "typeVersion": 4.5,
+        "waitBetweenTries": 2000
       },
       {
         "id": "7561e30e-bbf9-49bf-aa40-b4c21621935e",
@@ -1635,8 +1644,8 @@
     "staticData": null,
     "tags": [],
     "triggerCount": 1,
-    "updatedAt": "2026-08-27T02:45:49.087Z",
-    "versionCounter": 45,
-    "versionId": "b1c425bf-5830-4e3c-a6f7-bcf2c02ef593"
+    "updatedAt": "2026-08-31T17:22:44.402Z",
+    "versionCounter": 47,
+    "versionId": "1dfe5c75-9155-43db-9256-93d385faf6bd"
   }
 }
