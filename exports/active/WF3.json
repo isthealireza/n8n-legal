@@ -1,9 +1,9 @@
 {
   "_capture": {
-    "active_version_id": "644bbdb3-6e78-42c1-a250-3cf9ba05fadc",
+    "active_version_id": "f6b89eb5-14e3-4509-9bba-89ef3c46b2f1",
     "capture_time": "see exports/last-run.json (untracked, so an unchanged capture does not produce a commit)",
     "draft_active_determination": "from_active_version_object",
-    "draft_version_id": "87fc50bd-93d5-4014-bd8e-6e0c605b05a4",
+    "draft_version_id": "f6b89eb5-14e3-4509-9bba-89ef3c46b2f1",
     "key": "WF3",
     "kind": "active",
     "scrub_counts": {
@@ -20,7 +20,7 @@
   },
   "workflow": {
     "active": true,
-    "activeVersionId": "644bbdb3-6e78-42c1-a250-3cf9ba05fadc",
+    "activeVersionId": "f6b89eb5-14e3-4509-9bba-89ef3c46b2f1",
     "connections": {
       "Append Evidence": {
         "main": [
@@ -465,6 +465,7 @@
           }
         },
         "id": "0caa5a1b-b0d9-4b7c-b080-db9e0787bef3",
+        "maxTries": 3,
         "name": "Load Matters",
         "parameters": {
           "documentId": {
@@ -483,8 +484,10 @@
           448,
           560
         ],
+        "retryOnFail": true,
         "type": "n8n-nodes-base.googleSheets",
-        "typeVersion": 4.5
+        "typeVersion": 4.5,
+        "waitBetweenTries": 2000
       },
       {
         "alwaysOutputData": true,
@@ -495,6 +498,7 @@
           }
         },
         "id": "ff2a7929-206a-437a-bccb-ecfb695504a5",
+        "maxTries": 3,
         "name": "Load Evidence Register",
         "parameters": {
           "documentId": {
@@ -513,8 +517,10 @@
           672,
           560
         ],
+        "retryOnFail": true,
         "type": "n8n-nodes-base.googleSheets",
-        "typeVersion": 4.5
+        "typeVersion": 4.5,
+        "waitBetweenTries": 2000
       },
       {
         "id": "806c8eff-1efa-4645-9f6c-f510bf7871ba",
@@ -1633,8 +1639,8 @@
     "staticData": null,
     "tags": [],
     "triggerCount": 0,
-    "updatedAt": "2026-08-27T02:32:46.272Z",
-    "versionCounter": 14,
-    "versionId": "644bbdb3-6e78-42c1-a250-3cf9ba05fadc"
+    "updatedAt": "2026-08-31T23:45:38.282Z",
+    "versionCounter": 16,
+    "versionId": "f6b89eb5-14e3-4509-9bba-89ef3c46b2f1"
   }
 }
