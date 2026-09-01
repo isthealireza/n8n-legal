@@ -7,15 +7,16 @@ in `exports/last-run.json`, which is untracked.
 
 ## Changed since last sync
 
-- Nothing. Every captured body hashes identically to the previous sync.
+- WF3: active body changed
+- WF3: draft body disappeared (draft caught up to published?)
 
 ## Per-workflow state
 
 | key | name | capture | active sha256 (canonical, first 12) | draft present | draft sha256 (first 12) |
 |---|---|---|---|---|---|
-| WF1 | 1 - Telegram Intake and Command Router | ok | `ca8f4a4e99ca` | yes | `140b1ce6ad85` |
-| WF2 | 2 - Matter Classification and Planning | ok | `e10aa189ed18` | no | - |
-| WF3 | 3 - Evidence Intake and Storage | ok | `2e1844d69a07` | no | - |
-| WF4 | 4 - Research Drafting Approval and Dispatch | ok | `9b9c4b637877` | no | - |
-| WF5 | 5 - Inbound Replies and Daily Supervisor | ok | `fef1afc9eecb` | yes | `553e0a6a0906` |
-| WF9 | 9 - Error Handler | ok | `44ce03650373` | no | - |
+| WF1 | 1 - Telegram Intake and Command Router | ok | `16f1d37eb044` | no | - |
+| WF2 | 2 - Matter Classification and Planning | ok | `6596d22ccb99` | no | - |
+| WF3 | 3 - Evidence Intake and Storage | ok | `cb025d80aec4` | no | - |
+| WF4 | 4 - Research Drafting Approval and Dispatch | ok | `5d67272ea61d` | no | - |
+| WF5 | 5 - Inbound Replies and Daily Supervisor | ok | `d01a86c60cec` | no | - |
+| WF9 | 9 - Error Handler | ok | `457c0d6d893f` | yes | `91e829b646dd` |
